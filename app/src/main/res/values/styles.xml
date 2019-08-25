@@ -6,6 +6,11 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="NavdrawerTextStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="SubtitleDefault">
         <item name="android:textColor">?android:textColor</item>
         <item name="android:textSize">14sp</item>

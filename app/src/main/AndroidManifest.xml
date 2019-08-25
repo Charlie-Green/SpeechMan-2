@@ -9,6 +9,7 @@
             android:roundIcon="@drawable/ic_app"
             android:supportsRtl="true"
             android:theme="@style/AppThemeLight">
+
         <activity android:name=".SpeechManActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -16,6 +17,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
