@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="LabelDefault">
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SubtitleDefault">
+        <item name="android:textColor">?android:textColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:alpha">0.4</item>
+    </style>
+
 </resources>

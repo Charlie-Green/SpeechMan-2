@@ -4,6 +4,7 @@
         <item name="colorPrimary">#b167a7</item>
         <item name="colorPrimaryDark">#a05080</item>
         <item name="colorAccent">#4e9858</item>
+        <item name="android:textColor">#000000</item>
     </style>
 
 </resources>

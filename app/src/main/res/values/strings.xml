@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">ЛогоMan 2</string>
     <string name="copyright" translatable="false">© Вадим Чурун</string>
+    <string name="la_version">Версия ЛогоMan:\u0020</string>
+    <string name="mi_people">Люди</string>
+    <string name="mi_seminars">Семинары</string>
+    <string name="mi_products">Товары</string>
+    <string name="mi_tutors">Преподаватели</string>
 </resources>
