@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="big_fragment_padding">16dp</dimen>
+    <dimen name="button_default_height">32sp</dimen>
+    <dimen name="default_fragment_padding">8dp</dimen>
+</resources>

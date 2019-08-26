@@ -1,3 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- B U T T O N     S T Y L E S -->
+
+    <style name="ApplyButton">
+        <item name="android:background">@drawable/shape_button_default</item>
+        <item name="android:textColor">?android:colorBackground</item>
+    </style>
+
+    <style name="CancelButton">
+        <item name="android:background">#00000000</item>
+        <item name="android:textColor">?colorPrimary</item>
+    </style>
+
+
+    <!-- F L O A T I N G     A C T I O N     B U T T O N     S T Y L E S -->
+
+    <style name="AddFAB" parent="FABBase">
+        <item name="android:layout_gravity">bottom|end</item>
+        <item name="android:layout_margin">24dp</item>
+        <item name="android:src">@drawable/ic_add</item>
+    </style>
+
+    <style name="FABBase">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:backgroundTint">?colorPrimary</item>
+        <item name="android:tint">?android:colorBackground</item>
+    </style>
+
+
+    <!-- T E X T V I E W     S T Y L E S -->
+
+    <style name="InputDefault">
+        <item name="android:textSize">16sp</item>
+        <item name="android:scrollHorizontally">true</item>
+    </style>
+
+    <style name="InputMultiline">
+        <item name="android:scrollHorizontally" tools:override="true">false</item>
+        <item name="android:maxLines">32600</item>
+    </style>
+
+    <style name="LabelDefault">
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="NavdrawerTextStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="SubtitleDefault">
+        <item name="android:textColor">?android:textColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:alpha">0.4</item>
+    </style>
+
+    <style name="TitleDefault">
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ToolbarTitle">
+        <item name="android:textColor">?android:colorBackground</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/miPeople"
+              android:icon="@drawable/ic_person"
+              android:title="@string/mi_people" />
+        <item android:id="@+id/miSeminars"
+              android:icon="@drawable/ic_seminar"
+              android:title="@string/mi_seminars" />
+        <item android:id="@+id/miProducts"
+              android:icon="@drawable/ic_product"
+              android:title="@string/mi_products" />
+        <item android:id="@+id/miTutors"
+              android:icon="@drawable/ic_tutor"
+              android:title="@string/mi_tutors" />
+    </group>
+
+</menu>
