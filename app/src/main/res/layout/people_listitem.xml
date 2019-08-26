@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp" >
+
+    <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TitleDefault"
+            android:text="Name" />
+
+    <TextView
+            android:id="@+id/tvAppointsCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/SubtitleDefault" />
+
+    <TextView
+            android:id="@+id/tvOrdersCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/SubtitleDefault"  />
+
+</LinearLayout>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/navdrawer_graph"
+            app:startDestination="@id/navdrawer_people_subgraph" >
+
+
+    <!-- Global actions -->
+    <action android:id="@+id/actToPeople"
+            app:destination="@id/navdrawer_people_subgraph"
+            app:launchSingleTop="true" />
+
+
+    <!-- Destinations within dests.people project package. -->
+    <navigation android:id="@+id/navdrawer_people_subgraph"
+                app:startDestination="@id/destPeopleList" >
+
+        <fragment
+                android:id="@+id/destPeopleList"
+                android:name="by.vadim_churun.ordered.speechman2.dests.people.PeopleListDestination" />
+
+    </navigation>
+
+</navigation>
