@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/LabelDefault"
+            android:text="@string/la_costing_strategy" />
+
+    <Spinner
+            android:id="@+id/spCosting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1" >
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recvCosts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        <TextView
+                android:id="@+id/tvFixedCost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                android:textSize="32sp" />
+
+        <Button
+                android:id="@+id/buFixedCost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="?colorPrimary"
+                android:textColor="?android:colorBackground"
+                android:text="@string/la_click_me" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/AddFAB"
+                app:fabCustomSize="42dp" />
+
+        <ProgressBar
+                android:id="@+id/prbCostsLoad"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center"
+                android:theme="@style/ProgressBarTheme" />
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</LinearLayout>

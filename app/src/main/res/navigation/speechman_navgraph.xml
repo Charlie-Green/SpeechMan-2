@@ -2,23 +2,97 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/navdrawer_graph"
-            app:startDestination="@id/navdrawer_people_subgraph" >
+            app:startDestination="@id/destPeopleList" >
 
 
-    <!-- Global actions -->
+    <!-- Navigation drawer actions. -->
+
     <action android:id="@+id/actToPeople"
-            app:destination="@id/navdrawer_people_subgraph"
-            app:launchSingleTop="true" />
+            app:destination="@id/destPeopleList"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/destPeopleList"
+            app:popUpToInclusive="true" />
+
+    <action android:id="@+id/actToSeminars"
+            app:destination="@id/destSeminarsList"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/destPeopleList" />
 
 
     <!-- Destinations within dests.people project package. -->
-    <navigation android:id="@+id/navdrawer_people_subgraph"
-                app:startDestination="@id/destPeopleList" >
 
-        <fragment
-                android:id="@+id/destPeopleList"
-                android:name="by.vadim_churun.ordered.speechman2.dests.people.PeopleListDestination" />
+    <action android:id="@+id/actToPersonDetail"
+            app:destination="@id/destPersonDetail" />
 
-    </navigation>
+    <fragment android:id="@+id/destPeopleList"
+            android:name="by.vadim_churun.ordered.speechman2.dests.people.PeopleListDestination" >
+
+        <action android:id="@+id/actToPersonDetail"
+                app:destination="@id/destPersonDetail" />
+
+    </fragment>
+
+
+    <fragment android:id="@+id/destPersonDetail"
+            android:name="by.vadim_churun.ordered.speechman2.dests.people.PersonDetailDestination" >
+
+        <action android:id="@+id/actLookupPersonAppointments"
+                app:destination="@id/destPersonAppointments" />
+
+    </fragment>
+
+    <fragment android:id="@+id/destPersonAppointments"
+            android:name="by.vadim_churun.ordered.speechman2.dests.people.PersonAppointsListDestination" >
+
+        <action android:id="@+id/actAddPersonAppoint"
+                app:destination="@id/destAddPersonAppoint" />
+
+        <action android:id="@+id/actLookupAppointedSeminarDetail"
+                app:destination="@id/destSeminarDetail"  />
+
+    </fragment>
+
+    <fragment android:id="@+id/destAddPersonAppoint"
+            android:name="by.vadim_churun.ordered.speechman2.dests.people.AddPersonAppointDestination" />
+
+
+    <!-- Destinations within dests.sems project package. -->
+
+    <fragment android:id="@+id/destSeminarsList"
+            android:name="by.vadim_churun.ordered.speechman2.dests.sems.SeminarsListDestination" >
+
+        <action android:id="@+id/actAddSeminar"
+                app:destination="@id/destAddSeminar" />
+
+        <action android:id="@+id/actToSeminarDetail"
+                app:destination="@id/destSeminarDetail" />
+
+    </fragment>
+
+    <fragment android:id="@+id/destSeminarDetail"
+            android:name="by.vadim_churun.ordered.speechman2.dests.sems.SeminarDetailDestination" >
+
+        <action android:id="@+id/actEditDetailedSeminar"
+                app:destination="@id/destEditSeminar" />
+
+        <action android:id="@+id/actEditParticipants"
+                app:destination="@id/destEditParticipants" />
+
+        <action android:id="@+id/actLookupSeminar"
+                app:destination="@id/destEditSeminar" />
+
+        <action android:id="@+id/actLookupParticipant"
+                app:destination="@id/destPersonDetail" />
+
+    </fragment>
+
+    <fragment android:id="@+id/destAddSeminar"
+            android:name="by.vadim_churun.ordered.speechman2.dests.sems.AddSeminarDestination" />
+
+    <fragment android:id="@+id/destEditSeminar"
+            android:name="by.vadim_churun.ordered.speechman2.dests.sems.EditSeminarDestination" />
+
+    <fragment android:id="@+id/destEditParticipants"
+            android:name="by.vadim_churun.ordered.speechman2.dests.sems.EditParticipantsDestination" />
 
 </navigation>

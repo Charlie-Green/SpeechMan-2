@@ -5,9 +5,9 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SearchView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import by.vadim_churun.ordered.speechman2.R
-import by.vadim_churun.ordered.speechman2.SpeechManFragment
+import by.vadim_churun.ordered.speechman2.*
 import by.vadim_churun.ordered.speechman2.adapters.PeopleAdapter
 import by.vadim_churun.ordered.speechman2.db.entities.*
 import by.vadim_churun.ordered.speechman2.dialogs.people.AddPersonDialog
@@ -15,6 +15,7 @@ import by.vadim_churun.ordered.speechman2.model.filters.PeopleFilter
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.people_list_destination.*
+import kotlinx.android.synthetic.main.people_list_destination.etCount
 
 
 /** Displays the full list of people (optionally - a filtered list). **/
@@ -28,11 +29,12 @@ class PeopleListDestination:
 
     private fun setAdapter(people: List<Person>)
     {
-        tvCount.text = super.getString(R.string.fs_people_count, people.size)
+        etCount.text = super.getString(R.string.fs_people_count, people.size)
 
         if(recvPeople.layoutManager == null)
             recvPeople.layoutManager = LinearLayoutManager(super.requireContext())
-        val newAdapter = PeopleAdapter(super.requireContext(), people)
+        val newAdapter = PeopleAdapter(
+            super.requireContext(), people, findNavController(), super.requireFragmentManager() )
         recvPeople.swapAdapter(newAdapter, true)
     }
 
@@ -117,17 +119,22 @@ class PeopleListDestination:
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         setupTypesFiltering()
+        fabAddPerson.setOnClickListener { showAddPersonDialog() }
+        //super.setupSearchViewLayoutBehaviour(vSearch, tvDestTitle)
+    }
+
+    override fun onStart()
+    {
+        super.onStart()
         disposable.add(observePeople())
         // disposable.add(observeTypes())
         disposable.add(observePersonInfos())
-        fabAddPerson.setOnClickListener { showAddPersonDialog() }
-        super.setupSearchViewLayoutBehaviour(vSearch, tvDestTitle)
     }
 
-    override fun onDestroy()
+    override fun onStop()
     {
         Log.i(LOGTAG, "onDestroy")
-        super.onDestroy()
+        super.onStop()
         disposable.clear()
     }
 }

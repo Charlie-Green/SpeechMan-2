@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" >
+
+    <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:gravity="center_horizontal"
+            style="@style/InputDefault"
+            android:text="1-Jan-1111" />
+
+    <TextView
+            android:id="@+id/tvTimeStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:gravity="center_horizontal"
+            style="@style/InputDefault"
+            android:text="9:00 am" />
+
+    <TextView
+            android:id="@+id/tvTimeEnd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:gravity="center_horizontal"
+            style="@style/InputDefault"
+            android:text="5:00 pm" />
+    
+    <ImageView
+            android:id="@+id/imgvDelete"
+            android:layout_width="@dimen/edit_icon_default_size"
+            android:layout_height="@dimen/edit_icon_default_size"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_delete"
+            android:tint="@color/dangerPrimary" />
+
+</LinearLayout>

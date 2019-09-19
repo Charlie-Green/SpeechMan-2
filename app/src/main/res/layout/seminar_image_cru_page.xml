@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+
+        <ImageView
+                android:id="@+id/imgvAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/img_default_avatar" />
+
+        <ProgressBar
+                android:id="@+id/prbAvatarLoad"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center"
+                style="@style/ProgressBarTheme" />
+
+    </FrameLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp" >
+
+        <Button
+                android:id="@+id/buClear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                style="@style/CancelButton"
+                android:text="@string/la_clear_photo" />
+
+        <Button
+                android:id="@+id/buSelect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                style="@style/ApplyButton"
+                android:text="@string/la_select_photo" />
+
+    </LinearLayout>
+
+</LinearLayout>

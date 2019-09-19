@@ -22,12 +22,15 @@ abstract class SpeechManRepository(val appContext: Context)
             filtersSource: Observable<FilterConfigType>,
             predicate: (item: ItemType, filters: FilterConfigType) -> Boolean
         ): Observable< List<ItemType> >
-            = itemsSource.observeOn(Schedulers.newThread()).map { newItems ->
+            = itemsSource.observeOn(Schedulers.single()).map { newItems ->
                 lastItems = newItems
                 newItems to lastFilters
-            }.mergeWith(filtersSource.observeOn(Schedulers.computation()).map { newFilters ->
-                lastFilters = newFilters
-                lastItems to newFilters
+            }.mergeWith(filtersSource.observeOn(Schedulers.single())
+                .switchMap< Pair<List<ItemType>, FilterConfigType> > { newFilters ->
+                    if(newFilters!!.equals(lastFilters))
+                        return@switchMap Observable.empty()
+                    lastFilters = newFilters
+                    return@switchMap Observable.just(lastItems to newFilters)
             }).map { pair ->
                 // If filters haven't been set, just pass everything.
                 if(pair.second == null)

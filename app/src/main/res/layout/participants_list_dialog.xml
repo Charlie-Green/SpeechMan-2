@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/big_fragment_padding">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+        <TextView
+                android:id="@+id/tvSeminarName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TitleDefault"
+                android:text="SeminarName" />
+
+        <TextView
+                android:id="@+id/tvCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/SubtitleDefault"
+                android:text="Participants: X" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recvParticips"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <ProgressBar
+            android:id="@+id/prbParticipsLoad"
+            android:layout_width="@dimen/progressbar_default_size"
+            android:layout_height="@dimen/progressbar_default_size"
+            android:layout_gravity="center"
+            android:theme="@style/ProgressBarTheme" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            style="@style/FABBase"
+            android:src="@drawable/ic_edit"
+            app:fabCustomSize="32dp"
+            android:alpha="0.4" />
+
+</FrameLayout>

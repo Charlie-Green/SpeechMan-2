@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.room.TypeConverter
 import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.db.objs.*
+import java.util.Calendar
 
 
 class SpeechManTypeConverters
@@ -42,4 +43,16 @@ class SpeechManTypeConverters
     @TypeConverter
     fun intToHistoryStatus(int: Int): HistoryStatus
         = HistoryStatus.values()[int]
+
+
+    @TypeConverter
+    fun calendarToLong(cal: Calendar?): Long?
+        = cal?.timeInMillis
+
+    @TypeConverter
+    fun longToCalendar(long: Long?): Calendar?
+    {
+        long ?: return null
+        return Calendar.getInstance().apply { timeInMillis = long }
+    }
 }

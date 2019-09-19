@@ -4,7 +4,6 @@ import android.content.*
 import android.content.ClipboardManager
 import android.os.Bundle
 import android.text.*
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
@@ -18,9 +17,6 @@ import kotlinx.android.synthetic.main.add_person_dialog.*
 
 class AddPersonDialog: SpeechManFragment(R.layout.add_person_dialog)
 {
-    private val LOGTAG = AddPersonDialog::class.java.simpleName
-
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTIONALITY:
 
@@ -41,8 +37,6 @@ class AddPersonDialog: SpeechManFragment(R.layout.add_person_dialog)
         if( clipMan!!.hasPrimaryClip()
             && clipMan.primaryClip!!.description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) )
             etName.setText(clipMan.primaryClip!!.getItemAt(0).text)
-        else
-            Log.i(LOGTAG, "Nothing to paste.")
     }
 
     private fun applyPerson()
@@ -51,7 +45,6 @@ class AddPersonDialog: SpeechManFragment(R.layout.add_person_dialog)
             (spAssignType.selectedItem as PersonType).ID
             else null
         Person(null, etName.text.toString(), typeID).let {
-            Log.i(LOGTAG, "Adding person ${it.name} of typeID ${it.personTypeID}")
             SpeechManAction.AddPerson(it)
         }.also {
             super.viewModel.actionSubject.onNext(it)
@@ -91,7 +84,6 @@ class AddPersonDialog: SpeechManFragment(R.layout.add_person_dialog)
 
     override fun onDismiss(dialog: DialogInterface)
     {
-        Log.i(LOGTAG, "Dialog dissmissed")
         super.onDismiss(dialog)
         disposable.clear()
     }

@@ -12,6 +12,8 @@ import kotlin.concurrent.thread
     entities = [Person::class,
         Seminar::class,
         Product::class,
+        SemDay::class,
+        SemCost::class,
         Appointment::class,
         Order::class
     ],
@@ -34,14 +36,6 @@ abstract class SpeechManDatabase: RoomDatabase()
             = instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     appContext, SpeechManDatabase::class.java, "speech.db" )
-                    .addCallback( object: RoomDatabase.Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase)
-                        {
-                            thread(start = true) {
-                                // TODO: Add default currencies.
-                            }
-                        }
-                    } )
                     .build().also { instance = it }
             }
     }
