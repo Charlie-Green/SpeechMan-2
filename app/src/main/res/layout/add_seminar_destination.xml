@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/fragment_default_padding" >
+
+    <TextView
+            android:id="@+id/tvStep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TitleDefault"
+            android:text="@string/fs_step" />
+
+    <TextView
+            android:id="@+id/tvPurpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            style="@style/LabelDefault"
+            android:text="Purpose" />
+
+    <androidx.viewpager.widget.ViewPager
+            android:id="@+id/vPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginBottom="8dp" />
+
+    <Button
+            android:id="@+id/buSave"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_default_height"
+            style="@style/ApplyButton"
+            android:text="@string/la_save" />
+
+</LinearLayout>

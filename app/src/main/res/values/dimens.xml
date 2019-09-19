@@ -2,5 +2,9 @@
 <resources>
     <dimen name="big_fragment_padding">16dp</dimen>
     <dimen name="button_default_height">32sp</dimen>
-    <dimen name="default_fragment_padding">8dp</dimen>
+    <dimen name="edit_icon_default_size">18dp</dimen>
+    <dimen name="fragment_default_padding">8dp</dimen>
+    <dimen name="progressbar_default_size">30dp</dimen>
+    <dimen name="toolbar_default_height">48dp</dimen>
+    <dimen name="toolbar_expanded_height">210dp</dimen>
 </resources>

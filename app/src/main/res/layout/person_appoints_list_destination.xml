@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_default_height"
+            app:elevation="8dp"
+            android:background="?colorPrimary" >
+
+        <GridLayout
+                android:columnCount="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TextView
+                    android:id="@+id/tvPersonName"
+                    android:layout_gravity="center_vertical"
+                    style="@style/ToolbarTitle"
+                    android:text="PersonName" />
+
+            <androidx.appcompat.widget.SearchView
+                    android:id="@+id/vSearch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:theme="@style/SearchViewTheme" />
+
+        </GridLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/fragment_default_padding" >
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+            <TextView
+                    android:id="@+id/tvCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/LabelDefault"
+                    android:text="@string/fs_person_appointments_count" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recvAppoints"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <ProgressBar
+                android:id="@+id/prbAppointsLoad"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center"
+                android:theme="@style/ProgressBarTheme" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                style="@style/FABBase"
+                android:src="@drawable/ic_add"
+                app:fabCustomSize="42dp"  />
+
+    </FrameLayout>
+
+</LinearLayout>

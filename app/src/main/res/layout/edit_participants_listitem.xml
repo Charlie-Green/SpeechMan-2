@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:rowCount="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp" >
+
+    <TextView
+            android:id="@+id/tvName"
+            android:layout_gravity="fill_horizontal"
+            style="@style/TitleDefault"
+            android:text="Name" />
+
+    <TextView
+            android:id="@+id/tvType"
+            android:layout_gravity="fill_horizontal"
+            style="@style/SubtitleDefault"
+            android:text="@string/la_no_person_type" />
+
+    <CheckBox
+            android:id="@+id/chbIsAppointed"
+            android:layout_rowSpan="2"
+            android:layout_gravity="center_vertical"
+            android:button="@drawable/sel_checkbox"
+            android:buttonTint="?colorPrimary" />
+
+</GridLayout>

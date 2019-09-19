@@ -9,10 +9,8 @@ import by.vadim_churun.ordered.speechman2.db.objs.HistoryStatus
     tableName = "Orders",
     primaryKeys = ["person", "product"] )
 class Order(
-    // @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name="person", index=true) val personID: Int,
 
-    // @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name="product", index=true) val productID: Int,
 
     @ColumnInfo(name="history") val historyStatus: HistoryStatus,

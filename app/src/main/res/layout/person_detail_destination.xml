@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <GridLayout
+                android:columnCount="4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/fragment_default_padding" >
+
+            <TextView
+                    android:layout_columnSpan="4"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_marginBottom="12dp"
+                    style="@style/TitleDefault"
+                    android:text="@string/la_person_detail" />
+
+
+            <TextView
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    style="@style/LabelDefault"
+                    android:text="@string/la_person_name" />
+
+            <ImageView
+                    android:id="@+id/imgvCancelEditName"
+                    android:layout_width="@dimen/edit_icon_default_size"
+                    android:layout_height="@dimen/edit_icon_default_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="8dp"
+                    style="@style/CancelEditIcon" />
+
+            <by.vadim_churun.ordered.speechman2.views.TouchableEditText
+                    android:id="@+id/etName"
+                    android:layout_gravity="fill_horizontal|center_vertical"
+                    android:layout_marginBottom="8dp"
+                    style="@style/InputDefault"
+                    android:textColor="?android:textColor" />
+
+            <ImageView
+                    android:id="@+id/imgvSaveEditName"
+                    android:layout_width="@dimen/edit_icon_default_size"
+                    android:layout_height="@dimen/edit_icon_default_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="8dp"
+                    style="@style/SaveEditIcon" />
+
+
+            <TextView
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    style="@style/LabelDefault"
+                    android:text="@string/la_person_type" />
+
+            <TextView
+                    android:id="@+id/tvType"
+                    android:layout_columnSpan="2"
+                    android:layout_gravity="fill_horizontal|center_vertical"
+                    android:layout_marginBottom="8dp"
+                    style="@style/InputDefault" />
+
+            <ImageView
+                    android:id="@+id/imgvEditType"
+                    android:layout_width="@dimen/edit_icon_default_size"
+                    android:layout_height="@dimen/edit_icon_default_size"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_edit"
+                    android:tint="?colorPrimary" />
+
+        </GridLayout>
+
+
+        <ProgressBar
+                android:id="@+id/prbPersonLoad"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center"
+                android:theme="@style/ProgressBarTheme" />
+
+    </FrameLayout>
+
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="bottom" >
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabLookAppoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabCustomSize="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="32dp"
+                style="@style/FABBase"
+                android:src="@drawable/ic_seminar" />
+
+        <TextView
+                android:id="@+id/tvAppointsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="18dp"
+                android:text="0"
+                style="@style/AssociationsCountDefault" />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabLookOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabCustomSize="48dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginBottom="32dp"
+                style="@style/FABBase"
+                android:src="@drawable/ic_product" />
+
+        <TextView
+                android:id="@+id/tvOrdersCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:layout_marginStart="8dp"
+                android:text="0"
+                style="@style/AssociationsCountDefault" />
+
+    </LinearLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

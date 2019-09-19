@@ -13,6 +13,12 @@
         <item name="android:textColor">?colorPrimary</item>
     </style>
 
+    <style name="DeleteButton">
+        <item name="android:background">@drawable/shape_button_default</item>
+        <item name="android:backgroundTint">@color/dangerPrimary</item>
+        <item name="android:textColor">?android:colorBackground</item>
+    </style>
+
 
     <!-- F L O A T I N G     A C T I O N     B U T T O N     S T Y L E S -->
 
@@ -29,10 +35,35 @@
         <item name="android:tint">?android:colorBackground</item>
     </style>
 
+    <style name="MoreFAB" parent="FABBase">
+        <item name="android:layout_gravity">center_vertical|end</item>
+        <item name="android:src">@drawable/ic_more</item>
+    </style>
+
+
+    <!-- I C O N     S T Y L E S -->
+
+    <style name="CancelEditIcon">
+        <item name="android:src">@drawable/ic_cancel</item>
+        <item name="android:tint">@color/dangerPrimary</item>
+    </style>
+
+    <style name="SaveEditIcon">
+        <item name="android:src">@drawable/ic_save</item>
+        <item name="android:tint">?colorPrimary</item>
+    </style>
+
 
     <!-- T E X T V I E W     S T Y L E S -->
 
+    <style name="AssociationsCountDefault">
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="InputDefault">
+        <item name="android:textColor">?android:textColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:scrollHorizontally">true</item>
     </style>
@@ -64,10 +95,31 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TitleDelete">
+        <item name="android:textColor">@color/dangerPrimary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="ToolbarTitle">
         <item name="android:textColor">?android:colorBackground</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ToolbarTitleSmall" parent="ToolbarTitle">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ToolbarTitleExpanded">
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+
+
+    <!-- O T H E R     S T Y L E S -->
+    <style name="DatePickerDefault" parent="@android:style/Widget.Material.Light.DatePicker">
+        <item name="android:headerBackground">@color/DefaultTheme_colorPrimary</item>
     </style>
 
 </resources>

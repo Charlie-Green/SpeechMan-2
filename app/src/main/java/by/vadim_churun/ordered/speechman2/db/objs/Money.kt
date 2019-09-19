@@ -3,7 +3,8 @@ package by.vadim_churun.ordered.speechman2.db.objs
 
 class Money(
     val amount: Float,
-    val currency: String )
+    val currency: String
+): Cloneable
 {
     companion object
     {
@@ -14,4 +15,7 @@ class Money(
 
     override fun toString()
         = "${"%.2f".format(amount)} $currency"
+
+    public override fun clone(): Any
+        = Money(amount, currency)
 }

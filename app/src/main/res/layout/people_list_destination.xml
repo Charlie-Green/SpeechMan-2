@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:padding="@dimen/default_fragment_padding" >
+            android:padding="@dimen/fragment_default_padding" >
 
         <GridLayout
                 android:columnCount="3"
@@ -47,7 +47,7 @@
                 android:layout_height="match_parent">
 
             <TextView
-                    android:id="@+id/tvCount"
+                    android:id="@+id/etCount"
                     android:layout_columnSpan="3"
                     android:layout_gravity="fill_horizontal"
                     style="@style/LabelDefault"  />
@@ -79,8 +79,7 @@
                 android:id="@+id/fabAddPerson"
                 app:fabCustomSize="48dp"
                 app:elevation="6dp"
-                style="@style/AddFAB"
-                android:src="@drawable/ic_add" />
+                style="@style/AddFAB" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

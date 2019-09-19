@@ -9,11 +9,11 @@ import by.vadim_churun.ordered.speechman2.db.objs.*
     tableName = "Appointments",
     primaryKeys = ["person", "seminar"] )
 class Appointment(
-    // @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name="person", index = true) val personID: Int,
 
-    // @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name="seminar", index = true) val seminarID: Int,
+
+    @ColumnInfo(name="paid") val purchase: Money,
 
     @ColumnInfo(name="cost") val cost: Money,
 

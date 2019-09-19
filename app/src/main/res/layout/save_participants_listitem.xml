@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:rowCount="3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp" >
+
+    <TextView
+            android:id="@+id/tvName"
+            android:layout_gravity="fill_horizontal"
+            style="@style/TitleDefault"
+            android:text="Name" />
+
+    <TextView
+            android:id="@+id/tvType"
+            android:layout_gravity="fill_horizontal"
+            style="@style/SubtitleDefault"
+            android:text="@string/la_no_person_type" />
+
+    <EditText
+            android:id="@+id/etCost"
+            android:layout_rowSpan="3"
+            android:layout_gravity="fill_vertical"
+            android:gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            style="@style/InputDefault"
+            android:hint="@string/hint_appoint_cost" />
+
+</GridLayout>

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Default theme colors. -->
+    <color name="DefaultTheme_colorPrimary">#b167a7</color>
+    <color name="DefaultTheme_colorPrimaryDark">#803078</color>
+    <color name="DefaultTheme_colorAccent">#4e9858</color>
+    <color name="DefaultTheme_colorText">#000000</color>
+
+    <!-- Theme-aware colors. -->
     <color name="dangerPrimary">#c00000</color>
     <color name="error">#d00000</color>
     <color name="errorBackground">#202020</color>

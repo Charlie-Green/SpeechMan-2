@@ -5,5 +5,5 @@ enum class HistoryStatus
 {
     NOT_IN_HISTORY,
     USUAL,
-    NONE
+    FLOWER
 }

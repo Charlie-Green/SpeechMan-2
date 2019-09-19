@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/big_fragment_padding" >
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="center_horizontal"
+            style="@style/TitleDefault"
+            android:text="@string/la_pick_money" />
+
+    <TextView
+            android:id="@+id/tvPurpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            style="@style/LabelDefault"
+            android:text="Purpose." />
+
+    <EditText
+            android:id="@+id/etMoney"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:hint="@string/hint_pick_money"
+            style="@style/InputDefault" />
+
+    <TextView
+            android:id="@+id/tvError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textSize="12sp"
+            android:textColor="@color/error"
+            android:visibility="invisible" />
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <Button
+                android:id="@+id/buCancel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_default_height"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                style="@style/CancelButton"
+                android:text="@string/la_cancel" />
+
+        <Button
+                android:id="@+id/buApply"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_default_height"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                style="@style/ApplyButton"
+                android:text="@string/la_apply_money" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:columnCount="2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+            android:layout_columnSpan="2"
+            android:layout_gravity="fill_horizontal"
+            style="@style/LabelDefault"
+            android:text="@string/la_seminar_name" />
+
+    <EditText
+            android:id="@+id/etName"
+            android:layout_columnSpan="2"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginBottom="8dp"
+            style="@style/InputDefault"
+            android:hint="@string/hint_seminar_name" />
+
+
+    <TextView
+            android:layout_marginEnd="8dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_seminar_city" />
+
+    <EditText
+            android:id="@+id/etCity"
+            android:layout_gravity="fill_horizontal"
+            style="@style/InputDefault"
+            android:hint="@string/hint_seminar_city" />
+
+
+    <TextView
+            android:layout_marginEnd="8dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_seminar_address" />
+
+    <EditText
+            android:id="@+id/etAddress"
+            android:layout_gravity="fill_horizontal"
+            style="@style/InputDefault"
+            android:hint="@string/hint_seminar_address" />
+
+
+    <TextView
+            android:id="@+id/tvContentLabel"
+            android:layout_columnSpan="2"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginTop="8dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_seminar_content_suggest" />
+
+    <EditText
+            android:id="@+id/etContent"
+            android:layout_columnSpan="2"
+            android:layout_gravity="fill"
+            style="@style/InputDefault"
+            android:hint="@string/hint_seminar_content"
+            android:gravity="top" />
+
+</GridLayout>

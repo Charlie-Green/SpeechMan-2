@@ -15,6 +15,22 @@ interface AssociationsDAO
     @Query("select count(*) from Orders where person=:personID and isDeleted=0")
     fun countOrdersForPerson(personID: Int): Int
 
+    /** Counts only those [Appointment]s which have not been logically deleted. **/
+    @Query("select count(*) from Appointments where seminar=:seminarID and isDeleted=0")
+    fun countAppointmentsForSeminar(seminarID: Int): Int
+
+    /** Selects only those [Appointment]s which have not been logically deleted. **/
+    @Query("select * from Appointments where person=:personID and isDeleted=0")
+    fun getAppointmentsForPerson(personID: Int): List<Appointment>
+
+    /** Selects only those [Order]s which have not been logically deleted. **/
+    @Query("select * from Orders where person=:personID and isDeleted=0")
+    fun getOrdersForPerson(personID: Int): List<Order>
+
+    /** Selects only those [Appointment]s which have not been logically deleted. **/
+    @Query("select * from Appointments where seminar=:seminarID and isDeleted=0")
+    fun getAppointmentsForSeminar(seminarID: Int): List<Appointment>
+
     /** Selects both deleted and undeleted [Appointment]s. **/
     @Query("select * from Appointments where person=:personID")
     fun getAllAppointmentsForPerson(personID: Int): List<Appointment>
@@ -31,9 +47,11 @@ interface AssociationsDAO
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addOrUpdateOrders(orders: List<Order>)
 
+    /** Physical deletion. **/
     @Delete
     fun deleteAppointments(appoints: List<Appointment>)
 
+    /** Physical deletion. **/
     @Delete
     fun deleteOrders(orders: List<Order>)
 }
