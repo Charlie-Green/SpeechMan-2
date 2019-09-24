@@ -84,8 +84,6 @@ class AddSeminarDestination: SpeechManFragment(R.layout.add_seminar_destination)
     override fun onStop()
     {
         disposable.clear()
-        super.viewModel.actionSubject
-            .onNext( SpeechManAction.CommitCRUObject(pageCruId) )
         super.onStop()
     }
 }

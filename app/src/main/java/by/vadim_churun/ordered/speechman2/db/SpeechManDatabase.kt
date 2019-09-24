@@ -17,7 +17,7 @@ import kotlin.concurrent.thread
         Appointment::class,
         Order::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(SpeechManTypeConverters::class)

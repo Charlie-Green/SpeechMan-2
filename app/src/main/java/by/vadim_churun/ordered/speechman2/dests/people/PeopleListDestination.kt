@@ -1,7 +1,6 @@
 package by.vadim_churun.ordered.speechman2.dests.people
 
 import android.os.*
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SearchView
@@ -22,8 +21,6 @@ import kotlinx.android.synthetic.main.people_list_destination.etCount
 class PeopleListDestination:
     SpeechManFragment(R.layout.people_list_destination)
 {
-    private val LOGTAG = PeopleListDestination::class.java.simpleName
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // UI:
 
@@ -40,7 +37,7 @@ class PeopleListDestination:
 
     private fun setTypesMenu(types: List<PersonType>)
     {
-        spFilterType.adapter = ArrayAdapter<PersonType>(
+        spFilterType.adapter = ArrayAdapter(
             super.requireContext(), android.R.layout.simple_spinner_dropdown_item, types )
         chbFilterType.isEnabled = types.isNotEmpty()
     }
@@ -133,7 +130,6 @@ class PeopleListDestination:
 
     override fun onStop()
     {
-        Log.i(LOGTAG, "onDestroy")
         super.onStop()
         disposable.clear()
     }

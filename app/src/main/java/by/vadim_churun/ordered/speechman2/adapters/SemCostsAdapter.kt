@@ -143,7 +143,9 @@ class SemCostsAdapter(val context: Context,
 
         if(isEditable) {
             holder.imgvDelete.visibility = View.VISIBLE
+            holder.imgvDelete.isEnabled = true
             holder.imgvDelete.setOnClickListener {
+                holder.imgvDelete.isEnabled = false
                 semBuilder.costBuilders.removeAt(position - 1)
                 actionSubject.onNext( SpeechManAction.PublishSeminarBuilder(semBuilder) )
             }

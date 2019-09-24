@@ -40,6 +40,7 @@
 
             <by.vadim_churun.ordered.speechman2.views.TouchableEditText
                     android:id="@+id/etName"
+                    android:layout_width="0dp"
                     android:layout_gravity="fill_horizontal|center_vertical"
                     android:layout_marginBottom="8dp"
                     style="@style/InputDefault"

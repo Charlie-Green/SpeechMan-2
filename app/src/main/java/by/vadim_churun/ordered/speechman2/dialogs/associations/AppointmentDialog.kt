@@ -1,8 +1,7 @@
 package by.vadim_churun.ordered.speechman2.dialogs.associations
 
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
+import android.widget.*
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
 import by.vadim_churun.ordered.speechman2.db.entities.*

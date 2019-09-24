@@ -14,6 +14,7 @@
     <EditText
             android:id="@+id/etName"
             android:layout_columnSpan="2"
+            android:layout_width="0dp"
             android:layout_gravity="fill_horizontal"
             android:layout_marginBottom="8dp"
             style="@style/InputDefault"
@@ -27,6 +28,7 @@
 
     <EditText
             android:id="@+id/etCity"
+            android:layout_width="0dp"
             android:layout_gravity="fill_horizontal"
             style="@style/InputDefault"
             android:hint="@string/hint_seminar_city" />
@@ -39,6 +41,7 @@
 
     <EditText
             android:id="@+id/etAddress"
+            android:layout_width="0dp"
             android:layout_gravity="fill_horizontal"
             style="@style/InputDefault"
             android:hint="@string/hint_seminar_address" />
@@ -52,12 +55,18 @@
             style="@style/LabelDefault"
             android:text="@string/la_seminar_content_suggest" />
 
-    <EditText
-            android:id="@+id/etContent"
-            android:layout_columnSpan="2"
+    <ScrollView
             android:layout_gravity="fill"
-            style="@style/InputDefault"
-            android:hint="@string/hint_seminar_content"
-            android:gravity="top" />
+            android:layout_columnSpan="2" >
+
+        <EditText
+                android:id="@+id/etContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/InputMultiline"
+                android:hint="@string/hint_seminar_content"
+                android:gravity="top" />
+
+    </ScrollView>
 
 </GridLayout>

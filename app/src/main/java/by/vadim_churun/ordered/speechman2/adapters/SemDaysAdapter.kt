@@ -132,7 +132,9 @@ class SemDaysAdapter(val context: Context,
 
         if(editable) {
             holder.imgvDelete.visibility = View.VISIBLE
+            holder.imgvDelete.isEnabled = true
             holder.imgvDelete.setOnClickListener {
+                holder.imgvDelete.isEnabled = false
                 builder.dayBuilders.removeAt(position - 1)
                 actionSubject.onNext( SpeechManAction.PublishSeminarBuilder(builder) )
             }

@@ -26,8 +26,6 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
                 ( person.name.contains(filter.nameSubstring, true) ) &&
                 ( filter.typeID == null || person.personTypeID == filter.typeID )
             }.map { people ->
-                if(Looper.myLooper() == Looper.getMainLooper())
-                    throw Exception("Filtering people on UI thread")
                 people.sortedBy { it.name.toLowerCase() }
             }.observeOn(AndroidSchedulers.mainThread())
 
@@ -67,8 +65,6 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
         = super.peopleDAO.getAppointedSeminars(personID)
             .subscribeOn(Schedulers.io())
             .map { appsems ->
-                if(Looper.myLooper() == Looper.getMainLooper())
-                    throw Exception("Searching on the UI thread")
                 appsems.find { it.appoint.seminarID == seminarID }!!
             }.observeOn(AndroidSchedulers.mainThread())
 
@@ -91,8 +87,6 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
                     (!semheader.isLogicallyDeleted || !filter.forbidLogicallyDeleted) &&
                     (semheader.name.contains(filter.nameSubstring, true))
                 }.map { semheaders ->
-                    if(Looper.myLooper() == Looper.getMainLooper())
-                        throw Exception("Sorting on the UI thread")
                     semheaders.sortedBy { it.start?.timeInMillis ?: Long.MIN_VALUE }
                 }.observeOn(AndroidSchedulers.mainThread())
 

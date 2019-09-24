@@ -12,8 +12,7 @@ import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.db.objs.SeminarHeader
 import by.vadim_churun.ordered.speechman2.model.exceptions.ImageNotDecodedException
 import by.vadim_churun.ordered.speechman2.model.filters.SeminarsFilter
-import by.vadim_churun.ordered.speechman2.model.objects.DecodedImage
-import by.vadim_churun.ordered.speechman2.model.objects.SeminarInfo
+import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.*
 import io.reactivex.disposables.CompositeDisposable

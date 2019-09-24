@@ -118,6 +118,7 @@
 
                         <TextView
                                 android:id="@+id/tvCity"
+                                android:layout_width="0dp"
                                 android:layout_gravity="fill_horizontal" />
 
                         <TextView
@@ -127,6 +128,7 @@
 
                         <TextView
                                 android:id="@+id/tvAddress"
+                                android:layout_width="0dp"
                                 android:layout_gravity="fill_horizontal" />
 
                     </GridLayout>
@@ -266,6 +268,15 @@
                     android:src="@drawable/img_default_avatar"
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5" />
+
+            <ProgressBar
+                    android:id="@+id/prbImageLoad"
+                    android:layout_width="@dimen/progressbar_default_size"
+                    android:layout_height="@dimen/progressbar_default_size"
+                    android:layout_gravity="center"
+                    android:theme="@style/ProgressBarTheme"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="0.9" />
 
             <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"

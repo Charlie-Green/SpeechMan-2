@@ -13,24 +13,28 @@
             app:elevation="8dp"
             android:background="?colorPrimary" >
 
-        <GridLayout
-                android:columnCount="2"
+        <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" >
 
             <TextView
                     android:id="@+id/tvSeminarName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_gravity="center_vertical"
-                    style="@style/ToolbarTitle"  />
+                    style="@style/ToolbarTitle"
+                    android:text="SeminarName" />
 
             <androidx.appcompat.widget.SearchView
                     android:id="@+id/vSearch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
+                    android:layout_gravity="center_vertical|end"
                     android:theme="@style/SearchViewTheme" />
 
-        </GridLayout>
+        </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
 

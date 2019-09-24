@@ -1,9 +1,7 @@
 package by.vadim_churun.ordered.speechman2.model.objects
 
 import android.net.Uri
-import by.vadim_churun.ordered.speechman2.db.entities.SemCost
-import by.vadim_churun.ordered.speechman2.db.entities.SemDay
-import by.vadim_churun.ordered.speechman2.db.entities.Seminar
+import by.vadim_churun.ordered.speechman2.db.entities.*
 import by.vadim_churun.ordered.speechman2.db.objs.Money
 import java.util.Calendar
 
