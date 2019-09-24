@@ -134,6 +134,8 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
                 } ?: CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                 params.topMargin = layout.totalScrollRange + offset
                 vContent.layoutParams = params
+
+                wantToolbarCollapsed = false
             }
         } )
 
@@ -155,6 +157,7 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
             appbarLayout.setExpanded(false, false)
             wantToolbarCollapsed = false
         }
+        prbImageLoad.visibility = View.GONE
     }
 
     private fun applyInfo(info: SeminarInfo)
@@ -214,6 +217,8 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
                     decodeID = super.viewModel.nextImageDecodeID
                     super.viewModel.actionSubject
                         .onNext( SpeechManAction.DecodeImages(decodeID!!, listOf(it)) )
+                } ?: prbImageLoad.apply {
+                    visibility = View.GONE
                 }
 
                 updateProgressBarByLoad()

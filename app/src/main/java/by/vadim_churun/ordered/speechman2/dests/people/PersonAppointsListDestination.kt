@@ -26,7 +26,6 @@ class PersonAppointsListDestination:
 
     companion object
     {
-        private val LOGTAG = PersonAppointsListDestination::class.java.simpleName
         const val KEY_PERSON_ID = "personID"
     }
 
@@ -160,9 +159,9 @@ class PersonAppointsListDestination:
     {
         super.onStart()
         val personID = super.getIntArgument(KEY_PERSON_ID, null, "KEY_PERSON_ID")
+        disposable.add(subscribeDecodedImages())
         disposable.add(subscribeAppSems(personID))
         disposable.add(subscribePerson(personID))
-        disposable.add(subscribeDecodedImages())
     }
 
     override fun onStop()

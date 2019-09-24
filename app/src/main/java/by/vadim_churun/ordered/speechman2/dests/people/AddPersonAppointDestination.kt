@@ -1,7 +1,6 @@
 package by.vadim_churun.ordered.speechman2.dests.people
 
 import android.os.Bundle
-import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,6 +12,7 @@ import by.vadim_churun.ordered.speechman2.adapters.PersonPotentialAppointsAdapte
 import by.vadim_churun.ordered.speechman2.db.entities.Person
 import by.vadim_churun.ordered.speechman2.db.objs.SeminarHeader
 import by.vadim_churun.ordered.speechman2.model.filters.SeminarsFilter
+import by.vadim_churun.ordered.speechman2.model.objects.DecodedImage
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.add_person_appoint_destination.*
@@ -68,6 +68,12 @@ class AddPersonAppointDestination: SpeechManFragment(R.layout.add_person_appoint
         prbSeminarsLoad.visibility = View.GONE
     }
 
+    private fun applyImage(image: DecodedImage)
+    {
+        val adapter = recvSeminars.adapter as PersonPotentialAppointsAdapter
+        adapter.setAvatar(image)
+    }
+
     private fun setupSearch()
     {
         super.setupSearchViewLayoutBehaviour(vSearch, tvPersonName, tvAddAppointLabel)
@@ -95,12 +101,20 @@ class AddPersonAppointDestination: SpeechManFragment(R.layout.add_person_appoint
     // RX:
 
     private val disposable = CompositeDisposable()
+    private var decodeID: Int? = null
 
     private fun subscribePerson(personID: Int)
         = super.viewModel.createPersonObservable(personID)
             .doOnNext { p ->
                 person = p
                 applyPerson()
+            }.subscribe()
+
+    private fun subscribeDecodedImages()
+        = super.viewModel.createDecodedImagesObservable()
+            .doOnNext { image ->
+                if(image.requestID == decodeID)
+                    applyImage(image)
             }.subscribe()
 
     private fun subscribeHeaders(personID: Int)
@@ -111,9 +125,10 @@ class AddPersonAppointDestination: SpeechManFragment(R.layout.add_person_appoint
             // Then, subscribe.
             super.viewModel.createSemHeadersNotForPersonObservable(personID)
                 .doOnNext { headers ->
-                    if(Looper.myLooper() != Looper.getMainLooper())
-                        throw Exception("Setting adapter in background")
                     setAdapter(headers, personID)
+                    decodeID = super.viewModel.nextImageDecodeID
+                    super.viewModel.actionSubject
+                        .onNext( SpeechManAction.DecodeImages(decodeID!!, headers) )
                 }.subscribe()
         }
 
@@ -128,6 +143,7 @@ class AddPersonAppointDestination: SpeechManFragment(R.layout.add_person_appoint
     {
         super.onStart()
         val personID = super.getIntArgument(KEY_PERSON_ID, null, "KEY_PERSON_ID")
+        disposable.add(subscribeDecodedImages())
         disposable.add(subscribeHeaders(personID))
         disposable.add(subscribePerson(personID))
     }

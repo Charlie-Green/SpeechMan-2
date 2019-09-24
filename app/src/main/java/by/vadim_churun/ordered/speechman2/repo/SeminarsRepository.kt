@@ -43,8 +43,6 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
         = super.seminarsDAO.getCosts(seminarID)
             .subscribeOn(Schedulers.io())
             .map { costs ->
-                if(Looper.myLooper() == Looper.getMainLooper())
-                    throw Exception("Sorting SemCosts on the UI thread")
                 costs.sortedWith( object: Comparator<SemCost> {
                     override fun compare(c1: SemCost, c2: SemCost): Int
                     {
@@ -77,8 +75,6 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
     fun createInfosObservable(): Observable<List<SeminarInfo>>
         = infoSubject.observeOn(Schedulers.computation())
             .map { seminar ->
-                if (Looper.myLooper() == Looper.getMainLooper())
-                    throw Exception("Mapping infoSubject on the UI thread!")
                 listOf(
                     seminar.ID ?: throw NullPointerException(
                         "Attempt to retrieve SeminarInfo for a Seminar with null ID" )

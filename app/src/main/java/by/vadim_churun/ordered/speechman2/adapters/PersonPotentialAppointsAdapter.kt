@@ -1,9 +1,9 @@
 package by.vadim_churun.ordered.speechman2.adapters
 
+import android.animation.AnimatorInflater
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.*
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +37,7 @@ class PersonPotentialAppointsAdapter(val context: Context,
 
     class SeminarViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
     {
+        val frltBackground = itemView.frltBackground
         val imgvAvatar = itemView.imgvAvatar
         val tvName = itemView.tvName
         val tvStart = itemView.tvStart
@@ -61,19 +62,6 @@ class PersonPotentialAppointsAdapter(val context: Context,
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     // CONTENT UPDATE:
 
-    private val colorAccent: Int
-    private val colorBack: Int
-
-    init
-    {
-        val typval = TypedValue()
-        context.theme.resolveAttribute(R.attr.colorAccent, typval, true)
-        colorAccent = typval.data
-        context.theme.resolveAttribute(android.R.attr.colorBackground, typval, true)
-        colorBack = typval.data
-    }
-
-
     private val images = Array<Bitmap?>(headers.size) { null }
 
     fun setAvatar(avatar: DecodedImage)
@@ -82,16 +70,13 @@ class PersonPotentialAppointsAdapter(val context: Context,
         super.notifyItemChanged(avatar.listPosition)
     }
 
-
-    private var selected: Int? = null
-    var selectedPosition: Int?
-        get() = selected
-        set(value) {
-            val oldValue = selected
-            selected = value
-            oldValue?.also { super.notifyItemChanged(it) }    // Unselected.
-            value?.also { super.notifyItemChanged(it) }       // Selected.
+    fun flick(holder: SeminarViewHolder)
+    {
+        AnimatorInflater.loadAnimator(context, R.animator.flick).apply {
+            setTarget(holder.frltBackground)
+            start()
         }
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,8 +92,6 @@ class PersonPotentialAppointsAdapter(val context: Context,
 
     override fun onBindViewHolder(holder: SeminarViewHolder, position: Int)
     {
-        holder.itemView.setBackgroundColor(
-            if(position == selected) colorAccent else colorBack )
         holder.tvName.text = headers[position].name
         holder.tvStart.text = headers[position].start?.let {
             DATETIME_FORMAT.format(it.timeInMillis)
@@ -117,8 +100,9 @@ class PersonPotentialAppointsAdapter(val context: Context,
             holder.imgvAvatar.setImageBitmap(it)
         } ?: holder.imgvAvatar.setImageResource(R.drawable.img_default_avatar)
 
+        holder.frltBackground.animation?.cancel()
         holder.itemView.setOnClickListener {
-            this.selectedPosition = position
+            flick(holder)
             showAddAppointDialog(position)
         }
     }

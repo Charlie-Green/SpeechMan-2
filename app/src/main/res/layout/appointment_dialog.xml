@@ -1,112 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<GridLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+        android:columnCount="4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/big_fragment_padding" >
 
     <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_columnSpan="4"
+            android:layout_gravity="fill_horizontal"
             android:gravity="center_horizontal"
             style="@style/TitleDefault"
             android:text="@string/la_appointment" />
 
-    <GridLayout
-            android:columnCount="2"
-            android:layout_width="match_parent"
+    <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="8dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_person_id" />
+
+    <TextView
+            android:id="@+id/tvPersonName"
+            android:layout_columnSpan="3"
+            android:layout_width="0dp"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginBottom="8dp"
+            android:maxLines="4"
+            android:scrollHorizontally="false"
+            android:ellipsize="end"
+            android:textSize="14sp" />
+
+
+    <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="8dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_seminar_id" />
+
+    <TextView
+            android:id="@+id/tvSeminarName"
+            android:layout_columnSpan="3"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" >
-
-        <TextView
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
-                style="@style/LabelDefault"
-                android:text="@string/la_person_id" />
-
-        <TextView
-                android:id="@+id/tvPersonName"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_marginBottom="8dp"
-                android:textSize="14sp" />
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginBottom="8dp"
+            android:maxLines="4"
+            android:scrollHorizontally="false"
+            android:ellipsize="end"
+            android:textSize="14sp" />
 
 
-        <TextView
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
-                style="@style/LabelDefault"
-                android:text="@string/la_seminar_id" />
+    <TextView
+            android:layout_marginEnd="4dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_appoint_purchase" />
 
-        <TextView
-                android:id="@+id/tvSeminarName"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_marginBottom="8dp"
-                android:textSize="14sp" />
+    <EditText
+            android:id="@+id/etPurchase"
+            android:layout_columnSpan="3"
+            android:layout_width="0dp"
+            android:layout_gravity="fill_horizontal"
+            style="@style/InputDefault" />
 
 
-        <TextView
-                android:layout_marginEnd="4dp"
-                style="@style/LabelDefault"
-                android:text="@string/la_appoint_purchase" />
+    <TextView
+            android:layout_marginEnd="4dp"
+            style="@style/LabelDefault"
+            android:text="@string/la_appoint_cost" />
 
-        <EditText
-                android:id="@+id/etPurchase"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                style="@style/InputDefault" />
-
-
-        <TextView
-                android:layout_marginEnd="4dp"
-                style="@style/LabelDefault"
-                android:text="@string/la_appoint_cost" />
-
-        <EditText
-                android:id="@+id/etCost"
-                android:layout_width="0dp"
-                android:layout_gravity="fill_horizontal"
-                style="@style/InputDefault"  />
-
-
-    </GridLayout>
+    <EditText
+            android:id="@+id/etCost"
+            android:layout_columnSpan="3"
+            android:layout_width="0dp"
+            android:layout_gravity="fill_horizontal"
+            style="@style/InputDefault"  />
 
     <TextView
             android:id="@+id/tvError"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_columnSpan="4"
+            android:layout_gravity="fill_horizontal"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
             android:textSize="14sp"
             android:textColor="@color/error"
             android:visibility="gone" />
 
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" >
+    <Button
+            android:id="@+id/buCancel"
+            android:layout_columnSpan="2"
+            android:layout_height="30dp"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_marginEnd="8dp"
+            style="@style/CancelButton"
+            android:text="@string/la_cancel" />
 
-        <Button
-                android:id="@+id/buCancel"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                style="@style/CancelButton"
-                android:text="@string/la_cancel" />
+    <Button
+            android:id="@+id/buSave"
+            android:layout_columnSpan="2"
+            android:layout_height="30dp"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            style="@style/ApplyButton"
+            android:text="@string/la_save" />
 
-        <Button
-                android:id="@+id/buSave"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                style="@style/ApplyButton"
-                android:text="@string/la_save" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</GridLayout>

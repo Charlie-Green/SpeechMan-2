@@ -68,13 +68,13 @@ class BitmapRepository(appContext: Context): SpeechManRepository(appContext)
                             }
                         }
 
+                        if(isRequestCanceled(request.id)) break
                         val img: DecodedImage?
                         try {
                             img = DecodedImage.from(request.id, super.appContext.contentResolver, j, uri)
                         } catch(exc: Exception) {
                             throw ImageNotDecodedException(request.id, j, uri!!)
                         }
-                        if(isRequestCanceled(request.id)) break
                         img?.also { emitter.onNext(it) }
                     }
                     emitter.onComplete()

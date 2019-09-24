@@ -129,7 +129,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                     }
 
                     is SpeechManAction.DecodeImages -> {
-                        Log.i(LOGTAG, "Requested to decode ${action.imagesSource.size} image(s)")
                         bitmapRepo.sourceSubject.onNext(
                             BitmapRepository.DecodeRequest(action.requestID, action.imagesSource) )
                     }

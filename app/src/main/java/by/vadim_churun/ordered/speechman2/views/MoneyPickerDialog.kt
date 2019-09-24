@@ -24,11 +24,12 @@ class MoneyPickerDialog(
           * Exactly one of the pair's fields is null. **/
         fun validate(input: String): Pair<Money?, Int?>
         {
-            val words = input.split(' ').filter { it.isNotEmpty() }
+            val words = input.replace(',', '.')
+                .split(' ')
+                .filter { it.isNotEmpty() }
             if(words.size != 2)
                 return Pair(null, R.string.msg_money_two_words)
 
-            // TODO: Take care about the decimal point, which depends on locale.
             val amount = words[0].toFloatOrNull()
             if(amount == null || amount < 0f)
                 return Pair(null, R.string.msg_money_amount_incorrect)

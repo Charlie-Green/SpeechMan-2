@@ -9,8 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.model.exceptions.ImageNotDecodedException
-import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
-import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManViewModel
+import by.vadim_churun.ordered.speechman2.viewmodel.*
 
 
 abstract class SpeechManFragment(

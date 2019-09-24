@@ -1,7 +1,6 @@
 package by.vadim_churun.ordered.speechman2.views
 
 import android.animation.*
-import android.util.Log
 import android.view.*
 import androidx.recyclerview.widget.RecyclerView
 

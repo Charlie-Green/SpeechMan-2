@@ -22,7 +22,7 @@ class SeminarImageCRUPage: SeminarCRUPage
 
     companion object
     {
-        /** This {@link View} receives CRU-related actions with componentID set to this value. **/
+        /** This [View] receives CRU-related actions with componentID set to this value. **/
         val CRU_COMPONENT_ID = 1
     }
 

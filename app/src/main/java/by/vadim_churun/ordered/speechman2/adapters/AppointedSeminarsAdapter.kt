@@ -8,6 +8,7 @@ import android.view.*
 import androidx.recyclerview.widget.RecyclerView
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.db.objs.AppointedSeminar
+import by.vadim_churun.ordered.speechman2.dests.people.PersonAppointsListDestination
 import by.vadim_churun.ordered.speechman2.dialogs.people.DeletePersonAppointDialog
 import by.vadim_churun.ordered.speechman2.dialogs.associations.*
 import by.vadim_churun.ordered.speechman2.model.objects.DecodedImage
@@ -53,6 +54,7 @@ class AppointedSeminarsAdapter(val context: Context,
 
     fun setImage(image: DecodedImage)
     {
+        android.util.Log.i(PersonAppointsListDestination::class.java.simpleName, "Setting image at ${image.listPosition}")
         avatars[image.listPosition] = image.bitmap
         super.notifyItemChanged(image.listPosition)
     }

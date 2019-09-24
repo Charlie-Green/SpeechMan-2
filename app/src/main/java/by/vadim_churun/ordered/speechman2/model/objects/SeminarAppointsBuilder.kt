@@ -1,11 +1,8 @@
 package by.vadim_churun.ordered.speechman2.model.objects
 
-import android.util.Log
 import by.vadim_churun.ordered.speechman2.db.entities.Appointment
 import by.vadim_churun.ordered.speechman2.db.entities.*
-import by.vadim_churun.ordered.speechman2.db.objs.HistoryStatus
-import by.vadim_churun.ordered.speechman2.db.objs.Money
-import by.vadim_churun.ordered.speechman2.db.objs.Participant
+import by.vadim_churun.ordered.speechman2.db.objs.*
 
 
 class SeminarAppointsBuilder private constructor(
@@ -79,7 +76,6 @@ class SeminarAppointsBuilder private constructor(
                 "Wrong seminar ID. Expected $seminarID, got ${newAppoint.seminarID}" )
 
         val targetList = if(newAppoint.isLogicallyDeleted) removed else added
-        val listName = if(newAppoint.isLogicallyDeleted) "removed" else "added"
         val index = targetList.indexOfFirst {
             it.personID == newAppoint.personID
         }

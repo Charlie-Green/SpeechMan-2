@@ -49,7 +49,8 @@ SpeechManFragment(R.layout.participants_list_dialog)
         tvCount.text = super.getString(R.string.fs_participants_count, particips.size)
         recvParticips.layoutManager = recvParticips.layoutManager
             ?: LinearLayoutManager(super.requireContext())
-        val newAdapter = ParticipantsAdapter(super.requireContext(), particips, findNavController())
+        val newAdapter = ParticipantsAdapter(
+            super.requireContext(), particips, super.requireFragmentManager() )
         recvParticips.swapAdapter(newAdapter, true)
         prbParticipsLoad.visibility = View.GONE
     }

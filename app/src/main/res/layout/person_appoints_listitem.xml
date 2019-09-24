@@ -26,12 +26,14 @@
 
         <TextView
                 android:id="@+id/tvSeminarName"
+                android:layout_width="0dp"
                 android:layout_gravity="fill_horizontal"
                 style="@style/TitleDefault"
                 android:text="Seminar Name" />
 
         <TextView
                 android:id="@+id/tvPurchase"
+                android:layout_width="0dp"
                 android:layout_gravity="fill_horizontal"
                 style="@style/SubtitleDefault"
                 android:text="@string/fs_appoint_money" />

@@ -109,7 +109,8 @@ abstract class CRUView: FrameLayout
 
     override fun onDetachedFromWindow()
     {
-        super.onDetachedFromWindow()
+        onCommitChanges()
         disposable.clear()
+        super.onDetachedFromWindow()
     }
 }
