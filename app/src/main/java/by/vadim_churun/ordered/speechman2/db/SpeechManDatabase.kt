@@ -36,7 +36,13 @@ abstract class SpeechManDatabase: RoomDatabase()
             = instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     appContext, SpeechManDatabase::class.java, "speech.db" )
-                    .build().also { instance = it }
+                    .addMigrations(SpeechManDatabaseMigrations.get(
+                        SpeechManDatabaseMigrations.Version.V2_0_ALPHA1,
+                        SpeechManDatabaseMigrations.Version.V2_0_BETA1
+                    ), SpeechManDatabaseMigrations.get(
+                        SpeechManDatabaseMigrations.Version.V2_0_BETA1,
+                        SpeechManDatabaseMigrations.Version.V2_1_ALPHA1
+                    )).build().also { instance = it }
             }
     }
 }
