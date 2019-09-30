@@ -1,13 +1,14 @@
 package by.vadim_churun.ordered.speechman2.remote.lack
 
 import by.vadim_churun.ordered.speechman2.db.entities.Appointment
-import by.vadim_churun.ordered.speechman2.db.objs.*
+import by.vadim_churun.ordered.speechman2.db.objs.HistoryStatus
+import by.vadim_churun.ordered.speechman2.db.objs.Money
 
 
-class AppointmentCostLack(
+class AppointmentPurchaseLack(
     var personID: Int,
     var seminarID: Int,
-    var purchase: Money,
+    var cost: Money,
     var historyStatus: HistoryStatus,
     var isDeleted: Boolean
 ): DataLack<Money, Appointment>()
@@ -16,5 +17,5 @@ class AppointmentCostLack(
         = true
 
     override fun buildObject(missedData: Money): Appointment
-        = Appointment(personID, seminarID, purchase, missedData, historyStatus, isDeleted)
+        = Appointment(personID, seminarID, missedData, cost, historyStatus, isDeleted)
 }

@@ -1,9 +1,132 @@
 <resources>
     <string name="app_name">ЛогоMan 2</string>
     <string name="copyright" translatable="false">© Вадим Чурун</string>
+    <string name="costing_date">По дате записи</string>
+    <string name="costing_date_participants">По дате записи, потом - по числу участников</string>
+    <string name="costing_fixed">Фиксированная стоимость</string>
+    <string name="costing_participants">По числу участников</string>
+    <string name="costing_participants_date">По числу участников, потом - по дате записи</string>
+    <string name="expl_semcost_particips">
+        Это минимальное количество участников семинара, при котором указанная его стоимость становится рекомендуемой.
+    </string>
+    <string name="filter_person_type">Только определённого типа</string>
+    <string name="fs_all_seminars_appointed">%s уже участвует во всех семинарах.</string>
+    <string name="fs_appoint_money">Оплачено: %s из %s</string>
+    <string name="fs_appoints_count">Записей на семинар: %d</string>
+    <string name="fs_incorrect_appoint_cost">Стоимость для участника %s введена неправильно.</string>
+    <string name="fs_incorrect_appoint_cost_expanded">
+        Стоимость для участника %s и ещё %d чел. введена неправильно.
+    </string>
+    <string name="fs_orders_count">Заказов: %d</string>
+    <string name="fs_participants_count">Всего участников: %d</string>
+    <string name="fs_participants_expanded_count">Участвуют: %d из %d</string>
+    <string name="fs_participants_to_add_count">Вы собираетесь добавить: %d</string>
+    <string name="fs_participants_to_remove_count">Вы собираетесь убрать: %d</string>
+    <string name="fs_people_count">Всего людей: %d</string>
+    <string name="fs_person_appointments_count">Записей на семинары: %d</string>
+    <string name="fs_removed_participants_count">Вы также собираетесь удалить %d чел. из списка.</string>
+    <string name="fs_semcost_date_atleast">дата записи с %s</string>
+    <string name="fs_semcost_particips">%d чел</string>
+    <string name="fs_semcost_particips_atleast">хотя бы %d чел.</string>
+    <string name="fs_seminar_image_not_decoded">ЛогоMan 2 не смог расшифровать аватарку семинара "%s".</string>
+    <string name="fs_seminar_start">Начало: %s</string>
+    <string name="fs_seminars_count">Всего семинаров: %d</string>
+    <string name="fs_step">Шаг %d из %d</string>
+    <string name="hint_appoint_cost">Стоимость?</string>
+    <string name="hint_appoint_purchase">Сколько денег внесено?</string>
+    <string name="hint_person_name">Введите ФИО</string>
+    <string name="hint_pick_money">Например: 80.00 USD</string>
+    <string name="hint_pick_seminar_for_appoint">Выберите семинар, запись на который вы хотите произвести.</string>
+    <string name="hint_seminar_address">Уточните адрес проведения семинара.</string>
+    <string name="hint_seminar_city">Введите город проведения семинара.</string>
+    <string name="hint_seminar_content">О чём расскажут на семинаре?</string>
+    <string name="hint_seminar_name">Введите название семинара.</string>
+    <string name="la_add">Добавить</string>
+    <string name="la_add_person">Добавить человека</string>
+    <string name="la_add_person_appoint">Записать на семинар</string>
+    <string name="la_apply_money">Готово</string>
+    <string name="la_appointment">Запись на семинар</string>
+    <string name="la_appoint_cost">Стоимость:</string>
+    <string name="la_appoint_purchase">Оплачено:</string>
+    <string name="la_assign_type">Присвоить тип</string>
+    <string name="la_cancel">Отменить</string>
+    <string name="la_cancel_participants">Вернуться к редактору</string>
+    <string name="la_clear_photo">Убрать фото</string>
+    <string name="la_click_me">Нажми на меня! :)</string>
+    <string name="la_confdel_person_appoint">Отменить участие в семинаре?</string>
+    <string name="la_confirm_update_seminar">Сохранить изменения?</string>
+    <string name="la_costing_strategy">Стратегия расценки</string>
+    <string name="la_delete">Удалить</string>
+    <string name="la_delete_person">Удалить человека?</string>
+    <string name="la_delete_person_appoint">Отменить участие</string>
+    <string name="la_delete_seminar">Удалить семинар?</string>
+    <string name="la_leave_person_appoint">Оставить</string>
+    <string name="la_no_person_type">Не относится к типу</string>
+    <string name="la_person_detail">Информация о человеке:</string>
+    <string name="la_person_id">Человек:</string>
+    <string name="la_person_name">ФИО:</string>
+    <string name="la_person_type">Тип:</string>
+    <string name="la_pick_money">Введите денежную сумму</string>
+    <string name="la_pick_fixed_semcost">Задайте фиксированную стоимость семинара.</string>
+    <string name="la_remove_participants">Удалить участников?</string>
+    <string name="la_removed_participants_count">Столько человек будет удалено из списка на семинар.</string>
+    <string name="la_save">Сохранить</string>
+    <string name="la_save_participants">Сохранить список участников семинара?</string>
+    <string name="la_select_photo">Выбрать фото</string>
+    <string name="la_semcost_date">Начиная с даты</string>
+    <string name="la_semcost_particips">Минимум участников</string>
+    <string name="la_semcost_cost">Стоимость</string>
+    <string name="la_semcost_cost_purpose">Введите рекомендуемую стоимость семинара при следующих условиях:</string>
+    <string name="la_seminar_content_suggest">Вы можете также ввести программу семинара.</string>
+    <string name="la_semcosts">Может стоить:</string>
+    <string name="la_semdays">Дни семинара:</string>
+    <string name="la_semday_date">Дата</string>
+    <string name="la_semday_end">Конец</string>
+    <string name="la_semday_start">Начало</string>
+    <string name="la_seminar_address">Адрес:</string>
+    <string name="la_seminar_city">Город:</string>
+    <string name="la_seminar_content">Программа семинара:</string>
+    <string name="la_seminar_end">Окончание:</string>
+    <string name="la_seminar_id">Семинар:</string>
+    <string name="la_seminar_name">Название:</string>
+    <string name="la_seminar_start">Начало:</string>
+    <string name="la_set_editable">Разрешить редактирование</string>
+    <string name="la_update_seminar_no">Нет, вернуть как было</string>
+    <string name="la_update_seminar_yes">Да, сохранить</string>
     <string name="la_version">Версия ЛогоMan:\u0020</string>
     <string name="mi_people">Люди</string>
     <string name="mi_seminars">Семинары</string>
     <string name="mi_products">Товары</string>
     <string name="mi_tutors">Преподаватели</string>
+    <string name="msg_adding_person">Идёт добавление...</string>
+    <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
+    <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
+    <string name="msg_deleting_appoint">Идут изменения...</string>
+    <string name="msg_deleting_person">Идёт удаление...</string>
+    <string name="msg_deleting_seminar">Идёт удаление...</string>
+    <string name="msg_image_not_decoded">ЛогоMan 2 не может отобразить выбранную картинку.</string>
+    <string name="msg_money_amount_incorrect">
+        Номинал введён некорректно. Ожидается неотрицательное число, например: 15.45.
+    </string>
+    <string name="msg_money_currency_incorrect">
+        Некорректно введена валюта. Ожидается 3 латинские буквы, например: bYn.
+    </string>
+    <string name="msg_money_two_words">Введите номинал и валюту. Например: 7000 RUR</string>
+    <string name="msg_need_permission_for_image">
+        ЛогоMan 2 не может загрузить картинку: нет разрешения на чтение файлов из хранилища.
+    </string>
+    <string name="msg_no_seminars_found">Семинаров не найдено.</string>
+    <string name="msg_participants_not_changed">Вы не внесли изменений. Для отмены нажмите стрелку назад.</string>
+    <string name="msg_semcost_particips_empty">Вы ничего не ввели.</string>
+    <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
+    <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
+    <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
+    <string name="msg_no_seminar_name">Вы не ввели название.</string>
+    <string name="msg_saving_changes">Идёт сохранение...</string>
+    <string name="msg_unknown_cost">Стоимость неизвестна.</string>
+    <string name="msg_unknown_date">Дата неизвестна.</string>
+    <string name="semcosts_cru_purpose">Укажите возможные значения стоимости семинара.</string>
+    <string name="semdays_cru_purpose">Укажиите расписание семинара по дням.</string>
+    <string name="seminar_general_cru_purpose">Укажите общие сведения о семинаре.</string>
+    <string name="seminar_image_cru_purpose">Выберите аватарку.</string>
 </resources>

@@ -11,4 +11,17 @@
         <item name="colorAccent">?colorPrimary</item>
     </style>
 
+    <style name="SearchViewTheme">
+        <item name="android:editTextColor">?android:colorBackground</item>
+    </style>
+
+    <style name="DateDialogDefaultTheme" parent="Theme.MaterialComponents.Dialog">
+        <item name="colorAccent">@color/DefaultTheme_colorPrimary</item>
+        <item name="android:textColor">@color/DefaultTheme_colorPrimary</item>
+        <item name="android:textColorPrimary">@color/DefaultTheme_colorPrimary</item>
+        <item name="android:textColorSecondary">@color/DefaultTheme_colorPrimaryDark</item>
+        <item name="android:datePickerStyle">@style/DatePickerDefault</item>
+        <item name="colorSecondary">#00ff00</item>
+    </style>
+
 </resources>

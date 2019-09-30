@@ -3,11 +3,12 @@ package by.vadim_churun.ordered.speechman2.remote.lack
 import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 
 
-class SeminarCityLack(val name: String,
-    val address: String,
-    val content: String,
-    val costing: Seminar.CostingStrategy,
-    val isDeleted: Boolean
+class SeminarCityLack(var ID: Int?,
+    var name: String,
+    var address: String,
+    var content: String,
+    var costing: Seminar.CostingStrategy,
+    var isDeleted: Boolean
 ): DataLack<String, Seminar>()
 {
     override fun validate(potentialData: String): Boolean

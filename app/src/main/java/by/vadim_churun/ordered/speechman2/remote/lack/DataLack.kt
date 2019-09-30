@@ -10,6 +10,12 @@ abstract class DataLack<MissedDataType, ObjectType>
 
 
     private var datapiece: MissedDataType? = null
+    private var discarded = false
+
+    val isDiscarded: Boolean
+        get() = discarded
+    val isFilled: Boolean
+        get() = datapiece != null
 
     fun fill(data: MissedDataType)
     {
@@ -18,7 +24,16 @@ abstract class DataLack<MissedDataType, ObjectType>
         datapiece = data
     }
 
+    fun discard()
+    { discarded = true }
+
+
     fun buildObject(): ObjectType
-        = datapiece?.let { buildObject(it) }
-        ?: throw IllegalStateException("This DataLack hasn't been filled")
+    {
+        if(discarded)
+            throw IllegalStateException("Lack discarded.")
+        return datapiece?.let {
+            buildObject(it)
+        } ?: throw IllegalStateException("This DataLack hasn't been filled.")
+    }
 }

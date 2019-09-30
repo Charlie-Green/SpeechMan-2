@@ -2,6 +2,7 @@ package by.vadim_churun.ordered.speechman2.db.entities
 
 import androidx.room.*
 import by.vadim_churun.ordered.speechman2.db.objs.HistoryStatus
+import by.vadim_churun.ordered.speechman2.db.objs.Money
 
 
 /** Association between [Person] and [Product]. **/
@@ -12,6 +13,8 @@ class Order(
     @ColumnInfo(name="person", index=true) val personID: Int,
 
     @ColumnInfo(name="product", index=true) val productID: Int,
+
+    @ColumnInfo(name="paid") val purchase: Money,
 
     @ColumnInfo(name="history") val historyStatus: HistoryStatus,
 

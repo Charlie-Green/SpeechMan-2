@@ -27,7 +27,8 @@ internal object SpeechManDatabaseMigrations
             return object: Migration(2, 3) {
                 override fun migrate(database: SupportSQLiteDatabase)
                 {
-
+                    database.execSQL("alter table Orders add paid text not null")
+                    database.execSQL("alter table Products add isDeleted integer not null")
                 }
             }
         }
