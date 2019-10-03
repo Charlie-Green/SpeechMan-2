@@ -1,22 +1,34 @@
 package by.vadim_churun.ordered.speechman2.remote
 
-import java.io.*
 import java.net.URL
+import java.net.URLConnection
 
 
 object SpeechManRemoteConnector
 {
-    private fun ipToUrl(ip: String): URL
-        // URL of a servlet ran under a Tomcat server at the given IP.
-        = URL("http://${ip}:8080/SpeechManServer/SpeechManServlet")
-
-    fun getInputStream(ip: String): InputStream
+    fun validateIP(ip: String): Boolean
     {
-        // Return stream over a pre-defined String (for testing purposes):
-        val xml =
-            "<?xml version=\"1.0\"?>" +
-            "<speech2>" +
-            "</speech2>"
-        return ByteArrayInputStream(xml.toByteArray())
+        val octets = ip.split('.')
+        if(octets.size != 4) return false
+        for(octet in octets)
+        {
+            try {
+                val number = octet.toInt()
+                if(number < 0 || number > 255)
+                    return false
+            } catch(exc: NumberFormatException) {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun openConnection(ip: String, supportOutput: Boolean = true): URLConnection
+    {
+        val url = URL("http://${ip}:8080/SpeechManServer/SpeechManServlet")
+        return url.openConnection().apply {
+            doInput = true
+            doOutput = supportOutput
+        }
     }
 }

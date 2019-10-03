@@ -25,6 +25,7 @@ abstract class SpeechManDatabase: RoomDatabase()
 {
     abstract fun getPeopleDAO(): PeopleDAO
     abstract fun getSeminarsDAO(): SeminarsDAO
+    abstract fun getProductsDAO(): ProductsDAO
     abstract fun getAssociationsDAO(): AssociationsDAO
 
 

@@ -52,8 +52,11 @@ interface PeopleDAO
            "(select seminar from Appointments where person=:excludedPersonID)" )
     fun getSemHeadersNotForPerson(excludedPersonID: Int): Observable< List<SeminarHeader> >
 
+    @Query("select * from People where name=:name")
+    fun getByName(name: String): List<Person>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addOrUpdate(person: Person)
+    fun addOrUpdate(person: Person): Long
 
     @Delete
     fun delete(person: Person)

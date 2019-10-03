@@ -53,6 +53,9 @@ abstract class SpeechManRepository(val appContext: Context)
     protected val seminarsDAO: SeminarsDAO
         get() = SpeechManDatabase.getInstance(appContext).getSeminarsDAO()
 
+    protected val productsDAO: ProductsDAO
+        get() = SpeechManDatabase.getInstance(appContext).getProductsDAO()
+
     protected val associationsDAO: AssociationsDAO
         get() = SpeechManDatabase.getInstance(appContext).getAssociationsDAO()
 }

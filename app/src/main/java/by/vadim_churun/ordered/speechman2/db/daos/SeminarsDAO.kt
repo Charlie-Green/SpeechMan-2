@@ -18,6 +18,9 @@ interface SeminarsDAO
     @Query("select * from Seminars where Seminars.id=:seminarID")
     fun getRx(seminarID: Int): Observable<Seminar>
 
+    @Query("select * from Seminars where name=:name and city=:city")
+    fun getByNameAndCity(name: String, city: String): List<Seminar>
+
     @Query("select :seminarID as id, " +
             "max(Seminars.name) as name, " +
             "max(Seminars.image) as image, " +
@@ -78,7 +81,7 @@ interface SeminarsDAO
     // INSERT, UPDATE, DELETE:
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addOrUpdate(seminar: Seminar)
+    fun addOrUpdate(seminar: Seminar): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addOrUpdateRx(seminar: Seminar): Single<Long>
