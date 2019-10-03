@@ -8,18 +8,18 @@ abstract class DataWarning<ObjectType>
     protected abstract fun createObject(): ObjectType
 
 
-    private var confirmed: Boolean? = null
-
-    var isConfirmed: Boolean
-        get() = confirmed
-            ?: throw NullPointerException("Data hasn't been neither confirmed nor denied")
-        set(decision) { confirmed = decision }
+    enum class ConfirmStatus {
+        CONFIRMED,
+        DENIED,
+        NOT_DEFINED
+    }
+    var confirmStatus = ConfirmStatus.NOT_DEFINED
 
 
     fun produceObject(): ObjectType
     {
-        if(confirmed != true)
-            throw IllegalStateException("Adding data hasn't been confirmed")
+        if(confirmStatus != ConfirmStatus.CONFIRMED)
+            throw IllegalStateException("Adding data is not confirmed")
         return createObject()
     }
 }
