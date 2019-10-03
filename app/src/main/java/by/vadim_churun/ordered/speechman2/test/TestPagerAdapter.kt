@@ -17,6 +17,15 @@ class TestPagerAdapter(
 
     override fun getItem(position: Int): Fragment
     {
+        TestRepository.data = data
 
+        val fragm: TestFragment
+        when(position)
+        {
+            0    -> fragm = RemoteEntitiesFragment()
+            1    -> fragm = RemoteLacksFragment()
+            else -> fragm = RemoteWarningsFragment()
+        }
+        return fragm
     }
 }

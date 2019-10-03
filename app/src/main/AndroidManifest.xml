@@ -13,6 +13,9 @@
             android:theme="@style/AppThemeLight">
 
         <activity android:name=".SpeechManActivity">
+        </activity>
+
+        <activity android:name=".test.TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
