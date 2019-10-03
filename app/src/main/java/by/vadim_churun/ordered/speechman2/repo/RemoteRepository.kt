@@ -250,9 +250,6 @@ SpeechManRepository(appContext)
         super.seminarsDAO.addOrUpdateDays(insertedDays)
         super.seminarsDAO.addOrUpdateCosts(insertedCosts)
 
-        // TODO: Handle lacks.
-        // TODO: Handle warnings.
-
         return newBuilder.build()
     }
 
