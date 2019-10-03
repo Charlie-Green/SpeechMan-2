@@ -252,6 +252,8 @@ SpeechManRepository(appContext)
 
         return newBuilder.build()
     }
+    fun HANDLE_REMOTE_DATA_DEBUG(builder: RemoteData.Builder)
+        = handleRemoteData(builder)
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

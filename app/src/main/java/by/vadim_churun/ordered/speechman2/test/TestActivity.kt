@@ -1,75 +1,55 @@
 package by.vadim_churun.ordered.speechman2.test
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.*
 import by.vadim_churun.ordered.speechman2.R
+import by.vadim_churun.ordered.speechman2.SpeechManActivity
 import by.vadim_churun.ordered.speechman2.db.entities.*
-import by.vadim_churun.ordered.speechman2.db.objs.Money
+import by.vadim_churun.ordered.speechman2.db.objs.*
 import by.vadim_churun.ordered.speechman2.model.objects.RemoteData
 import by.vadim_churun.ordered.speechman2.model.warning.*
-import by.vadim_churun.ordered.speechman2.remote.lack.SeminarCityLack
+import by.vadim_churun.ordered.speechman2.remote.lack.*
+import by.vadim_churun.ordered.speechman2.repo.RemoteRepository
+import java.util.Calendar
 import kotlinx.android.synthetic.main.test_activity.*
 import kotlin.concurrent.thread
 
 
 class TestActivity: AppCompatActivity()
 {
-    private var stopped = true
-
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         super.setContentView(R.layout.test_activity)
-    }
+        super.deleteDatabase("speech.db")
 
-    override fun onStart()
-    {
-        super.onStart()
-        stopped = false
+        fabSpeechMan.setOnClickListener {
+            Intent(super.getApplicationContext(), SpeechManActivity::class.java).also {
+                super.startActivity(it)
+            }
+        }
 
         thread(start = true) {
-            val data = RemoteData(
-                requestID = 0,
+            val inData = RemoteData(
+                requestID = 1,
 
                 entities = listOf(
-                    Person(7, "Melinda", null)
+                    Person(6, "Sinorita", null)
                 ),
 
-                lacks = listOf(
-                    SeminarCityLack(null,
-                        "Alalia",
-                        "85 West-Street",
-                        "",
-                        Seminar.CostingStrategy.DATE,
-                        false
-                    )
-                ),
+                lacks = listOf(),
 
-                warnings = listOf(
-                    PersonNameExistsWarning(11, "Suzy", 3),
-                    SeminarNameAndCityExistWarning(
-                        88,
-                        "Tutorillo",
-                        "Washington",
-                        "17A, White Street",
-                        "",
-                        Seminar.CostingStrategy.FIXED,
-                        true
-                    ),
-                    ProductNameExistsWarning(15, "Speechy Box", Money(177f, "RUR"), 3, 5, false)
-                )
+                warnings = listOf()
             )
+
+            val outData = RemoteRepository(super.getApplicationContext())
+                .HANDLE_REMOTE_DATA_DEBUG(inData.toBuilder())
 
             Handler(Looper.getMainLooper()).post {
                 filePager.adapter = TestPagerAdapter(
-                    this, super.getSupportFragmentManager(), data)
+                    this, super.getSupportFragmentManager(), outData)
             }
         }
-    }
-
-    override fun onStop()
-    {
-        stopped = true
-        super.onStop()
     }
 }
