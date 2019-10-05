@@ -1,11 +1,8 @@
 package by.vadim_churun.ordered.speechman2.remote.xml
 
-import by.vadim_churun.ordered.speechman2.db.entities.Person
-import by.vadim_churun.ordered.speechman2.db.entities.PersonType
-import by.vadim_churun.ordered.speechman2.db.entities.Product
-import by.vadim_churun.ordered.speechman2.db.entities.Seminar
-import java.io.OutputStream
-import java.io.PrintWriter
+import by.vadim_churun.ordered.speechman2.db.entities.*
+import by.vadim_churun.ordered.speechman2.db.objs.HistoryStatus
+import java.io.*
 
 
 class SpeechManXmlWriter
@@ -41,6 +38,16 @@ class SpeechManXmlWriter
         }
         // mTabs[j] contains the line separator + j tabs.
         return mTabs[count]
+    }
+
+    private fun getHistoryStatusValue(hs: HistoryStatus): String
+    {
+        when(hs)
+        {
+            HistoryStatus.NOT_IN_HISTORY -> return "nih"
+            HistoryStatus.USUAL          -> return "usual"
+            else                         -> return "flower"
+        }
     }
 
 
@@ -145,7 +152,7 @@ class SpeechManXmlWriter
                         attrCache.name = XmlContract.ATTR_SEMINAR_COSTING
                         when(sem.costing)
                         {
-                            Seminar.CostingStrategy.FIXED             -> attrCache.value = "fix"
+                            Seminar.CostingStrategy.FIXED             -> attrCache.value = "f"
                             Seminar.CostingStrategy.PARTICIPANTS      -> attrCache.value = "p"
                             Seminar.CostingStrategy.DATE              -> attrCache.value = "d"
                             Seminar.CostingStrategy.PARTICIPANTS_DATE -> attrCache.value = "pd"
@@ -190,4 +197,114 @@ class SpeechManXmlWriter
                 }
             }
         )
+
+    fun writeAppointments(appointments: Collection<Appointment>)
+        = writeEntities(appointments,
+            XmlContract.TAG_APPOINT_LONG,
+            5, { appoint, index ->
+                when(index)
+                {
+                    0 -> {
+                        attrCache.name = XmlContract.ATTR_APPOINT_PERSON_ID
+                        attrCache.value = "${appoint.personID}"
+                    }
+                    1 -> {
+                        attrCache.name = XmlContract.ATTR_APPOINT_SEMINAR_ID
+                        attrCache.value = "${appoint.seminarID}"
+                    }
+                    2 -> {
+                        attrCache.name = XmlContract.ATTR_APPOINT_PURCHASE
+                        attrCache.value = "${appoint.purchase}"
+                    }
+                    3 -> {
+                        attrCache.name = XmlContract.ATTR_APPOINT_COST
+                        attrCache.value = "${appoint.cost}"
+                    }
+                    4 -> {
+                        attrCache.name = XmlContract.ATTR_APPOINT_HISTORY_STATUS
+                        attrCache.value = getHistoryStatusValue(appoint.historyStatus)
+                    }
+                }
+            }
+        )
+
+    fun writeOrders(orders: Collection<Order>)
+        = writeEntities(orders,
+            XmlContract.TAG_ORDER,
+            5, { order, index ->
+                when(index)
+                {
+                    0 -> {
+                        attrCache.name = XmlContract.ATTR_ORDER_PERSON_ID
+                        attrCache.value = "${order.personID}"
+                    }
+                    1 -> {
+                        attrCache.name = XmlContract.ATTR_ORDER_PRODUCT_ID
+                        attrCache.value = "${order.productID}"
+                    }
+                    2 -> {
+                        attrCache.name = XmlContract.ATTR_ORDER_PURCHASE
+                        attrCache.value = "${order.purchase}"
+                    }
+                    3 -> {
+                        attrCache.name = XmlContract.ATTR_ORDER_HISTORY_STATUS
+                        attrCache.value = getHistoryStatusValue(order.historyStatus)
+                    }
+                    4 -> {
+                        attrCache.name = XmlContract.ATTR_ORDER_DELETED
+                        attrCache.value = if(order.isLogicallyDeleted) "yes" else "no"
+                    }
+                }
+            }
+        )
+
+    fun writeSemDays(days: Collection<SemDay>)
+        = writeEntities(days,
+            XmlContract.TAG_SEMDAY_LONG,
+            4, { day, index ->
+                when(index)
+                {
+                    0 -> {
+                        attrCache.name = XmlContract.ATTR_PSEUDOID
+                        attrCache.value = "${day.ID}"
+                    }
+                    1 -> {
+                        attrCache.name = XmlContract.ATTR_SEMDAY_SEMINAR_ID
+                        attrCache.value = "${day.seminarID}"
+                    }
+                    2 -> {
+                        attrCache.name = XmlContract.ATTR_SEMDAY_START
+                        attrCache.value = "${day.start.timeInMillis}"
+                    }
+                    3 -> {
+                        attrCache.name = XmlContract.ATTR_SEMDAY_DURATION
+                        attrCache.value = "${day.duration}"
+                    }
+                }
+            })
+
+    fun writeSemCosts(costs: Collection<SemCost>)
+        = writeEntities(costs,
+            XmlContract.TAG_SEMCOST_LONG,
+            4, { cost, index ->
+                when(index)
+                {
+                    0 -> {
+                        attrCache.name = XmlContract.ATTR_SEMCOST_SEMINAR_ID
+                        attrCache.value = "${cost.seminarID}"
+                    }
+                    1 -> {
+                        attrCache.name = XmlContract.ATTR_SEMCOST_PARTICIPANTS
+                        attrCache.value = "${cost.minParticipants}"
+                    }
+                    2 -> {
+                        attrCache.name = XmlContract.ATTR_SEMCOST_DATE
+                        attrCache.value = "${cost.minDate.timeInMillis}"
+                    }
+                    3 -> {
+                        attrCache.name = XmlContract.ATTR_SEMCOST_MONEY
+                        attrCache.value = "${cost.cost}"
+                    }
+                }
+            })
 }
