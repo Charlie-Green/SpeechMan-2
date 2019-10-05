@@ -97,7 +97,8 @@ SpeechManRepository(appContext)
 
         val newBuilder = RemoteData.Builder(
             requestID = builder.requestID,
-            lacks = builder.lacks
+            lacks = builder.lacks,
+            warnings = builder.warnings
         )
 
         // Insert PersonType's, so that People's foreign key constraints don't fail.
@@ -252,8 +253,6 @@ SpeechManRepository(appContext)
 
         return newBuilder.build()
     }
-    fun HANDLE_REMOTE_DATA_DEBUG(builder: RemoteData.Builder)
-        = handleRemoteData(builder)
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -14,13 +14,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <!-- Content of the activity. -->
-        <!-- TODO: Add a NavHost. -->
-        <FrameLayout
+        <fragment
+                android:id="@+id/navHost"
+                android:name="androidx.navigation.fragment.NavHostFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-        </FrameLayout>
+                android:layout_height="match_parent"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/speechman_navgraph" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
