@@ -7,6 +7,7 @@ import by.vadim_churun.ordered.speechman2.db.entities.*
 import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.model.warning.*
 import by.vadim_churun.ordered.speechman2.remote.*
+import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlParser
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
