@@ -5,21 +5,27 @@ import by.vadim_churun.ordered.speechman2.db.objs.HistoryStatus
 import java.io.*
 
 
-class SpeechManXmlWriter
+class SpeechManXmlWriter: AutoCloseable
 {
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // PROPERTIES, CONSTRUCTORS:
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // PROPERTIES:
 
     private val out: PrintWriter
+
+    /** If true, the resulting XML file is more human readable, but is widely larger in its size. **/
+    var doFormatting = false
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // LIFECYCLE:
 
     constructor(outstream: OutputStream)
     {
         out = PrintWriter(outstream)
     }
 
-
-    /** If true, the resulting XML file is more human readable, but is widely larger in its size. **/
-    var doFormatting = false
+    override fun close()
+        = out.close()
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +38,7 @@ class SpeechManXmlWriter
         if(!doFormatting) return ""
 
         val mTabs = tabs ?: mutableListOf(System.lineSeparator()).also { tabs = it }
-        while(mTabs.size < count)
+        while(mTabs.size <= count)
         {
             mTabs.add(mTabs.last() + "\t")
         }
@@ -82,12 +88,13 @@ class SpeechManXmlWriter
     {
         for(entity in entities)
         {
-            out.print("${getTabs(1)}<$tagName")
+            out.print("${getTabs(1)}<$tagName ")
 
             for(attrIndex in 0.until(attrCount))
             {
                 attrFactory(entity, attrIndex)    // Initializes attrCache.
-                out.print("${getTabs(3)}${attrCache.name}=\"${attrCache.value}\"")
+                if(attrCache.value.isNotEmpty())
+                    out.print("${getTabs(3)}${attrCache.name}=\"${attrCache.value}\"")
             }
 
             val content = contentFactory(entity)
@@ -112,7 +119,7 @@ class SpeechManXmlWriter
                 {
                     0 -> {
                         attrCache.name = XmlContract.ATTR_PSEUDOID
-                        attrCache.value = "${person.ID}"
+                        attrCache.value = person.ID?.let { "$it" } ?: ""
                     }
                     1 -> {
                         attrCache.name = XmlContract.ATTR_PERSON_NAME
@@ -120,7 +127,7 @@ class SpeechManXmlWriter
                     }
                     2 -> {
                         attrCache.name = XmlContract.ATTR_PERSON_TYPE_ID
-                        attrCache.value = "${person.personTypeID}"
+                        attrCache.value = person.personTypeID?.let { "$it" } ?: ""
                     }
                 }
             }
@@ -134,7 +141,7 @@ class SpeechManXmlWriter
                 {
                     0 -> {
                         attrCache.name = XmlContract.ATTR_PSEUDOID
-                        attrCache.value = "${sem.ID}"
+                        attrCache.value = sem.ID?.let { "$it" } ?: ""
                     }
                     1 -> {
                         attrCache.name = XmlContract.ATTR_SEMINAR_NAME
@@ -176,7 +183,7 @@ class SpeechManXmlWriter
                 {
                     0 -> {
                         attrCache.name = XmlContract.ATTR_PSEUDOID
-                        attrCache.value = "${product.ID}"
+                        attrCache.value = product.ID?.let { "$it" } ?: ""
                     }
                     1 -> {
                         attrCache.name = XmlContract.ATTR_PRODUCT_NAME
@@ -201,7 +208,7 @@ class SpeechManXmlWriter
     fun writeAppointments(appointments: Collection<Appointment>)
         = writeEntities(appointments,
             XmlContract.TAG_APPOINT_LONG,
-            5, { appoint, index ->
+            6, { appoint, index ->
                 when(index)
                 {
                     0 -> {
@@ -223,6 +230,10 @@ class SpeechManXmlWriter
                     4 -> {
                         attrCache.name = XmlContract.ATTR_APPOINT_HISTORY_STATUS
                         attrCache.value = getHistoryStatusValue(appoint.historyStatus)
+                    }
+                    5 -> {
+                        attrCache.name = XmlContract.ATTR_APPOINT_DELETED
+                        attrCache.value = if(appoint.isLogicallyDeleted) "yes" else "no"
                     }
                 }
             }
