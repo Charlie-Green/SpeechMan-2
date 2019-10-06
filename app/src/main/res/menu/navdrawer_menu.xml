@@ -14,6 +14,9 @@
         <item android:id="@+id/miTutors"
               android:icon="@drawable/ic_tutor"
               android:title="@string/mi_tutors" />
+        <item android:id="@+id/miRemote"
+              android:icon="@drawable/ic_remote"
+              android:title="@string/mi_remote" />
     </group>
 
 </menu>

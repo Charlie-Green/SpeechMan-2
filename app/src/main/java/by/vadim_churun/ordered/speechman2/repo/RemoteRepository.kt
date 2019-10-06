@@ -43,7 +43,7 @@ SpeechManRepository(appContext)
             throw Exception("Connecting to the server on the UI thread.")
 
         val rdb = RemoteData.Builder(request.requestID)
-        val connection = SpeechManRemoteConnector.openConnection(request.ip, false)
+        val connection = SpeechManRemoteConnector.openConnection(request.ip)
         connection.getInputStream().use { instream ->
             SpeechManXmlParser.parse(instream, rdb.entities, rdb.lacks)
         }

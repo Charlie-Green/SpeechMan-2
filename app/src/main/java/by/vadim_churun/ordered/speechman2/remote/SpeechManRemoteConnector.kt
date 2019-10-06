@@ -1,7 +1,6 @@
 package by.vadim_churun.ordered.speechman2.remote
 
-import java.net.URL
-import java.net.URLConnection
+import java.net.*
 
 
 object SpeechManRemoteConnector
@@ -23,12 +22,12 @@ object SpeechManRemoteConnector
         return true
     }
 
-    fun openConnection(ip: String, supportOutput: Boolean = true): URLConnection
+    fun openConnection(ip: String): URLConnection
     {
-        val url = URL("http://${ip}:8080/SpeechManServer/SpeechManServlet")
+        val url = URL("http://${ip}:8080/SpeechMan Server/SpeechMan2")
         return url.openConnection().apply {
             doInput = true
-            doOutput = supportOutput
+            doOutput = true
         }
     }
 }

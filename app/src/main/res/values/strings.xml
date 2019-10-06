@@ -60,6 +60,12 @@
     <string name="la_delete_person">Удалить человека?</string>
     <string name="la_delete_person_appoint">Отменить участие</string>
     <string name="la_delete_seminar">Удалить семинар?</string>
+    <string name="la_export">Экспорт данных</string>
+    <string name="la_export_expanded">Сохранит копию вашей базы данных на сервере.</string>
+    <string name="la_import">Импорт данных</string>
+    <string name="la_import_expanded">
+        Притянет с сервера недостающие данные. Данные, что ЛогоMan 2 хранит сейчас, останутся невредимы!
+    </string>
     <string name="la_leave_person_appoint">Оставить</string>
     <string name="la_no_person_type">Не относится к типу</string>
     <string name="la_person_detail">Информация о человеке:</string>
@@ -97,6 +103,7 @@
     <string name="mi_people">Люди</string>
     <string name="mi_seminars">Семинары</string>
     <string name="mi_products">Товары</string>
+    <string name="mi_remote">Данные</string>
     <string name="mi_tutors">Преподаватели</string>
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>

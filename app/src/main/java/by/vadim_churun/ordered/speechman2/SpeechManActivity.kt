@@ -127,6 +127,10 @@ class SpeechManActivity: AppCompatActivity()
                 R.id.miSeminars -> {
                     navController.navigate(R.id.actToSeminars)
                 }
+
+                R.id.miRemote -> {
+                    navController.navigate(R.id.actToRemote)
+                }
             }
 
             drawerLayout.closeDrawers()
@@ -147,6 +151,8 @@ class SpeechManActivity: AppCompatActivity()
                 destID == R.id.destEditSeminar ||
                 destID == R.id.destEditParticipants )
                 itemID = R.id.miSeminars
+            else if(destID == R.id.destRemote)
+                itemID = R.id.miRemote
             else
                 throw Exception("Unknown destination")
             navDrawer.setCheckedItem(itemID)
