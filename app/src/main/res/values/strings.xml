@@ -108,6 +108,7 @@
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
+    <string name="msg_connection_opened">Идёт передача данных...</string>
     <string name="msg_deleting_appoint">Идут изменения...</string>
     <string name="msg_deleting_person">Идёт удаление...</string>
     <string name="msg_deleting_seminar">Идёт удаление...</string>
@@ -128,10 +129,12 @@
     <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
     <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
     <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
+    <string name="msg_lost_network">Соединение потеряно.</string>
     <string name="msg_no_seminar_name">Вы не ввели название.</string>
     <string name="msg_saving_changes">Идёт сохранение...</string>
     <string name="msg_unknown_cost">Стоимость неизвестна.</string>
     <string name="msg_unknown_date">Дата неизвестна.</string>
+    <string name="msg_waiting_for_network">Ожидание подключения к интернету...</string>
     <string name="semcosts_cru_purpose">Укажите возможные значения стоимости семинара.</string>
     <string name="semdays_cru_purpose">Укажиите расписание семинара по дням.</string>
     <string name="seminar_general_cru_purpose">Укажите общие сведения о семинаре.</string>

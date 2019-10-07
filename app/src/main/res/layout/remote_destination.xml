@@ -112,6 +112,14 @@
 
         </GridLayout>
 
+        <ProgressBar
+                android:id="@+id/prbDataLoad"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:theme="@style/ProgressBarTheme" />
+
     </LinearLayout>
 
     <TextView

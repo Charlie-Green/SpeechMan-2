@@ -28,6 +28,7 @@ object SpeechManRemoteConnector
         return url.openConnection().apply {
             doInput = true
             doOutput = true
+            connectTimeout = 4000
         }
     }
 }

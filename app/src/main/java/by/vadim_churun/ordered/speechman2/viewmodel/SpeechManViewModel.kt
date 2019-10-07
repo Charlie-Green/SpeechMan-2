@@ -81,6 +81,15 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
+    // WRAPPING REMOTE REPOSITORY:
+
+    private val remoteRepo = RemoteRepository(super.getApplication())
+
+    fun createSyncResponseObservable()
+        = remoteRepo.createSyncResponseObservable()
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     // WRAPPING BITMAP REPOSITORY:
 
     private val bitmapRepo = BitmapRepository(super.getApplication())

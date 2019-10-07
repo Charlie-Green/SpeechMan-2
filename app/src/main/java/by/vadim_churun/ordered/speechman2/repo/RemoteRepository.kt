@@ -44,8 +44,15 @@ SpeechManRepository(appContext)
 
         val rdb = RemoteData.Builder(request.requestID)
         val connection = SpeechManRemoteConnector.openConnection(request.ip)
+        SyncResponse(request.requestID, SyncResponse.ProgressStatus.CONNECTION_OPENED).also {
+            responseSubject.onNext(it)
+        }
+
         connection.getInputStream().use { instream ->
             SpeechManXmlParser.parse(instream, rdb.entities, rdb.lacks)
+        }
+        SyncResponse(request.requestID, SyncResponse.ProgressStatus.XML_PARSED).also {
+            responseSubject.onNext(it)
         }
 
         return rdb
@@ -259,15 +266,20 @@ SpeechManRepository(appContext)
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATING OBSERVABLES:
 
-    val dataPullSubject = BehaviorSubject.create<SyncRequest>()
+    private val responseSubject = BehaviorSubject.create<SyncResponse>()
+    val importSubject = BehaviorSubject.create<SyncRequest>()
     val databaseFulfillSubject = BehaviorSubject.create<RemoteData>()
 
-    /** Emits responses for requests supplied via [dataPullSubject] and [databaseFulfillSubject]. **/
+    fun createSyncResponseObservable(): Observable<SyncResponse>
+        = responseSubject.observeOn(AndroidSchedulers.mainThread())
+
+
+    /** Emits responses for requests supplied via [importSubject] and [databaseFulfillSubject]. **/
     fun createRemoteDataObservable(): Observable<RemoteData>
-        = dataPullSubject
+        = importSubject
             .observeOn(Schedulers.io())
-            .map { request ->
-                fetchRemoteData(request)
+            .switchMap { request ->
+                Observable.just( fetchRemoteData(request) )
             }.mergeWith(databaseFulfillSubject
                 .observeOn(Schedulers.computation())
                 .map { rd ->
