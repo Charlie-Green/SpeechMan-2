@@ -84,9 +84,22 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     // WRAPPING REMOTE REPOSITORY:
 
     private val remoteRepo = RemoteRepository(super.getApplication())
+    private val ipValidationSubject = PublishSubject.create<Boolean>()
+
+    val nextSyncRequestID: Int
+        = RemoteRepository.nextRequestID
+
+    fun createRemoteDataObservable()
+         = remoteRepo.createRemoteDataObservable()
 
     fun createSyncResponseObservable()
         = remoteRepo.createSyncResponseObservable()
+
+    fun createPersistedIpMaybe()
+        = remoteRepo.createPersistedIpMaybe()
+
+    fun createIpValidationObservable()
+        = ipValidationSubject.observeOn(AndroidSchedulers.mainThread())
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +206,15 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
 
                     is SpeechManAction.RequestSeminarInfos -> {
                         semsRepo.infoSubjectHeaders.onNext(action.semHeaders)
+                    }
+
+                    is SpeechManAction.RequestSync -> {
+                        val isIpGood = remoteRepo.validateIP(action.request.ip)
+                        ipValidationSubject.onNext(isIpGood)
+                        if(isIpGood) {
+                            remoteRepo.persistIP(action.request.ip)
+                            remoteRepo.requestSubject.onNext(action.request)
+                        }
                     }
 
                     is SpeechManAction.SaveAppointment -> {

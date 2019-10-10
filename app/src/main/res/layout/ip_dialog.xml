@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/big_fragment_padding">
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp" >
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TitleDefault"
+                    android:text="@string/la_enter_ip" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/SubtitleDefault"
+                    android:text="@string/la_ip_purpose" />
+
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/buSubmit"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/shape_round"
+                android:backgroundTint="?colorPrimary"
+                android:textColor="?android:colorBackground"
+                android:textSize="18sp"
+                android:text="OK" />
+
+    </LinearLayout>
+
+    <EditText
+            android:id="@+id/etIp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/InputMultiline"
+            android:hint="@string/hint_ip" />
+
+    <TextView
+            android:id="@+id/tvInvalidIp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?colorError"
+            android:textSize="14sp"
+            android:text="@string/msg_invalid_ip"
+            android:visibility="gone" />
+
+</LinearLayout>

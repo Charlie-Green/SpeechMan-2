@@ -11,7 +11,7 @@ import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlParser
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 
 
 class RemoteRepository(appContext: Context):
@@ -35,12 +35,34 @@ SpeechManRepository(appContext)
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
+    // IP:
+
+    fun validateIP(ip: String): Boolean
+        = SpeechManRemoteConnector.validateIP(ip)
+
+    fun persistIP(ip: String)
+        = SpeechManRemoteConnector.persistIP(super.appContext, ip)
+
+    fun createPersistedIpMaybe(): Maybe<String>
+        = Maybe.create<String> { emitter ->
+            if(Looper.myLooper() == Looper.getMainLooper())
+                throw Exception("Getting persisted IP on the UI thread!")
+            SpeechManRemoteConnector
+                .getPersistedIP(super.appContext)
+                ?.also { emitter.onSuccess(it) }
+            emitter.onComplete()
+        }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     // IMPLEMENTATION OF THE TRANSFORMATIONS:
 
     private fun fetchRemoteData(request: SyncRequest): RemoteData.Builder
     {
         if(Looper.myLooper() == Looper.getMainLooper())
             throw Exception("Connecting to the server on the UI thread.")
+        Log.v(LOGTAG, "fetchRemoteData")
 
         val rdb = RemoteData.Builder(request.requestID)
         val connection = SpeechManRemoteConnector.openConnection(request.ip)
@@ -266,20 +288,31 @@ SpeechManRepository(appContext)
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATING OBSERVABLES:
 
-    private val responseSubject = BehaviorSubject.create<SyncResponse>()
-    val importSubject = BehaviorSubject.create<SyncRequest>()
-    val databaseFulfillSubject = BehaviorSubject.create<RemoteData>()
+    private val responseSubject = PublishSubject.create<SyncResponse>()
+    val requestSubject = PublishSubject.create<SyncRequest>()
+    val databaseFulfillSubject = PublishSubject.create<RemoteData>()
 
     fun createSyncResponseObservable(): Observable<SyncResponse>
-        = responseSubject.observeOn(AndroidSchedulers.mainThread())
-
-
-    /** Emits responses for requests supplied via [importSubject] and [databaseFulfillSubject]. **/
-    fun createRemoteDataObservable(): Observable<RemoteData>
-        = importSubject
+        = requestSubject
             .observeOn(Schedulers.io())
-            .switchMap { request ->
-                Observable.just( fetchRemoteData(request) )
+            .filter { request ->
+                request.action == SyncRequest.RemoteAction.EXPORT
+            }.map { request ->
+                // TODO: Export data
+                SyncResponse(request.requestID, SyncResponse.ProgressStatus.DATA_PUSHED)
+            }.mergeWith(responseSubject)
+            .observeOn(AndroidSchedulers.mainThread())
+
+
+    /** Emits responses for requests supplied via [requestSubject] and [databaseFulfillSubject]. **/
+    fun createRemoteDataObservable(): Observable<RemoteData>
+        = requestSubject
+            .observeOn(Schedulers.io())
+            .filter { request ->
+                Log.i(LOGTAG, "filter in createRemoteDataObservable")
+                request.action == SyncRequest.RemoteAction.IMPORT
+            }.map { request ->
+                fetchRemoteData(request)
             }.mergeWith(databaseFulfillSubject
                 .observeOn(Schedulers.computation())
                 .map { rd ->

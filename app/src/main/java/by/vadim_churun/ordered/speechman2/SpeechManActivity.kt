@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
@@ -18,6 +19,8 @@ import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManViewModel
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.exceptions.UndeliverableException
+import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.android.synthetic.main.speechman_activity.*
 
 
@@ -195,6 +198,18 @@ class SpeechManActivity: AppCompatActivity()
             }
             .subscribe()
 
+    private fun setupGlobalErrorHandler()
+    {
+        RxJavaPlugins.setErrorHandler { err: Throwable ->
+            if(err is UndeliverableException) {
+                Log.i("speech2", "${err.cause!!.javaClass.name} was not delievered.")
+            } else {
+                Thread.currentThread().uncaughtExceptionHandler
+                    .uncaughtException(Thread.currentThread(), err)
+            }
+        }
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // LIFECYCLE:
@@ -207,6 +222,7 @@ class SpeechManActivity: AppCompatActivity()
         initColors()
         setupNavigation()
         disposable.add(connectActionsChannel())
+        setupGlobalErrorHandler()
     }
 
     override fun onRequestPermissionsResult
@@ -236,7 +252,7 @@ class SpeechManActivity: AppCompatActivity()
 
     override fun onDestroy()
     {
-        super.onDestroy()
         disposable.clear()
+        super.onDestroy()
     }
 }

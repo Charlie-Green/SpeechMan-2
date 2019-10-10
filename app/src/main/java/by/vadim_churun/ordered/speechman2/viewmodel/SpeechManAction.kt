@@ -31,6 +31,7 @@ sealed class SpeechManAction
     class RequestPersonInfos(val people: List<Person>): SpeechManAction()
     class RequestSeminarInfo(val seminar: Seminar): SpeechManAction()
     class RequestSeminarInfos(val semHeaders: List<SeminarHeader>): SpeechManAction()
+    class RequestSync(val request: SyncRequest): SpeechManAction()
     class RetrieveSeminarAppointsBuilder(val seminarID: Int): SpeechManAction()
     class SaveAppointment(val appoint: Appointment): SpeechManAction()
     class SaveCRUObject(val componentID: Int): SpeechManAction()

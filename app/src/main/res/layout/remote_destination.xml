@@ -118,7 +118,8 @@
                 android:layout_height="@dimen/progressbar_default_size"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
-                android:theme="@style/ProgressBarTheme" />
+                android:theme="@style/ProgressBarTheme"
+                android:visibility="gone" />
 
     </LinearLayout>
 
