@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.TypedValue
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
 import by.vadim_churun.ordered.speechman2.dialogs.remote.IPDialog
 import by.vadim_churun.ordered.speechman2.model.objects.*
+import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlException
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -47,8 +49,16 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     private fun handleError(thr: Throwable)
     {
         prbDataLoad.visibility = View.GONE
-        tvLog.setTextColor(Color.RED)
-        tvLog.text = "${thr.javaClass.simpleName}: ${thr.message}"
+        tvLog.text = ""
+        var messageResId = R.string.msg_remote_unknown_error
+        if(thr is SpeechManXmlException)
+            messageResId = R.string.msg_remote_xml_error
+        else if(thr.javaClass.name.startsWith("java.net."))
+            messageResId = R.string.msg_remote_network_error
+        AlertDialog.Builder(super.requireContext())
+            .setMessage(messageResId)
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     private fun notifyConnectionOpened()

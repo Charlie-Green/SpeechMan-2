@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" >
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"  >
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+            <TextView
+                    android:id="@+id/tvTitle"
+                    style="@style/TitleDefault"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Title" />
+
+            <TextView
+                    android:id="@+id/tvInfo"
+                    style="@style/SubtitleDefault"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Info" />
+
+            <EditText
+                    android:id="@+id/etMissingData"
+                    style="@style/InputDefault"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="The missing data." />
+
+        </LinearLayout>
+
+        <ImageView
+                android:id="@+id/imgvDelete"
+                android:layout_width="@dimen/edit_icon_default_size"
+                android:layout_height="@dimen/edit_icon_default_size"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_delete"
+                android:tint="@color/dangerPrimary" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone" >
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_horizontal"
+                android:text="@string/msg_data_lack_discared" />
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_default_height"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                style="@style/ApplyButton"
+                android:text="@string/la_restore_data_lack" />
+
+    </LinearLayout>
+
+</FrameLayout>

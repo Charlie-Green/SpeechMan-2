@@ -27,6 +27,9 @@ abstract class DataLack<MissedDataType, ObjectType>
     fun discard()
     { discarded = true }
 
+    fun restore()
+    { discarded = false }
+
 
     fun buildObject(): ObjectType
     {

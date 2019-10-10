@@ -13,6 +13,9 @@
     <string name="fs_all_seminars_appointed">%s уже участвует во всех семинарах.</string>
     <string name="fs_appoint_money">Оплачено: %s из %s</string>
     <string name="fs_appoints_count">Записей на семинар: %d</string>
+    <string name="fs_data_lacks_count">
+        Для восстановления некоторых объектов не хватает данных. Количество таких объектов: %d.
+    </string>
     <string name="fs_incorrect_appoint_cost">Стоимость для участника %s введена неправильно.</string>
     <string name="fs_incorrect_appoint_cost_expanded">
         Стоимость для участника %s и ещё %d чел. введена неправильно.
@@ -64,6 +67,7 @@
     <string name="la_enter_ip">Введите IP</string>
     <string name="la_export">Экспорт данных</string>
     <string name="la_export_expanded">Сохранит копию вашей базы данных на сервере.</string>
+    <string name="la_finish_import">Закончить импорт</string>
     <string name="la_import">Импорт данных</string>
     <string name="la_import_expanded">
         Притянет с сервера недостающие данные. Данные, что ЛогоMan 2 хранит сейчас, останутся невредимы!
@@ -82,6 +86,7 @@
     <string name="la_pick_fixed_semcost">Задайте фиксированную стоимость семинара.</string>
     <string name="la_remove_participants">Удалить участников?</string>
     <string name="la_removed_participants_count">Столько человек будет удалено из списка на семинар.</string>
+    <string name="la_restore_data_lack">Восстановить</string>
     <string name="la_save">Сохранить</string>
     <string name="la_save_participants">Сохранить список участников семинара?</string>
     <string name="la_select_photo">Выбрать фото</string>
@@ -115,6 +120,7 @@
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
     <string name="msg_connection_opened">Идёт передача данных...</string>
+    <string name="msg_data_lack_discared">Объект удалён.</string>
     <string name="msg_data_pulled">Данные приняты. Идёт обработка...</string>
     <string name="msg_data_pushed">Экпорт данных прошёл успешно.</string>
     <string name="msg_deleting_appoint">Идут изменения...</string>
@@ -134,6 +140,17 @@
     </string>
     <string name="msg_no_seminars_found">Семинаров не найдено.</string>
     <string name="msg_participants_not_changed">Вы не внесли изменений. Для отмены нажмите стрелку назад.</string>
+    <string name="msg_remote_network_error">
+        ЛогоMan 2 не смог подключиться к серверу. Вот возможные причины:\n
+        - Нет подключения к интернету.\n
+        - Сервер и ваше устройство находятся в разных подсетях.\n
+        - На сервере не запущено web-приложение ЛогоMan 2.\n
+        - Вы ошиблись при вводе IP-адреса.
+    </string>
+    <string name="msg_remote_unknown_error">При передаче данных возникла неизвестная ошибка.</string>
+    <string name="msg_remote_xml_error">
+        Данные, полученные с сервера, некорректны. ЛогоMan 2 не сможет сохранить объекты.
+    </string>
     <string name="msg_semcost_particips_empty">Вы ничего не ввели.</string>
     <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
     <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
