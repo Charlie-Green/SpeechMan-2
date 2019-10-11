@@ -16,6 +16,36 @@
     <string name="fs_data_lacks_count">
         Для восстановления некоторых объектов не хватает данных. Количество таких объектов: %d.
     </string>
+    <string name="fs_fill_appoint_cost_lack">Введите стоимость семинара "%s" для участника %s.</string>
+    <string name="fs_fill_appoint_money_lack">Введите оплату и стоимость семинара "%s" для участника %s</string>
+    <string name="fs_fill_appoint_purchase_lack">Введите оплату участника %s за семинар "%s"</string>
+    <string name="fs_fill_order_purchase_lack">Введите оплату за товар.\nЗаказчик: %s\nТовар: %s</string>
+    <string name="fs_fill_semcost_lack_f">
+        Введите стоимость семинара.
+    </string>
+    <string name="fs_fill_semcost_lack_d">
+        Введите стоимость семинара %s для участников записавшихся с %s.
+    </string>
+    <string name="fs_fill_semcost_lack_dp">
+        Введите стоимость семинара %s при следующих условиях:\n
+        - Дата записи: от %s\n
+        - Количество участников: от %d\n
+    </string>
+    <string name="fs_fill_semcost_lack_p">
+        Введите стоимость семинара "%s" при минимальном количестве участников %d.
+    </string>
+    <string name="la_fill_semcost_lack_pd">
+        Введите стоимость при следующих условиях:
+        - Количество участников: от %d
+        - Дата записи: с %s
+    </string>
+    <string name="fs_fill_seminar_city_lack">
+        Пожалуйста, введите город проведения семинара.\nАдрес: %s\nПрограмма: %s\n
+    </string>
+    <string name="fs_fill_seminar_name_lack">
+        Введите название семинара, поставленного в г. %s по адресу: %s.\n
+        Программа семинара: %s
+    </string>
     <string name="fs_incorrect_appoint_cost">Стоимость для участника %s введена неправильно.</string>
     <string name="fs_incorrect_appoint_cost_expanded">
         Стоимость для участника %s и ещё %d чел. введена неправильно.
@@ -27,6 +57,11 @@
     <string name="fs_participants_to_remove_count">Вы собираетесь убрать: %d</string>
     <string name="fs_people_count">Всего людей: %d</string>
     <string name="fs_person_appointments_count">Записей на семинары: %d</string>
+    <string name="fs_fill_product_cost_lack">
+        В чемодане: %d\n
+        В коробках: %d\n
+        Пожалуйста, введите стоимость товара.
+    </string>
     <string name="fs_removed_participants_count">Вы также собираетесь удалить %d чел. из списка.</string>
     <string name="fs_semcost_date_atleast">дата записи с %s</string>
     <string name="fs_semcost_particips">%d чел</string>
@@ -94,6 +129,7 @@
     <string name="la_semcost_particips">Минимум участников</string>
     <string name="la_semcost_cost">Стоимость</string>
     <string name="la_semcost_cost_purpose">Введите рекомендуемую стоимость семинара при следующих условиях:</string>
+    <string name="la_seminar_content_empty">* Программа отсутствует. *</string>
     <string name="la_seminar_content_suggest">Вы можете также ввести программу семинара.</string>
     <string name="la_semcosts">Может стоить:</string>
     <string name="la_semdays">Дни семинара:</string>
@@ -101,6 +137,7 @@
     <string name="la_semday_end">Конец</string>
     <string name="la_semday_start">Начало</string>
     <string name="la_seminar_address">Адрес:</string>
+    <string name="la_seminar_address_empty">* Адрес не указан. *</string>
     <string name="la_seminar_city">Город:</string>
     <string name="la_seminar_content">Программа семинара:</string>
     <string name="la_seminar_end">Окончание:</string>
@@ -111,6 +148,10 @@
     <string name="la_update_seminar_no">Нет, вернуть как было</string>
     <string name="la_update_seminar_yes">Да, сохранить</string>
     <string name="la_version">Версия ЛогоMan:\u0020</string>
+    <string name="mi_appoint_cost">Стоимость семинара</string>
+    <string name="mi_appoint_money">Оплата и стоимость семинара</string>
+    <string name="mi_appoint_purchase">Оплата за семинар</string>
+    <string name="mi_order_purchase">Оплата за товар</string>
     <string name="mi_people">Люди</string>
     <string name="mi_seminars">Семинары</string>
     <string name="mi_products">Товары</string>

@@ -10,10 +10,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"  >
 
+        <ImageView
+                android:id="@+id/imgvEntityType"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:tint="?colorPrimary"
+                android:visibility="invisible" />
+
         <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
                 android:layout_weight="1">
 
             <TextView
@@ -28,6 +38,8 @@
                     style="@style/SubtitleDefault"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:scrollHorizontally="false"
                     android:text="Info" />
 
             <EditText
@@ -40,7 +52,7 @@
         </LinearLayout>
 
         <ImageView
-                android:id="@+id/imgvDelete"
+                android:id="@+id/imgvDiscard"
                 android:layout_width="@dimen/edit_icon_default_size"
                 android:layout_height="@dimen/edit_icon_default_size"
                 android:layout_gravity="center_vertical"
