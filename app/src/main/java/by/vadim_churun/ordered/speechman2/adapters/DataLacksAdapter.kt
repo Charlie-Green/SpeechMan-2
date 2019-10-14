@@ -1,7 +1,6 @@
 package by.vadim_churun.ordered.speechman2.adapters
 
 import android.content.Context
-import android.provider.Settings.System.DATE_FORMAT
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
@@ -12,8 +11,7 @@ import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.db.objs.Money
 import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfo
 import by.vadim_churun.ordered.speechman2.remote.lack.*
-import by.vadim_churun.ordered.speechman2.views.MoneyPickerDialog
-import by.vadim_churun.ordered.speechman2.views.PurchaseCostPickerDialog
+import by.vadim_churun.ordered.speechman2.views.*
 import kotlinx.android.synthetic.main.data_lack_listitem.view.*
 import java.text.SimpleDateFormat
 
@@ -220,7 +218,6 @@ class DataLacksAdapter(
 
     private fun bindSemCostMoney(holder: LackViewHolder, position: Int)
     {
-        val lack = lacks[position] as SemCostMoneyLack
         holder.imgvEntityType.visibility = View.VISIBLE
         holder.imgvEntityType.setImageResource(R.drawable.ic_seminar)
         holder.tvTitle.text = "SeminarName"

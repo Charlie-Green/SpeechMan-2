@@ -7,6 +7,9 @@ import by.vadim_churun.ordered.speechman2.db.entities.Product
 @Dao
 interface ProductsDAO
 {
+    @Query("select * from Products where id=:productID")
+    fun rawGet(productID: Int): Product
+
     @Query("select * from Products where name=:name")
     fun getByName(name: String): List<Product>
 

@@ -95,6 +95,9 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     fun createSyncResponseObservable()
         = remoteRepo.createSyncResponseObservable()
 
+    fun createLackInfosObservable()
+        = remoteRepo.createLackInfosObservable()
+
     fun createPersistedIpMaybe()
         = remoteRepo.createPersistedIpMaybe()
 
@@ -194,6 +197,10 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
 
                     is SpeechManAction.RetrieveSeminarAppointsBuilder -> {
                         semsRepo.retrieveAppointsBuilder(action.seminarID)
+                    }
+
+                    is SpeechManAction.RequestDataLackInfos -> {
+                        remoteRepo.lackInfosSubject.onNext(action.request)
                     }
 
                     is SpeechManAction.RequestPersonInfos -> {

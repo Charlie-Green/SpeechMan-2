@@ -4,7 +4,9 @@ import android.content.res.Resources
 import by.vadim_churun.ordered.speechman2.db.entities.*
 import by.vadim_churun.ordered.speechman2.db.objs.SeminarHeader
 import by.vadim_churun.ordered.speechman2.model.filters.*
+import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfosRequest
 import by.vadim_churun.ordered.speechman2.model.objects.*
+import by.vadim_churun.ordered.speechman2.remote.lack.DataLack
 
 
 sealed class SpeechManAction
@@ -28,6 +30,7 @@ sealed class SpeechManAction
     class NavigateError(val errorMessageResID: Int): SpeechManAction()
     class PublishSemAppointsBuilder(val builder: SeminarAppointsBuilder): SpeechManAction()
     class PublishSeminarBuilder(val builder: SeminarBuilder): SpeechManAction()
+    class RequestDataLackInfos(val request: DataLackInfosRequest): SpeechManAction()
     class RequestPersonInfos(val people: List<Person>): SpeechManAction()
     class RequestSeminarInfo(val seminar: Seminar): SpeechManAction()
     class RequestSeminarInfos(val semHeaders: List<SeminarHeader>): SpeechManAction()

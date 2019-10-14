@@ -4,14 +4,18 @@ import android.content.Context
 import android.os.Looper
 import android.util.Log
 import by.vadim_churun.ordered.speechman2.db.entities.*
+import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfo
+import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfosRequest
 import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.model.warning.*
 import by.vadim_churun.ordered.speechman2.remote.*
+import by.vadim_churun.ordered.speechman2.remote.lack.*
 import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlParser
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import java.util.Calendar
 
 
 class RemoteRepository(appContext: Context):
@@ -285,12 +289,157 @@ SpeechManRepository(appContext)
     }
 
 
+    private fun getLackInfos(request: DataLackInfosRequest): List<DataLackInfo?>
+    {
+        // Person ID -> Person name
+        var peopleMap: HashMap<Int, String>? = null
+
+        // Seminar ID -> Pair<Seminar name, Seminar CostingStrategy>.
+        var seminarsMap: HashMap<Int, Pair<String, Seminar.CostingStrategy>>? = null
+
+        // Product ID -> Product name
+        var productsMap: HashMap<Int, String>? = null
+
+        // SemCost ID -> Pair<SemCost minParticipants, SemCost minDate>
+        var costsMap: HashMap<Int, Pair<Int, Calendar>>? = null
+
+        // Fill the maps:
+        for(lack in request.lacks)
+        {
+            when(lack)
+            {
+                is ProductCostLack -> {
+                    productsMap = productsMap ?: HashMap()
+                    lack.ID?.also { productsMap!!.put(it, lack.name) }
+                }
+
+                is SeminarCityLack -> {
+                    seminarsMap = seminarsMap ?: HashMap()
+                    lack.ID?.also {
+                        seminarsMap!!.put(it, Pair(lack.name, lack.costing))
+                    }
+                }
+
+                is SemCostMoneyLack -> {
+                    costsMap = costsMap ?: HashMap()
+                    costsMap.put(lack.seminarID, Pair(lack.minParticipants, lack.minDate))
+                }
+            }
+        }
+        for(warning in request.warnings)
+        {
+            when(warning)
+            {
+                is PersonNameExistsWarning -> {
+                    peopleMap = peopleMap ?: HashMap()
+                    warning.ID?.also { peopleMap.put(it, warning.name) }
+                }
+
+                is SeminarNameAndCityExistWarning -> {
+                    seminarsMap = seminarsMap ?: HashMap()
+                    warning.ID?.also { seminarsMap.put(it, Pair(warning.name, warning.costing)) }
+                }
+
+                is ProductNameExistsWarning -> {
+                    productsMap = productsMap ?: HashMap()
+                    warning.ID?.also { productsMap.put(it, warning.name) }
+                }
+            }
+        }
+
+        // Define methods to extract information from the maps and the database:
+        fun getPersonName(personID: Int): String
+        {
+            try {
+                return peopleMap?.get(personID) ?: super.peopleDAO.rawGet(personID).name
+            } catch(exc: Exception) {
+                throw Exception("Cannot retrieve a Person with ID $personID", exc)
+            }
+        }
+        fun getSeminarPair(seminarID: Int): Pair<String, Seminar.CostingStrategy>
+        {
+            val pair = seminarsMap?.get(seminarID)
+            if(pair != null) return pair
+            try {
+                val sem = super.seminarsDAO.get(seminarID)
+                return Pair(sem.name, sem.costing)
+            } catch(exc: Exception) {
+                throw Exception("Failed to retrieve a Seminar with ID $seminarID", exc)
+            }
+        }
+        fun getProductName(productID: Int): String
+        {
+            try {
+                return productsMap?.get(productID) ?: super.productsDAO.rawGet(productID).name
+            } catch(exc: Exception) {
+                throw Exception("Failed to retrieve a Product with ID $productID", exc)
+            }
+        }
+        fun getCostPair(costID: Int): Pair<Int, Calendar>
+        {
+            val pair = costsMap?.get(costID)
+            if(pair != null) return pair
+            try {
+                val cost = super.seminarsDAO.rawGetCost(costID)
+                return Pair(cost.minParticipants, cost.minDate)
+            } catch(exc: Exception) {
+                throw Exception("Failed to retrieve a SemCost with ID $costID", exc)
+            }
+        }
+
+        // Obtain the infos and return:
+        return MutableList<DataLackInfo?>(request.lacks.size) { index ->
+            val lack = request.lacks[index]
+            when(lack)
+            {
+                is AppointmentPurchaseLack -> {
+                    return@MutableList DataLackInfo.AppointmentInfo(
+                        getPersonName(lack.personID),
+                        getSeminarPair(lack.seminarID).first
+                    )
+                }
+
+                is AppointmentCostLack -> {
+                    return@MutableList DataLackInfo.AppointmentInfo(
+                        getPersonName(lack.personID),
+                        getSeminarPair(lack.seminarID).first
+                    )
+                }
+
+                is AppointmentMoneyLack -> {
+                    return@MutableList DataLackInfo.AppointmentInfo(
+                        getPersonName(lack.personID),
+                        getSeminarPair(lack.seminarID).first
+                    )
+                }
+
+                is OrderPurchaseLack -> {
+                    return@MutableList  DataLackInfo.OrderInfo(
+                        getPersonName(lack.personID),
+                        getProductName(lack.productID)
+                    )
+                }
+
+                is SemCostMoneyLack -> {
+                    val sempair = getSeminarPair(lack.seminarID)
+                    return@MutableList DataLackInfo.SemCostInfo(
+                        sempair.first, sempair.second, lack.minParticipants, lack.minDate )
+                }
+            }
+
+            // No additional information is needed for other types of DataLack.
+            return@MutableList null
+        }
+    }
+
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATING OBSERVABLES:
 
     private val responseSubject = PublishSubject.create<SyncResponse>()
     val requestSubject = PublishSubject.create<SyncRequest>()
     val databaseFulfillSubject = PublishSubject.create<RemoteData>()
+    val lackInfosSubject = PublishSubject.create<DataLackInfosRequest>()
 
     fun createSyncResponseObservable(): Observable<SyncResponse>
         = requestSubject
@@ -321,5 +470,12 @@ SpeechManRepository(appContext)
             ).observeOn(Schedulers.io())
             .map { builder ->
                 handleRemoteData(builder)
+            }.observeOn(AndroidSchedulers.mainThread())
+
+    fun createLackInfosObservable(): Observable< List<DataLackInfo?> >
+        = lackInfosSubject
+            .observeOn(Schedulers.computation())
+            .map { request ->
+                getLackInfos(request)
             }.observeOn(AndroidSchedulers.mainThread())
 }

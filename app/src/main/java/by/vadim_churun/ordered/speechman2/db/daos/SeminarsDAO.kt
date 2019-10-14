@@ -73,6 +73,9 @@ interface SeminarsDAO
     @Query("select * from SemDays where seminar=:seminarID")
     fun getDays(seminarID: Int): Observable< List<SemDay> >
 
+    @Query("select * from SemCosts where id=:costID")
+    fun rawGetCost(costID: Int): SemCost
+
     @Query("select * from SemCosts where seminar=:seminarID")
     fun getCosts(seminarID: Int): Observable< List<SemCost> >
 

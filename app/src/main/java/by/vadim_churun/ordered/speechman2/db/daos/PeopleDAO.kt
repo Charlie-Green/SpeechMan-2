@@ -16,6 +16,9 @@ interface PeopleDAO
     @Query("select * from People where id=:personID")
     fun get(personID: Int): Observable<Person>
 
+    @Query("select * from People where id=:personID")
+    fun rawGet(personID: Int): Person
+
     ///** Selects [Appointment]s and [Seminar]s regardless of their logical deletion status. **/
     /** Selects only those [Appointment]s which haven't been logically deleted. **/
     @Query("select max(Appointments.person) as appoint_person, " +
