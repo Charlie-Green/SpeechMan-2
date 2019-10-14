@@ -24,7 +24,7 @@
         Введите стоимость семинара.
     </string>
     <string name="fs_fill_semcost_lack_d">
-        Введите стоимость семинара %s для участников записавшихся с %s.
+        Введите стоимость семинара %s для участников, записавшихся с %s.
     </string>
     <string name="fs_fill_semcost_lack_dp">
         Введите стоимость семинара %s при следующих условиях:\n
@@ -34,7 +34,7 @@
     <string name="fs_fill_semcost_lack_p">
         Введите стоимость семинара "%s" при минимальном количестве участников %d.
     </string>
-    <string name="la_fill_semcost_lack_pd">
+    <string name="fs_fill_semcost_lack_pd">
         Введите стоимость при следующих условиях:
         - Количество участников: от %d
         - Дата записи: с %s
@@ -118,6 +118,8 @@
     <string name="la_person_name">ФИО:</string>
     <string name="la_person_type">Тип:</string>
     <string name="la_pick_money">Введите денежную сумму</string>
+    <string name="la_pick_cost">Стоимость:</string>
+    <string name="la_pick_purchase">Оплачено:</string>
     <string name="la_pick_fixed_semcost">Задайте фиксированную стоимость семинара.</string>
     <string name="la_remove_participants">Удалить участников?</string>
     <string name="la_removed_participants_count">Столько человек будет удалено из списка на семинар.</string>
@@ -178,6 +180,9 @@
     <string name="msg_money_two_words">Введите номинал и валюту. Например: 7000 RUR</string>
     <string name="msg_need_permission_for_image">
         ЛогоMan 2 не может загрузить картинку: нет разрешения на чтение файлов из хранилища.
+    </string>
+    <string name="msg_not_money">
+        Введите номинал и валюту - 3 латинские буквы. Например: 79.99 EUR.
     </string>
     <string name="msg_no_seminars_found">Семинаров не найдено.</string>
     <string name="msg_participants_not_changed">Вы не внесли изменений. Для отмены нажмите стрелку назад.</string>

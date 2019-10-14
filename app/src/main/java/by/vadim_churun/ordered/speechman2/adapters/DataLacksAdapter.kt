@@ -1,17 +1,21 @@
 package by.vadim_churun.ordered.speechman2.adapters
 
 import android.content.Context
+import android.provider.Settings.System.DATE_FORMAT
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.vadim_churun.ordered.speechman2.R
+import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.db.objs.Money
 import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfo
 import by.vadim_churun.ordered.speechman2.remote.lack.*
 import by.vadim_churun.ordered.speechman2.views.MoneyPickerDialog
+import by.vadim_churun.ordered.speechman2.views.PurchaseCostPickerDialog
 import kotlinx.android.synthetic.main.data_lack_listitem.view.*
+import java.text.SimpleDateFormat
 
 
 class DataLacksAdapter(
@@ -20,6 +24,16 @@ class DataLacksAdapter(
     val lacks: List<DataLack<*,*>>
 ): RecyclerView.Adapter<DataLacksAdapter.LackViewHolder>()
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // COMPANION OBJECT:
+
+    companion object
+    {
+        // TODO: Localize.
+        private val DATE_FORMAT = SimpleDateFormat("dd.MM.yyyy")
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // VIEW HOLDER:
 
@@ -74,7 +88,7 @@ class DataLacksAdapter(
     {
         holder.imgvEntityType.visibility = View.INVISIBLE
         val promptText = context.getString(
-            R.string.fs_fill_appoint_purchase_lack, info?.seminarName ?: "", info?.personName ?: "" )
+            R.string.fs_fill_appoint_purchase_lack, info?.personName ?: "", info?.seminarName ?: "" )
         holder.tvInfo.text = promptText
         holder.tvTitle.setText(R.string.mi_appoint_purchase)
         holder.etMissingData.isEnabled = false
@@ -114,7 +128,9 @@ class DataLacksAdapter(
         holder.etMissingData.isEnabled = false
         holder.etMissingData.setOnClickListener {
             info ?: return@setOnClickListener
-            // TODO: Show PurchaseCostPickerDialog
+            PurchaseCostPickerDialog(promptText, null, null) { purchase, cost ->
+                lack.fill( AppointmentMoneyLack.MissedData(purchase, cost) )
+            }
         }
     }
 
@@ -208,8 +224,38 @@ class DataLacksAdapter(
         holder.imgvEntityType.visibility = View.VISIBLE
         holder.imgvEntityType.setImageResource(R.drawable.ic_seminar)
         holder.tvTitle.text = "SeminarName"
-        holder.tvInfo.setText(R.string.fs_fill_semcost_lack_f)
-        // TODO: Set different tvInfo.setText depending on the Seminar's CostingStrategy.
+
+        val info = infos?.get(position) as DataLackInfo.SemCostInfo?
+        val infoText: String
+        when(info?.costing)
+        {
+            Seminar.CostingStrategy.FIXED -> {
+                infoText = context.getString(R.string.fs_fill_semcost_lack_f)
+            }
+            Seminar.CostingStrategy.PARTICIPANTS -> {
+                infoText = context.getString(
+                    R.string.fs_fill_semcost_lack_p, info.seminarName, info.minParticipants )
+            }
+            Seminar.CostingStrategy.DATE -> {
+                infoText = context.getString(
+                    R.string.fs_fill_semcost_lack_d,
+                    info.seminarName,
+                    DATE_FORMAT.format(info.minDate.time)
+                )
+            }
+            Seminar.CostingStrategy.PARTICIPANTS_DATE -> {
+                infoText = context.getString(
+                    R.string.fs_fill_semcost_lack_pd,
+                    info.minParticipants,
+                    DATE_FORMAT.format(info.minDate.time)
+                )
+            }
+            else /* null */ -> {
+                infoText = ""
+            }
+        }
+        holder.tvInfo.text = infoText
+
         holder.etMissingData.isEnabled = true
         listenMissingText(holder) { text ->
             try {
@@ -234,6 +280,50 @@ class DataLacksAdapter(
 
     override fun onBindViewHolder(holder: LackViewHolder, position: Int)
     {
+        val lack = lacks[position]
+        when(lack)
+        {
+            is AppointmentPurchaseLack -> {
+                val info = infos?.get(position) as DataLackInfo.AppointmentInfo
+                bindAppointPurchase(holder, lack, info)
+            }
 
+            is AppointmentCostLack -> {
+                val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
+                bindAppointCost(holder, lack, info)
+            }
+
+            is AppointmentMoneyLack -> {
+                val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
+                bindAppointMoney(holder, lack, info)
+            }
+
+            is OrderPurchaseLack -> {
+                val info = infos?.get(position) as DataLackInfo.OrderInfo?
+                bindOrderPurchase(holder, lack, info)
+            }
+
+            is ProductCostLack -> {
+                bindProductCost(holder, position)
+            }
+
+            is SeminarNameLack -> {
+                bindSeminarName(holder, position)
+            }
+
+            is SeminarCityLack -> {
+                bindSeminarCity(holder, position)
+            }
+
+            is SemCostMoneyLack -> {
+                bindSemCostMoney(holder, position)
+            }
+
+            else -> {
+                val superTypeName = DataLack::class.java.simpleName
+                val subtypeName = lack.javaClass.simpleName
+                throw IllegalArgumentException("Unknown $superTypeName subtype $subtypeName")
+            }
+        }
     }
 }

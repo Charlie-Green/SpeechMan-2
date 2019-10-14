@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/big_fragment_padding" >
+
+    <TextView
+            android:id="@+id/tvPurpose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Purpose." />
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp" >
+
+            <TextView
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="4dp"
+                    style="@style/LabelDefault"
+                    android:text="@string/la_pick_purchase" />
+
+            <EditText
+                    android:id="@+id/etPurchase"
+                    android:layout_gravity="fill_horizontal|center_vertical"
+                    style="@style/InputDefault"
+                    android:hint="@string/hint_pick_money" />
+
+            <TextView
+                    android:id="@+id/tvPurchaseError"
+                    android:layout_columnSpan="2"
+                    android:layout_marginBottom="4sp"
+                    android:textColor="@color/error"
+                    android:textSize="14sp"
+                    android:text="@string/msg_not_money"
+                    android:visibility="gone" />
+
+
+            <TextView
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="4dp"
+                    style="@style/LabelDefault"
+                    android:text="@string/la_pick_cost" />
+
+            <EditText
+                    android:id="@+id/etCost"
+                    android:layout_gravity="fill_horizontal|center_vertical"
+                    style="@style/InputDefault"
+                    android:hint="@string/hint_pick_money" />
+
+            <TextView
+                    android:id="@+id/tvCostError"
+                    android:layout_columnSpan="2"
+                    android:textColor="@color/error"
+                    android:textSize="14sp"
+                    android:text="@string/msg_not_money"
+                    android:visibility="gone" />
+
+        </GridLayout>
+
+        <ProgressBar
+                android:id="@+id/prbar"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center"
+                android:theme="@style/ProgressBarTheme"
+                android:visibility="gone" />
+
+    </FrameLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <Button
+                android:id="@+id/buCancel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_default_height"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                style="@style/CancelButton"
+                android:text="@string/la_cancel" />
+
+        <Button
+                android:id="@+id/buApply"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_default_height"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                style="@style/ApplyButton"
+                android:text="@string/la_apply_money" />
+
+    </LinearLayout>
+
+</LinearLayout>
