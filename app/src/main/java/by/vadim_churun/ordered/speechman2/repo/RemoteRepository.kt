@@ -300,9 +300,6 @@ SpeechManRepository(appContext)
         // Product ID -> Product name
         var productsMap: HashMap<Int, String>? = null
 
-        // SemCost ID -> Pair<SemCost minParticipants, SemCost minDate>
-        var costsMap: HashMap<Int, Pair<Int, Calendar>>? = null
-
         // Fill the maps:
         for(lack in request.lacks)
         {
@@ -318,11 +315,6 @@ SpeechManRepository(appContext)
                     lack.ID?.also {
                         seminarsMap!!.put(it, Pair(lack.name, lack.costing))
                     }
-                }
-
-                is SemCostMoneyLack -> {
-                    costsMap = costsMap ?: HashMap()
-                    costsMap.put(lack.seminarID, Pair(lack.minParticipants, lack.minDate))
                 }
             }
         }
@@ -375,17 +367,6 @@ SpeechManRepository(appContext)
                 throw Exception("Failed to retrieve a Product with ID $productID", exc)
             }
         }
-        fun getCostPair(costID: Int): Pair<Int, Calendar>
-        {
-            val pair = costsMap?.get(costID)
-            if(pair != null) return pair
-            try {
-                val cost = super.seminarsDAO.rawGetCost(costID)
-                return Pair(cost.minParticipants, cost.minDate)
-            } catch(exc: Exception) {
-                throw Exception("Failed to retrieve a SemCost with ID $costID", exc)
-            }
-        }
 
         // Obtain the infos and return:
         return MutableList<DataLackInfo?>(request.lacks.size) { index ->
@@ -423,7 +404,7 @@ SpeechManRepository(appContext)
                 is SemCostMoneyLack -> {
                     val sempair = getSeminarPair(lack.seminarID)
                     return@MutableList DataLackInfo.SemCostInfo(
-                        sempair.first, sempair.second, lack.minParticipants, lack.minDate )
+                        sempair.first, sempair.second)
                 }
             }
 

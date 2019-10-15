@@ -15,8 +15,6 @@ sealed class DataLackInfo
     ): DataLackInfo()
     class SemCostInfo(
         val seminarName: String,
-        val costing: Seminar.CostingStrategy,
-        val minParticipants: Int,
-        val minDate: Calendar
+        val costing: Seminar.CostingStrategy
     ): DataLackInfo()
 }

@@ -12,6 +12,8 @@ abstract class DataLack<MissedDataType, ObjectType>
     private var datapiece: MissedDataType? = null
     private var discarded = false
 
+    val filledData: MissedDataType?
+        get() = datapiece
     val isDiscarded: Boolean
         get() = discarded
     val isFilled: Boolean
@@ -23,6 +25,9 @@ abstract class DataLack<MissedDataType, ObjectType>
             throw IllegalArgumentException("DataLack filled with invalid data")
         datapiece = data
     }
+
+    fun erase()
+    { datapiece = null }
 
     fun discard()
     { discarded = true }
