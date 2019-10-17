@@ -18,7 +18,7 @@ interface SeminarsDAO
     @Query("select * from Seminars where Seminars.id=:seminarID")
     fun getRx(seminarID: Int): Observable<Seminar>
 
-    @Query("select * from Seminars where name=:name and city=:city")
+    @Query("select * from Seminars where name=:name and city=:city and isDeleted=0")
     fun getByNameAndCity(name: String, city: String): List<Seminar>
 
     @Query("select :seminarID as id, " +

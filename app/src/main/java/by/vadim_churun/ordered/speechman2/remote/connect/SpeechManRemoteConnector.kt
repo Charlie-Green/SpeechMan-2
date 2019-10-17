@@ -1,4 +1,4 @@
-package by.vadim_churun.ordered.speechman2.remote
+package by.vadim_churun.ordered.speechman2.remote.connect
 
 import android.content.Context
 import java.io.IOException

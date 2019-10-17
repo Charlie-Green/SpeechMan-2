@@ -109,7 +109,6 @@
     <string name="la_enter_ip">Введите IP</string>
     <string name="la_export">Экспорт данных</string>
     <string name="la_export_expanded">Сохранит копию вашей базы данных на сервере.</string>
-    <string name="la_finish_import">Закончить импорт</string>
     <string name="la_import">Импорт данных</string>
     <string name="la_import_expanded">
         Притянет с сервера недостающие данные. Данные, что ЛогоMan 2 хранит сейчас, останутся невредимы!
@@ -170,6 +169,7 @@
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
+    <string name="msg_changes_applied">Изменения сохранены.</string>
     <string name="msg_connection_opened">Идёт передача данных...</string>
     <string name="msg_data_lack_discared">Объект удалён.</string>
     <string name="msg_data_not_entered">* Данные не введены. *</string>
@@ -183,6 +183,7 @@
         Этот объект помечен как удалённый. Он может быть отображён в истории человека.
     </string>
     <string name="msg_image_not_decoded">ЛогоMan 2 не может отобразить выбранную картинку.</string>
+    <string name="msg_import_finished">Импорт данных завершён успешно.</string>
     <string name="msg_invalid_ip">Некорректный IPv4 адрес.</string>
     <string name="msg_money_amount_incorrect">
         Номинал введён некорректно. Ожидается неотрицательное число, например: 15.45.
@@ -213,12 +214,21 @@
     <string name="msg_semcost_particips_empty">Вы ничего не ввели.</string>
     <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
     <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
+    <string name="msg_server_no_data">Данных на сервере не обнаружено.</string>
     <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
     <string name="msg_lost_network">Соединение потеряно.</string>
     <string name="msg_no_seminar_name">Вы не ввели название.</string>
     <string name="msg_saving_changes">Идёт сохранение...</string>
     <string name="msg_unknown_cost">Стоимость неизвестна.</string>
     <string name="msg_unknown_date">Дата неизвестна.</string>
+    <string name="msg_unknown_remote_action">
+        Web-приложение ЛогоMan не поддерживает это действие. Возможное решение:\n
+        - Обновить web-приложение.
+    </string>
+    <string name="msg_unknown_server_response">
+        Web-приложение ЛогоMan общается по неизвестному протоколу. Возможное решение:\n
+        - Обновить ЛогоMan на вашем устройстве.
+    </string>
     <string name="msg_waiting_for_network">Ожидание подключения к интернету...</string>
     <string name="semcosts_cru_purpose">Укажите возможные значения стоимости семинара.</string>
     <string name="semdays_cru_purpose">Укажиите расписание семинара по дням.</string>

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.db.entities.SemCost
+import by.vadim_churun.ordered.speechman2.model.objects.RemoteData
 import by.vadim_churun.ordered.speechman2.model.objects.SeminarBuilder
 import by.vadim_churun.ordered.speechman2.repo.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -230,6 +231,10 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                         peopleRepo.addOrUpdateAppointments(listOf(action.appoint))
                     }
 
+                    is SpeechManAction.SaveRemoteData -> {
+                        remoteRepo.databaseFulfillSubject.onNext(action.rd)
+                    }
+
                     is SpeechManAction.SaveSeminar -> {
                         semsRepo.builderSubject.onNext(action.builder)
                         semsRepo.save(action.builder)?.also {
@@ -291,6 +296,15 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
       * currently stored within the application model is up-to-date.
       * It emits true on each [SpeechManAction.PublishSeminarBuilder] action. **/
     val sbuilderUptodateSubject = BehaviorSubject.create<Boolean>()
+
+
+    private val remoteDataSubject = BehaviorSubject.create<RemoteData>()
+
+    fun keepRemoteData(rd: RemoteData)
+    { remoteDataSubject.onNext(rd) }
+
+    fun getKeptRemoteDataRx()
+        = remoteDataSubject.observeOn(AndroidSchedulers.mainThread())
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

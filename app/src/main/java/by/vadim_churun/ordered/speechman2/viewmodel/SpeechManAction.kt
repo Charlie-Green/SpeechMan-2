@@ -38,6 +38,7 @@ sealed class SpeechManAction
     class RetrieveSeminarAppointsBuilder(val seminarID: Int): SpeechManAction()
     class SaveAppointment(val appoint: Appointment): SpeechManAction()
     class SaveCRUObject(val componentID: Int): SpeechManAction()
+    class SaveRemoteData(val rd: RemoteData): SpeechManAction()
     class SaveSeminar(val builder: SeminarBuilder): SpeechManAction()
     class SaveSeminarAppoints(val builder: SeminarAppointsBuilder): SpeechManAction()
     class SelectImage: SpeechManAction()

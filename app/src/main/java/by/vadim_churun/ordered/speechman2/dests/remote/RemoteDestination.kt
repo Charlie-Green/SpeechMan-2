@@ -1,17 +1,20 @@
 package by.vadim_churun.ordered.speechman2.dests.remote
 
-import android.graphics.Color
 import android.net.*
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
 import by.vadim_churun.ordered.speechman2.dialogs.remote.IPDialog
+import by.vadim_churun.ordered.speechman2.model.exceptions.UnknownResponseSpeechManException
 import by.vadim_churun.ordered.speechman2.model.objects.*
+import by.vadim_churun.ordered.speechman2.remote.connect.SpeechManServerException
 import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlException
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.Observable
@@ -22,6 +25,8 @@ import kotlinx.android.synthetic.main.remote_destination.*
 
 class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
 {
+    private val LOGTAG = RemoteDestination::class.java.simpleName
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     // STYLING:
 
@@ -48,6 +53,8 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
 
     private fun handleError(thr: Throwable)
     {
+        Log.e(LOGTAG, "${thr.javaClass.name}: ${thr.message}")
+
         prbDataLoad.visibility = View.GONE
         tvLog.text = ""
         var messageResId = R.string.msg_remote_unknown_error
@@ -55,6 +62,15 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
             messageResId = R.string.msg_remote_xml_error
         else if(thr.javaClass.name.startsWith("java.net."))
             messageResId = R.string.msg_remote_network_error
+        else if(thr is SpeechManServerException &&
+            thr.reason == SpeechManServerException.Reason.UNKNOWN_REMOTE_ACTION )
+            messageResId = R.string.msg_unknown_remote_action
+        else if(thr is SpeechManServerException &&
+            thr.reason == SpeechManServerException.Reason.NO_DATA )
+            messageResId = R.string.msg_server_no_data
+        else if(thr is UnknownResponseSpeechManException)
+            messageResId = R.string.msg_unknown_server_response
+
         AlertDialog.Builder(super.requireContext())
             .setMessage(messageResId)
             .setPositiveButton("OK", null)
@@ -77,9 +93,8 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         }
     }
 
-    private fun notifyXmlParsed()
-    {
-        tvLog.setText(colorText)
+    private fun notifyXmlParsed() {
+        tvLog.setTextColor(colorText)
         tvLog.setText(R.string.msg_data_pulled)
     }
 
@@ -116,16 +131,34 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
 
     private fun unregisterNetCallback()
     {
-        netCallback?.also {
-            ContextCompat.getSystemService(super.requireContext(), ConnectivityManager::class.java)!!
-                .unregisterNetworkCallback(it)
+        netCallback?.also { ContextCompat
+            .getSystemService(super.requireContext(), ConnectivityManager::class.java)!!
+            .unregisterNetworkCallback(it)
         }
         netCallback = null
     }
 
-    private fun navigateDataDestination()
+    private fun navigateNext(rd: RemoteData)
     {
-        // TODO
+        super.viewModel.keepRemoteData(rd)
+
+        val actionID: Int
+        if(rd.lacks.isNotEmpty()) {
+            actionID = R.id.actRemoteToLacks
+        } else if(rd.warnings.isNotEmpty()) {
+            actionID = TODO()
+        } else {
+            actionID = R.id.actToPeople
+            SpeechManAction.ShowMessage(
+                false, super.getResources(), R.string.msg_import_finished
+            ).also {
+                super.viewModel
+                    .actionSubject
+                    .onNext(it)
+            }
+        }
+
+        findNavController().navigate(actionID)
     }
 
 
@@ -152,7 +185,8 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     {
         if(isRemoteDataSubscribed) return null
         isRemoteDataSubscribed = true
-        return super.viewModel.createRemoteDataObservable()
+        return super.viewModel
+            .createRemoteDataObservable()
             .onErrorResumeNext { thr: Throwable ->
                 unregisterNetCallback()
                 handleError(thr)
@@ -160,7 +194,7 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
                 Observable.empty()
             }.doOnNext { rd ->
                 prbDataLoad.visibility = View.GONE
-                navigateDataDestination()
+                navigateNext(rd)
             }.subscribe()
     }
 

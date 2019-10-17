@@ -1,15 +1,12 @@
 package by.vadim_churun.ordered.speechman2.adapters
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.*
 import android.util.Log
 import android.view.*
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,11 +41,14 @@ class DataLacksAdapter(
     class LackViewHolder(itemView: View):
     RecyclerView.ViewHolder(itemView)
     {
+        val vlltBack = itemView.vlltBack
+        val vlltFront = itemView.vlltFront
         val imgvEntityType = itemView.imgvEntityType
         val tvTitle = itemView.tvTitle
         val tvDeletedWarning = itemView.tvDeletedWarning
         val tvInfo = itemView.tvInfo
         val imgvDiscard = itemView.imgvDiscard
+        val buRestore = itemView.buRestore
         val pholderMissingData = itemView.pholderMissingData
     }
 
@@ -68,8 +68,10 @@ class DataLacksAdapter(
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // HELP METHODS:
 
+    private val textWatchers = MutableList<TextWatcher?>(lacks.size) { null }
+
     private fun ensureMissingDataFieldIsEditable
-    (holder: LackViewHolder, editable: Boolean): TextView
+    (holder: LackViewHolder, editable: Boolean, position: Int): TextView
     {
         var params: FrameLayout.LayoutParams? = null
         if(holder.pholderMissingData.childCount != 0) {
@@ -78,17 +80,24 @@ class DataLacksAdapter(
                 return oldView
             params = oldView.layoutParams as FrameLayout.LayoutParams
             holder.pholderMissingData.removeAllViews()
+            oldView.getTag(R.string.tagkey_missing_data_position)?.also {
+                val oldWatcher = textWatchers[it as Int] ?: return@also
+                oldView.removeTextChangedListener(oldWatcher)
+                textWatchers[it as Int] = null
+            }
         }
 
         val newView: TextView = if(editable) EditText(context) else TextView(context)
         params = params ?: FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         holder.pholderMissingData.addView(newView, params)
+        newView.setTag(R.string.tagkey_missing_data_position, position)
         return newView
     }
 
-    private fun listenMissingText(holder: LackViewHolder, listener: (CharSequence) -> Unit)
+    private fun listenMissingText(holder: LackViewHolder, position: Int, listener: (CharSequence) -> Unit)
     {
         val et = holder.pholderMissingData.getChildAt(0) as EditText
+        textWatchers[position]?.also { et.removeTextChangedListener(it) }
         et.addTextChangedListener( object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int)
             {    }
@@ -98,6 +107,8 @@ class DataLacksAdapter(
 
             override fun afterTextChanged(s: Editable)
             { listener(s) }
+        }.also {
+            textWatchers[position] = it
         } )
     }
 
@@ -105,9 +116,11 @@ class DataLacksAdapter(
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // HOLDER BINDING:
 
-    private fun bindAppointPurchase
-    (holder: LackViewHolder, lack: AppointmentPurchaseLack, info: DataLackInfo.AppointmentInfo?)
+    private fun bindAppointPurchase(holder: LackViewHolder, position: Int)
     {
+        val lack = lacks[position] as AppointmentPurchaseLack
+        val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
+
         holder.imgvEntityType.visibility = View.VISIBLE
         holder.imgvEntityType.setImageResource(R.drawable.ic_seminar)
         holder.tvTitle.setText(R.string.mi_appoint_purchase)
@@ -116,20 +129,23 @@ class DataLacksAdapter(
             R.string.fs_fill_appoint_purchase_lack, info?.personName ?: "", info?.seminarName ?: "" )
         holder.tvInfo.text = promptText
 
-        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false)
+        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false, position)
         tvMissingData.text = lack.filledData?.toString()
             ?: context.getString(R.string.msg_data_not_entered_click)
         tvMissingData.setOnClickListener {
             info ?: return@setOnClickListener
             MoneyPickerDialog(promptText, null) { money ->
                 lack.fill(money)
+                super.notifyItemChanged(position)
             }.show(fragmMan, null)
         }
     }
 
-    private fun bindAppointCost
-    (holder: LackViewHolder, lack: AppointmentCostLack, info: DataLackInfo.AppointmentInfo?)
+    private fun bindAppointCost(holder: LackViewHolder, position: Int)
     {
+        val lack = lacks[position] as AppointmentCostLack
+        val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
+
         holder.imgvEntityType.visibility = View.VISIBLE
         holder.imgvEntityType.setImageResource(R.drawable.ic_seminar)
         holder.tvTitle.setText(R.string.mi_appoint_cost)
@@ -142,41 +158,49 @@ class DataLacksAdapter(
         )
         holder.tvInfo.text = promptText
 
-        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false)
+        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false, position)
         tvMissingData.text = lack.filledData?.toString()
             ?: context.getString(R.string.msg_data_not_entered_click)
         tvMissingData.setOnClickListener {
             info ?: return@setOnClickListener
             MoneyPickerDialog(promptText, null) { money ->
                 lack.fill(money)
-            }
+                super.notifyItemChanged(position)
+            }.show(fragmMan, null)
         }
     }
 
-    private fun bindAppointMoney
-    (holder: LackViewHolder, lack: AppointmentMoneyLack, info: DataLackInfo.AppointmentInfo?)
+    private fun bindAppointMoney(holder: LackViewHolder, position: Int)
     {
-        holder.imgvEntityType.visibility = View.INVISIBLE
+        val lack = lacks[position] as AppointmentMoneyLack
+        val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
+
+        holder.imgvEntityType.visibility = View.VISIBLE
+        holder.imgvEntityType.setImageResource(R.drawable.ic_seminar)
         holder.tvTitle.setText(R.string.mi_appoint_money)
         holder.tvDeletedWarning.isVisible = lack.isDeleted
         val promptText = context.getString(
             R.string.fs_fill_appoint_money_lack, info?.seminarName ?: "", info?.personName ?: "")
         holder.tvInfo.text = promptText
 
-        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false)
-        tvMissingData.text = lack.filledData?.toString()
-            ?: context.getString(R.string.msg_data_not_entered_click)
+        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false, position)
+        tvMissingData.text = lack.filledData?.let {
+            context.getString(R.string.fs_appoint_money, it.purchase, it.cost)
+        } ?: context.getString(R.string.msg_data_not_entered_click)
         tvMissingData.setOnClickListener {
             info ?: return@setOnClickListener
             PurchaseCostPickerDialog(promptText, null, null) { purchase, cost ->
                 lack.fill( AppointmentMoneyLack.MissingData(purchase, cost) )
-            }
+                super.notifyItemChanged(position)
+            }.show(fragmMan, null)
         }
     }
 
-    private fun bindOrderPurchase
-    (holder: LackViewHolder, lack: OrderPurchaseLack, info: DataLackInfo.OrderInfo?)
+    private fun bindOrderPurchase(holder: LackViewHolder, position: Int)
     {
+        val lack = lacks[position] as OrderPurchaseLack
+        val info = infos?.get(position) as DataLackInfo.OrderInfo?
+
         holder.imgvEntityType.visibility = View.VISIBLE
         holder.imgvEntityType.setImageResource(R.drawable.ic_product)
         holder.tvTitle.setText(R.string.mi_order_purchase)
@@ -185,7 +209,7 @@ class DataLacksAdapter(
             R.string.fs_fill_order_purchase_lack, info?.personName ?: "", info?.productName ?: "" )
         holder.tvInfo.text = promptText
 
-        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false)
+        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false, position)
         tvMissingData.text = lack.filledData?.toString()
             ?: context.getString(R.string.msg_data_not_entered_click)
         tvMissingData.setOnClickListener {
@@ -193,7 +217,8 @@ class DataLacksAdapter(
             info ?: return@setOnClickListener
             MoneyPickerDialog(promptText, null) { money ->
                 lack.fill(money)
-            }
+                super.notifyItemChanged(position)
+            }.show(fragmMan, null)
         }
     }
 
@@ -207,14 +232,16 @@ class DataLacksAdapter(
         holder.tvInfo.text = context.getString(
             R.string.fs_fill_product_cost_lack, lack.countCase, lack.countBoxes )
 
-        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false)
-        tvMissingData.text = lack.filledData?.toString() ?: ""
+        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false, position)
+        tvMissingData.text = lack.filledData?.toString()
+            ?: context.getString(R.string.msg_data_not_entered_click)
         tvMissingData.setOnClickListener {
             Log.v(DataLacksAdapter::class.java.simpleName, "ProductCostLack TextView clicked.")
             val purpose = context.getString(
                 R.string.fs_product_cost_lack_purpose, lack.name )
             MoneyPickerDialog(purpose, null) { money ->
                 lack.fill(money)
+                super.notifyItemChanged(position)
             }.show(fragmMan, null)
         }
     }
@@ -235,10 +262,11 @@ class DataLacksAdapter(
         holder.tvInfo.text = context.getString(
             R.string.fs_fill_seminar_name_lack, lack.city, address, content )
 
-        val etMissingData = ensureMissingDataFieldIsEditable(holder, true) as EditText
+        val etMissingData = ensureMissingDataFieldIsEditable(holder, true, position) as EditText
         etMissingData.setHint(R.string.msg_data_not_entered)
         etMissingData.setText( lack.filledData ?: "" )
-        listenMissingText(holder) { text ->
+        listenMissingText(holder, position) { text ->
+            Log.v(DataLacksAdapter::class.java.simpleName, "SeminarNameLack text: $text.")
             val name = text.toString()
             if(lack.validate(name))
                 lack.fill(name)
@@ -263,10 +291,10 @@ class DataLacksAdapter(
             else lack.content
         holder.tvInfo.text = context.getString(R.string.fs_fill_seminar_city_lack, address, content)
 
-        val etMissingData = ensureMissingDataFieldIsEditable(holder, true) as EditText
+        val etMissingData = ensureMissingDataFieldIsEditable(holder, true, position) as EditText
         etMissingData.setHint(R.string.msg_data_not_entered)
         etMissingData.setText( lack.filledData ?: "" )
-        listenMissingText(holder) { text ->
+        listenMissingText(holder, position) { text ->
             Log.v(DataLacksAdapter::class.java.simpleName, "SeminarCityLack text: $text.")
             val city = text.toString()
             if(lack.validate(city))
@@ -324,14 +352,15 @@ class DataLacksAdapter(
         }
         holder.tvInfo.text = infoText
 
-        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false)
+        val tvMissingData = ensureMissingDataFieldIsEditable(holder, false, position)
         tvMissingData.text = lack.filledData?.toString()
             ?: context.getString(R.string.msg_data_not_entered_click)
         tvMissingData.setOnClickListener {
             info ?: return@setOnClickListener
             MoneyPickerDialog(infoText, null) { money ->
                 lack.fill(money)
-            }
+                super.notifyItemChanged(position)
+            }.show(fragmMan, null)
         }
     }
 
@@ -350,26 +379,40 @@ class DataLacksAdapter(
     override fun onBindViewHolder(holder: LackViewHolder, position: Int)
     {
         val lack = lacks[position]
+        holder.pholderMissingData.getChildAt(0)?.isEnabled = !lack.isDiscarded
+        if(lack.isDiscarded) {
+            holder.vlltBack.alpha = 0.25f
+            holder.vlltFront.visibility = View.VISIBLE
+            holder.buRestore.setOnClickListener {
+                lack.restore()
+                super.notifyItemChanged(position)
+            }
+        } else {
+            holder.vlltBack.alpha = 1.0f
+            holder.vlltFront.visibility = View.INVISIBLE
+            holder.imgvDiscard.setOnClickListener {
+                lack.discard()
+                super.notifyItemChanged(position)
+            }
+        }
+
         when(lack)
         {
             is AppointmentPurchaseLack -> {
-                val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
-                bindAppointPurchase(holder, lack, info)
+                bindAppointPurchase(holder, position)
             }
 
             is AppointmentCostLack -> {
-                val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
-                bindAppointCost(holder, lack, info)
+                bindAppointCost(holder, position)
             }
 
             is AppointmentMoneyLack -> {
-                val info = infos?.get(position) as DataLackInfo.AppointmentInfo?
-                bindAppointMoney(holder, lack, info)
+                bindAppointMoney(holder, position)
             }
 
             is OrderPurchaseLack -> {
                 val info = infos?.get(position) as DataLackInfo.OrderInfo?
-                bindOrderPurchase(holder, lack, info)
+                bindOrderPurchase(holder, position)
             }
 
             is ProductCostLack -> {

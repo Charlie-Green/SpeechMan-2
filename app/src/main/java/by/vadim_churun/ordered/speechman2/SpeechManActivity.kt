@@ -154,7 +154,8 @@ class SpeechManActivity: AppCompatActivity()
                 destID == R.id.destEditSeminar ||
                 destID == R.id.destEditParticipants )
                 itemID = R.id.miSeminars
-            else if(destID == R.id.destRemote)
+            else if(destID == R.id.destRemote ||
+                destID == R.id.destLacks )
                 itemID = R.id.miRemote
             else
                 throw Exception("Unknown destination")

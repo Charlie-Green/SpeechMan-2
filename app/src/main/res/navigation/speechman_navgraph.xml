@@ -105,6 +105,14 @@
     <!-- Destinations within dests.remote package. -->
 
     <fragment android:id="@+id/destRemote"
-              android:name="by.vadim_churun.ordered.speechman2.dests.remote.RemoteDestination" />
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.RemoteDestination" >
+
+        <action android:id="@+id/actRemoteToLacks"
+                app:destination="@id/destLacks" />
+
+    </fragment>
+
+    <fragment android:id="@+id/destLacks"
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataLacksDestination" />
 
 </navigation>
