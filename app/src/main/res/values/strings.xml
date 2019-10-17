@@ -16,6 +16,11 @@
     <string name="fs_data_lacks_count">
         Для восстановления некоторых объектов не хватает данных. Количество таких объектов: %d.
     </string>
+    <string name="fs_data_warnings_count">
+        ЛогоMan 2 обнаружил объекты (%d), идентичные тем, что уже имеются в базе данных.\n
+        По умолчанию, ЛогоMan 2 предлагает обновить существующие объекты;
+        вы можете оставить дубликаты, если это требуется.
+    </string>
     <string name="fs_fill_appoint_cost_lack">
         Оплата участника %s за семинар "%s" составляет %s.\n
         Пожалуйста, введите полную стоимость семинара для этого участника.
@@ -160,12 +165,14 @@
     <string name="mi_appoint_cost">Стоимость семинара</string>
     <string name="mi_appoint_money">Оплата и стоимость семинара</string>
     <string name="mi_appoint_purchase">Оплата за семинар</string>
+    <string name="mi_check_all">Выделить всё</string>
     <string name="mi_order_purchase">Оплата за товар</string>
     <string name="mi_people">Люди</string>
     <string name="mi_seminars">Семинары</string>
     <string name="mi_products">Товары</string>
     <string name="mi_remote">Данные</string>
     <string name="mi_tutors">Преподаватели</string>
+    <string name="mi_uncheck_all">Снять выделение</string>
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>

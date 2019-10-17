@@ -1,22 +1,19 @@
 package by.vadim_churun.ordered.speechman2.repo
 
 import android.content.Context
-import android.os.Looper
 import android.util.Log
 import by.vadim_churun.ordered.speechman2.db.entities.*
 import by.vadim_churun.ordered.speechman2.model.exceptions.UnknownResponseSpeechManException
-import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfo
-import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfosRequest
-import by.vadim_churun.ordered.speechman2.model.lack_info.DataLackInfosResponse
+import by.vadim_churun.ordered.speechman2.model.lack_info.*
 import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.model.warning.*
-import by.vadim_churun.ordered.speechman2.remote.connect.SpeechManRemoteConnector
-import by.vadim_churun.ordered.speechman2.remote.connect.SpeechManServerException
+import by.vadim_churun.ordered.speechman2.remote.connect.*
 import by.vadim_churun.ordered.speechman2.remote.lack.*
 import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlParser
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 
 
@@ -105,8 +102,6 @@ SpeechManRepository(appContext)
     private fun refactorRemoteData(rd: RemoteData): RemoteData.Builder
     {
         Log.v(LOGTAG, "refactorRemoteData. Entities: ${rd.entities.size}. Lacks: ${rd.lacks.size}")
-        if(Looper.myLooper() == Looper.getMainLooper())
-            throw Exception("Creating Builder from RemoteData on the UI thread")
 
         val newBuilder = RemoteData.Builder(rd.requestID, rd.entities.toMutableList())
 
@@ -126,6 +121,10 @@ SpeechManRepository(appContext)
             {
                 DataWarning.ConfirmStatus.CONFIRMED -> {
                     newBuilder.entities.add(warning.produceObject()!!)
+                }
+
+                DataWarning.ConfirmStatus.DENIED -> {
+                    // TODO: Update the object rather than just forget it.
                 }
 
                 DataWarning.ConfirmStatus.NOT_DEFINED -> {
@@ -389,7 +388,8 @@ SpeechManRepository(appContext)
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATING OBSERVABLES:
 
-    private val responseSubject = PublishSubject.create<SyncResponse>()
+    private var lastRequestID: Int? = null
+    private val responseSubject = BehaviorSubject.create<SyncResponse>()
     val requestSubject = PublishSubject.create<SyncRequest>()
     val databaseFulfillSubject = PublishSubject.create<RemoteData>()
     val lackInfosSubject = PublishSubject.create<DataLackInfosRequest>()
@@ -408,11 +408,15 @@ SpeechManRepository(appContext)
 
     /** Emits responses for requests supplied via [requestSubject] and [databaseFulfillSubject]. **/
     fun createRemoteDataObservable(): Observable<RemoteData>
-        = requestSubject
-            .observeOn(Schedulers.io())
+        = requestSubject                   // A publish subject.
+            .observeOn(Schedulers.io())    // Won't be triggered unless the user requests it explicitly.
             .filter { request ->
+                Log.v(LOGTAG,
+                    "filter: request.requestID=${request.requestID}. lastRequestID=$lastRequestID" )
+                request.requestID != lastRequestID &&
                 request.action == SyncRequest.RemoteAction.IMPORT
             }.map { request ->
+                lastRequestID = request.requestID
                 fetchRemoteData(request)
             }.mergeWith(databaseFulfillSubject
                 .observeOn(Schedulers.computation())

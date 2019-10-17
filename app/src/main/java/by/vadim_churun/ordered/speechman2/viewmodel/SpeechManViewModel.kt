@@ -88,7 +88,7 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     private val ipValidationSubject = PublishSubject.create<Boolean>()
 
     val nextSyncRequestID: Int
-        = RemoteRepository.nextRequestID
+        get() = RemoteRepository.nextRequestID
 
     fun createRemoteDataObservable()
          = remoteRepo.createRemoteDataObservable()
@@ -316,5 +316,5 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     }
 
     override fun onCleared()
-        = disposable.clear()
+    { disposable.clear() }
 }

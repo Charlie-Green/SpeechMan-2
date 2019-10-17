@@ -10,4 +10,5 @@
     <color name="dangerPrimary">#c00000</color>
     <color name="error">#d00000</color>
     <color name="errorBackground">#202020</color>
+    <color name="warning">#c0a000</color>
 </resources>

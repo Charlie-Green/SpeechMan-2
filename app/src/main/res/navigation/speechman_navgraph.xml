@@ -115,4 +115,12 @@
     <fragment android:id="@+id/destLacks"
               android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataLacksDestination" />
 
+    <fragment android:id="@+id/destWarnings"
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataWarningsDestination" >
+
+        <action android:id="@+id/actWarningsToLacks"
+                app:destination="@id/destLacks" />
+
+    </fragment>
+
 </navigation>

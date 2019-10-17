@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"  >
+
+        <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="8dp"
+                app:cardCornerRadius="2dp" >
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_data_warning"
+                        android:tint="@color/warning" />
+
+                <TextView
+                        android:id="@+id/tvWarningsCount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/warning"
+                        android:textStyle="italic"
+                        android:text="@string/fs_data_warnings_count" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recvWarnings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:layout_weight="1" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/optionsPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:menu="@menu/data_warning_options"
+                app:itemTextAppearanceInactive="@style/BottomMenuItemText"
+                app:itemBackground="?colorPrimary"
+                app:itemIconTint="?colorPrimaryDark" />
+
+    </LinearLayout>
+
+
+    <ProgressBar
+            android:id="@+id/prBar"
+            android:layout_width="@dimen/progressbar_default_size"
+            android:layout_height="@dimen/progressbar_default_size"
+            android:layout_gravity="center"
+            android:theme="@style/ProgressBarTheme" />
+
+</FrameLayout>

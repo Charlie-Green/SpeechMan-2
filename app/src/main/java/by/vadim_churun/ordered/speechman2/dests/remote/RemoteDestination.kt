@@ -2,7 +2,6 @@ package by.vadim_churun.ordered.speechman2.dests.remote
 
 import android.net.*
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -25,7 +24,15 @@ import kotlinx.android.synthetic.main.remote_destination.*
 
 class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
 {
-    private val LOGTAG = RemoteDestination::class.java.simpleName
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // COMPANION:
+
+    companion object
+    {
+        private val LOGTAG = RemoteDestination::class.java.simpleName
+        private const val KEY_REQUEST_ID = "requestID"
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     // STYLING:
@@ -54,6 +61,8 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     private fun handleError(thr: Throwable)
     {
         Log.e(LOGTAG, "${thr.javaClass.name}: ${thr.message}")
+        // We know that this request resulted into an error and don't expect results anymore.
+        requestID = null
 
         prbDataLoad.visibility = View.GONE
         tvLog.text = ""
@@ -168,11 +177,22 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     private val disposable = CompositeDisposable()
     private var isRemoteDataSubscribed = false
 
+    private fun subscribeSyncRequest()
+        = super.viewModel
+            .actionSubject
+            .filter { action ->
+                action is SpeechManAction.RequestSync
+            }.doOnNext { action ->
+                requestID = (action as SpeechManAction.RequestSync).request.requestID
+                Log.i(LOGTAG, "requestID = $requestID")
+            }.subscribe()
+
     private fun subscribeSyncResponse()
-        = super.viewModel.createSyncResponseObservable()
-            .doOnNext { response ->
-                if(Looper.myLooper() != Looper.getMainLooper())
-                    throw Exception("Received SyncResponse in background.")
+        = super.viewModel
+            .createSyncResponseObservable()
+            .filter { response ->
+                response.requestID == requestID
+            }.doOnNext { response ->
                 when(response.action)
                 {
                     SyncResponse.ProgressStatus.CONNECTION_OPENED -> notifyConnectionOpened()
@@ -192,6 +212,8 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
                 handleError(thr)
                 isRemoteDataSubscribed = false
                 Observable.empty()
+            }.filter { rd ->
+                rd.requestID == requestID
             }.doOnNext { rd ->
                 prbDataLoad.visibility = View.GONE
                 navigateNext(rd)
@@ -204,6 +226,9 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
+        if(savedInstanceState?.containsKey(KEY_REQUEST_ID) == true)
+            requestID = savedInstanceState.getInt(KEY_REQUEST_ID)
+
         initColors()
 
         val onImportRequested = View.OnClickListener {
@@ -225,8 +250,15 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     override fun onStart()
     {
         super.onStart()
+        disposable.add(subscribeSyncRequest())
         disposable.add(subscribeSyncResponse())
         subscribeRemoteData()?.also { disposable.add(it) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle)
+    {
+        super.onSaveInstanceState(outState)
+        requestID?.also { outState.putInt(KEY_REQUEST_ID, it) }
     }
 
     override fun onStop()
