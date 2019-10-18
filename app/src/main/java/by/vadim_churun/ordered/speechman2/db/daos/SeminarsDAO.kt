@@ -99,6 +99,9 @@ interface SeminarsDAO
     fun delete(seminar: Seminar)
 
     @Delete
+    fun delete(seminars: List<Seminar>)
+
+    @Delete
     fun deleteDays(days: List<SemDay>)
 
     @Delete

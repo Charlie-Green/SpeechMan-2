@@ -8,17 +8,18 @@ abstract class DataWarning<ObjectType>
     protected abstract fun createObject(): ObjectType
 
 
-    enum class ConfirmStatus {
-        CONFIRMED,
-        DENIED,
+    enum class Action {
+        UPDATE,
+        DROP,
+        DUPLICATE,
         NOT_DEFINED
     }
-    var confirmStatus = ConfirmStatus.NOT_DEFINED
+    var action = Action.NOT_DEFINED
 
 
     fun produceObject(): ObjectType
     {
-        if(confirmStatus != ConfirmStatus.CONFIRMED)
+        if(action != Action.UPDATE && action != Action.DUPLICATE)
             throw IllegalStateException("Adding data is not confirmed")
         return createObject()
     }

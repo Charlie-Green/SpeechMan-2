@@ -117,17 +117,58 @@ SpeechManRepository(appContext)
         // Check user's response to warnings:
         for(warning in rd.warnings)
         {
-            when(warning.confirmStatus)
+            when(warning.action)
             {
-                DataWarning.ConfirmStatus.CONFIRMED -> {
+                DataWarning.Action.DUPLICATE -> {
                     newBuilder.entities.add(warning.produceObject()!!)
                 }
 
-                DataWarning.ConfirmStatus.DENIED -> {
-                    // TODO: Update the object rather than just forget it.
+                DataWarning.Action.UPDATE -> {
+                    when(warning)
+                    {
+                        is PersonNameExistsWarning -> {
+                            for(oldPerson in super.peopleDAO.getByName(warning.name))
+                            {
+                                val newPerson = Person(
+                                    oldPerson.ID, warning.name, warning.personTypeID )
+                                super.peopleDAO.addOrUpdate(newPerson)
+                            }
+                        }
+
+                        is SeminarNameAndCityExistWarning -> {
+                            val oldSems = super.seminarsDAO.getByNameAndCity(warning.name, warning.city)
+                            for(oldSeminar in oldSems)
+                            {
+                                val newSeminar = Seminar(oldSeminar.ID,
+                                    warning.name,
+                                    warning.city,
+                                    warning.address,
+                                    warning.content,
+                                    oldSeminar.imageUri,    // Because images are never exported.
+                                    warning.costing,
+                                    warning.isLogicallyDeleted
+                                )
+                                super.seminarsDAO.addOrUpdate(newSeminar)
+                            }
+                        }
+
+                        is ProductNameExistsWarning -> {
+                            for(oldProduct in super.productsDAO.getByName(warning.name))
+                            {
+                                val newProduct = Product(oldProduct.ID,
+                                    warning.name,
+                                    warning.cost,
+                                    warning.countBoxes,
+                                    warning.countCase,
+                                    warning.isLogicallyDeleted
+                                )
+                                super.productsDAO.addOrUpdate(newProduct)
+                            }
+                        }
+                    }
                 }
 
-                DataWarning.ConfirmStatus.NOT_DEFINED -> {
+                DataWarning.Action.NOT_DEFINED -> {
                     newBuilder.warnings.add(warning)
                 }
             }

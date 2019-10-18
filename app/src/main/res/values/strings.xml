@@ -78,7 +78,12 @@
     <string name="fs_semcost_date_atleast">дата записи с %s</string>
     <string name="fs_semcost_particips">%d чел</string>
     <string name="fs_semcost_particips_atleast">хотя бы %d чел.</string>
-    <string name="fs_seminar_image_not_decoded">ЛогоMan 2 не смог расшифровать аватарку семинара "%s".</string>
+    <string name="fs_seminar_image_not_decoded">
+        ЛогоMan 2 не смог расшифровать аватарку семинара "%s".
+    </string>
+    <string name="fs_seminar_name_and_city_exist">
+        Город: %s\nВ этом городе уже есть семинар с таким названием.
+    </string>
     <string name="fs_seminar_start">Начало: %s</string>
     <string name="fs_seminars_count">Всего семинаров: %d</string>
     <string name="fs_step">Шаг %d из %d</string>
@@ -107,6 +112,8 @@
     <string name="la_confdel_person_appoint">Отменить участие в семинаре?</string>
     <string name="la_confirm_update_seminar">Сохранить изменения?</string>
     <string name="la_costing_strategy">Стратегия расценки</string>
+    <string name="la_data_warning_action">Действие</string>
+    <string name="la_data_warning_info">Описание</string>
     <string name="la_delete">Удалить</string>
     <string name="la_delete_person">Удалить человека?</string>
     <string name="la_delete_person_appoint">Отменить участие</string>
@@ -166,13 +173,18 @@
     <string name="mi_appoint_money">Оплата и стоимость семинара</string>
     <string name="mi_appoint_purchase">Оплата за семинар</string>
     <string name="mi_check_all">Выделить всё</string>
+    <string name="mi_drop_all_warnings">Забыть всё</string>
+    <string name="mi_drop_warning">Забыть</string>
+    <string name="mi_duplicate_all_warnings">Дублировать всё</string>
+    <string name="mi_duplicate_warning">Дублировать</string>
     <string name="mi_order_purchase">Оплата за товар</string>
     <string name="mi_people">Люди</string>
     <string name="mi_seminars">Семинары</string>
     <string name="mi_products">Товары</string>
     <string name="mi_remote">Данные</string>
     <string name="mi_tutors">Преподаватели</string>
-    <string name="mi_uncheck_all">Снять выделение</string>
+    <string name="mi_update_all_warnings">Заменить всё</string>
+    <string name="mi_update_warning">Заменить</string>
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
@@ -218,14 +230,16 @@
     <string name="msg_remote_xml_error">
         Данные, полученные с сервера, некорректны. ЛогоMan 2 не сможет сохранить объекты.
     </string>
+    <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
+    <string name="msg_lost_network">Соединение потеряно.</string>
+    <string name="msg_no_seminar_name">Вы не ввели название.</string>
+    <string name="msg_person_name_exists">Человек с таким именем уже существует.</string>
+    <string name="msg_product_name_exists">Товар с таким названием уже существует.</string>
+    <string name="msg_saving_changes">Идёт сохранение...</string>
     <string name="msg_semcost_particips_empty">Вы ничего не ввели.</string>
     <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
     <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
     <string name="msg_server_no_data">Данных на сервере не обнаружено.</string>
-    <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
-    <string name="msg_lost_network">Соединение потеряно.</string>
-    <string name="msg_no_seminar_name">Вы не ввели название.</string>
-    <string name="msg_saving_changes">Идёт сохранение...</string>
     <string name="msg_unknown_cost">Стоимость неизвестна.</string>
     <string name="msg_unknown_date">Дата неизвестна.</string>
     <string name="msg_unknown_remote_action">

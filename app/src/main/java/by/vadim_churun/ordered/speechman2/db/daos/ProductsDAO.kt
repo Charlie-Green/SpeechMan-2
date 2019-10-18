@@ -16,4 +16,7 @@ interface ProductsDAO
     /** Can be used for both updating and logical deletion. **/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addOrUpdate(product: Product): Long
+
+    @Delete
+    fun delete(products: List<Product>)
 }

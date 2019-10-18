@@ -63,4 +63,7 @@ interface PeopleDAO
 
     @Delete
     fun delete(person: Person)
+
+    @Delete
+    fun delete(people: List<Person>)
 }
