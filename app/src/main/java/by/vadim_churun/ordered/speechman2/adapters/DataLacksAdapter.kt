@@ -68,8 +68,6 @@ class DataLacksAdapter(
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // HELP METHODS:
 
-    private val textWatchers = MutableList<TextWatcher?>(lacks.size) { null }
-
     private fun ensureMissingDataFieldIsEditable
     (holder: LackViewHolder, editable: Boolean, position: Int): TextView
     {
@@ -80,24 +78,17 @@ class DataLacksAdapter(
                 return oldView
             params = oldView.layoutParams as FrameLayout.LayoutParams
             holder.pholderMissingData.removeAllViews()
-            oldView.getTag(R.string.tagkey_missing_data_position)?.also {
-                val oldWatcher = textWatchers[it as Int] ?: return@also
-                oldView.removeTextChangedListener(oldWatcher)
-                textWatchers[it as Int] = null
-            }
         }
 
-        val newView: TextView = if(editable) EditText(context) else TextView(context)
+        val newView: TextView = if(editable) SingleWatcherEditText(context) else TextView(context)
         params = params ?: FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         holder.pholderMissingData.addView(newView, params)
-        newView.setTag(R.string.tagkey_missing_data_position, position)
         return newView
     }
 
     private fun listenMissingText(holder: LackViewHolder, position: Int, listener: (CharSequence) -> Unit)
     {
         val et = holder.pholderMissingData.getChildAt(0) as EditText
-        textWatchers[position]?.also { et.removeTextChangedListener(it) }
         et.addTextChangedListener( object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int)
             {    }
@@ -107,8 +98,6 @@ class DataLacksAdapter(
 
             override fun afterTextChanged(s: Editable)
             { listener(s) }
-        }.also {
-            textWatchers[position] = it
         } )
     }
 
@@ -400,19 +389,23 @@ class DataLacksAdapter(
         {
             is AppointmentPurchaseLack -> {
                 bindAppointPurchase(holder, position)
+                holder.tvInfo.text = "Per=${lack.personID}, Sem=${lack.seminarID}"
             }
 
             is AppointmentCostLack -> {
                 bindAppointCost(holder, position)
+                holder.tvInfo.text = "Per=${lack.personID}, Sem=${lack.seminarID}"
             }
 
             is AppointmentMoneyLack -> {
                 bindAppointMoney(holder, position)
+                holder.tvInfo.text = "Per=${lack.personID}, Sem=${lack.seminarID}"
             }
 
             is OrderPurchaseLack -> {
                 val info = infos?.get(position) as DataLackInfo.OrderInfo?
                 bindOrderPurchase(holder, position)
+                holder.tvInfo.text = "Per=${lack.personID}, Prd=${lack.productID}"
             }
 
             is ProductCostLack -> {
@@ -429,6 +422,7 @@ class DataLacksAdapter(
 
             is SemCostMoneyLack -> {
                 bindSemCostMoney(holder, position)
+                holder.tvInfo.text = "Sem=${lack.seminarID}"
             }
 
             else -> {

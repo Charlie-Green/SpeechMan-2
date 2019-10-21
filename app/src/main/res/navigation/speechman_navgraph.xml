@@ -113,7 +113,12 @@
     </fragment>
 
     <fragment android:id="@+id/destLacks"
-              android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataLacksDestination" />
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataLacksDestination" >
+
+        <action android:id="@+id/actLacksToWarnings"
+                app:destination="@id/destWarnings" />
+
+    </fragment>
 
     <fragment android:id="@+id/destWarnings"
               android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataWarningsDestination" >

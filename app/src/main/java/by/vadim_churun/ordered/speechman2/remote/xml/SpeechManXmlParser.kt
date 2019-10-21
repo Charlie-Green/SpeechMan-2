@@ -26,8 +26,7 @@ object SpeechManXmlParser
             "false" -> return false
             "no"    -> return false
             else    -> throw SpeechManXmlException(
-                "$name attribute: expected a boolean value, got \"$value\""
-            )
+                "$name attribute: expected a boolean value, got \"$value\"" )
         }
     }
 

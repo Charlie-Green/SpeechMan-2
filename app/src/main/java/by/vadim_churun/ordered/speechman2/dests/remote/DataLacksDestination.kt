@@ -1,6 +1,7 @@
 package by.vadim_churun.ordered.speechman2.dests.remote
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,8 @@ import kotlinx.android.synthetic.main.data_lacks_destination.*
 
 class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
 {
+    private val LOGTAG = "Import UI"
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTIONALITY:
 
@@ -38,9 +41,12 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
         adapter.setLackInfos(infos)
     }
 
-    private fun navigateWarnings() {
-        // TODO
-    }
+    private fun navigateWarnings()
+    {
+        Log.i(LOGTAG, "Navigate: Lacks -> Warnings")
+        val rd = lastRemoteData ?: return
+        super.viewModel.keepRemoteData(rd)
+        findNavController().navigate(R.id.actLacksToWarnings) }
 
     private fun finishImport()
     { findNavController().navigateUp() }
@@ -76,6 +82,7 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
 
                 // Proceed with the import process or finish it:
                 lastRemoteData = rd
+                Log.i(LOGTAG, "Received ${rd.lacks.size} lacks and ${rd.warnings.size} warnings.")
                 if(rd.lacks.isEmpty()) {
                     if(rd.warnings.isEmpty())
                         finishImport()

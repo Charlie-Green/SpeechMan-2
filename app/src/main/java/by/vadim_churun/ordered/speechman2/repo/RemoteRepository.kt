@@ -27,7 +27,6 @@ SpeechManRepository(appContext)
     {
         private val LOGTAG = RemoteRepository::class.java.simpleName
         private val ID_LOCK = Any()
-        private val REMOTE_LOCK = Any()
         private var nRequestID = 0
 
         val nextRequestID: Int
@@ -57,11 +56,12 @@ SpeechManRepository(appContext)
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    // IMPLEMENTATION OF THE TRANSFORMATIONS:
+    // INTERACTION WITH THE SERVER:
 
     private fun fetchRemoteData(request: SyncRequest): RemoteData.Builder
     {
         Log.v(LOGTAG, "fetchRemoteData")
+
         val rdb = RemoteData.Builder(request.requestID)
         val connection = SpeechManRemoteConnector.openConnection(request.ip)
         SyncResponse(request.requestID, SyncResponse.ProgressStatus.CONNECTION_OPENED).also {
@@ -99,257 +99,426 @@ SpeechManRepository(appContext)
         return rdb
     }
 
-    private fun refactorRemoteData(rd: RemoteData): RemoteData.Builder
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // WARNING GENERATORS:
+
+    private fun warningOrNull(entity: Any): DataWarning<*>?
     {
-        Log.v(LOGTAG, "refactorRemoteData. Entities: ${rd.entities.size}. Lacks: ${rd.lacks.size}")
-
-        val newBuilder = RemoteData.Builder(rd.requestID, rd.entities.toMutableList())
-
-        // Check for filled data which was previously lacked:
-        for(lack in rd.lacks)
+        fun personNameExistsWarningOrNull
+                    (p: Person): PersonNameExistsWarning?
         {
-            if(lack.isFilled)
-                newBuilder.entities.add(lack.buildObject()!!)
-            else if(!lack.isDiscarded)
-                newBuilder.lacks.add(lack)
+            if(super.peopleDAO.getByName(p.name).isEmpty())
+                return null
+            return PersonNameExistsWarning(p.ID, p.name, p.personTypeID)
         }
 
-        // Check user's response to warnings:
-        for(warning in rd.warnings)
+        fun seminarNameAndCityExistWarningOrNull(sem: Seminar): SeminarNameAndCityExistWarning?
         {
-            when(warning.action)
-            {
-                DataWarning.Action.DUPLICATE -> {
-                    newBuilder.entities.add(warning.produceObject()!!)
-                }
-
-                DataWarning.Action.UPDATE -> {
-                    when(warning)
-                    {
-                        is PersonNameExistsWarning -> {
-                            for(oldPerson in super.peopleDAO.getByName(warning.name))
-                            {
-                                val newPerson = Person(
-                                    oldPerson.ID, warning.name, warning.personTypeID )
-                                super.peopleDAO.addOrUpdate(newPerson)
-                            }
-                        }
-
-                        is SeminarNameAndCityExistWarning -> {
-                            val oldSems = super.seminarsDAO.getByNameAndCity(warning.name, warning.city)
-                            for(oldSeminar in oldSems)
-                            {
-                                val newSeminar = Seminar(oldSeminar.ID,
-                                    warning.name,
-                                    warning.city,
-                                    warning.address,
-                                    warning.content,
-                                    oldSeminar.imageUri,    // Because images are never exported.
-                                    warning.costing,
-                                    warning.isLogicallyDeleted
-                                )
-                                super.seminarsDAO.addOrUpdate(newSeminar)
-                            }
-                        }
-
-                        is ProductNameExistsWarning -> {
-                            for(oldProduct in super.productsDAO.getByName(warning.name))
-                            {
-                                val newProduct = Product(oldProduct.ID,
-                                    warning.name,
-                                    warning.cost,
-                                    warning.countBoxes,
-                                    warning.countCase,
-                                    warning.isLogicallyDeleted
-                                )
-                                super.productsDAO.addOrUpdate(newProduct)
-                            }
-                        }
-                    }
-                }
-
-                DataWarning.Action.NOT_DEFINED -> {
-                    newBuilder.warnings.add(warning)
-                }
-            }
+            if(super.seminarsDAO.getByNameAndCity(sem.name, sem.city).isEmpty())
+                return null
+            return SeminarNameAndCityExistWarning(
+                sem.ID, sem.name, sem.city, sem.address, sem.content, sem.costing, sem.isLogicallyDeleted )
         }
 
-        return newBuilder
+        fun productNameExistsWarningOrNull(pr: Product): ProductNameExistsWarning?
+        {
+            if(super.productsDAO.getByName(pr.name).isEmpty())
+                return null
+            return ProductNameExistsWarning(
+                pr.ID, pr.name, pr.cost, pr.countBoxes, pr.countCase, pr.isLogicallyDeleted )
+        }
+
+        return when(entity) {
+            is Person  -> personNameExistsWarningOrNull(entity)
+            is Seminar -> seminarNameAndCityExistWarningOrNull(entity)
+            is Product -> productNameExistsWarningOrNull(entity)
+            else       -> null
+        }
     }
 
 
-    private fun handleRemoteData(builder: RemoteData.Builder): RemoteData
-    {
-        Log.i(LOGTAG, "handleRemoteData. Entities: ${builder.entities.size}. Lacks: ${builder.lacks.size}")
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // CLEARING DATA:
 
-        // Map XML pseudo-IDs to real database IDs:
-        val personIdMap = HashMap<Int, Int>()
+    private fun removeDiscardedLacks
+    (rdb: RemoteData.Builder, removedSeminarIDs: HashSet<Int>, removedProductIDs: HashSet<Int>)
+    {
+        val newLacks = mutableListOf<DataLack<*,*>>()
+
+        for(lack in rdb.lacks)
+        {
+            if(!lack.isDiscarded) {
+                newLacks.add(lack)
+                continue
+            }
+
+            when(lack) {
+                is SeminarNameLack -> lack.ID?.also { removedSeminarIDs.add(it) }
+                is SeminarCityLack -> lack.ID?.also { removedSeminarIDs.add(it) }
+                is ProductCostLack -> lack.ID?.also { removedProductIDs.add(it) }
+            }
+        }
+
+        rdb.lacks = newLacks
+    }
+
+    private fun removeDroppedWarnings(
+        rdb: RemoteData.Builder,
+        removedPersonIDs: HashSet<Int>,
+        removedSeminarIDs: HashSet<Int>,
+        removedProductIDs: HashSet<Int> )
+    {
+        val newWarnings = mutableListOf<DataWarning<*>>()
+
+        for(w in rdb.warnings)
+        {
+            if(w.action != DataWarning.Action.DROP) {
+                newWarnings.add(w)
+                continue
+            }
+
+            when(w) {
+                is PersonNameExistsWarning -> w.ID?.also { removedPersonIDs.add(it) }
+                is SeminarNameAndCityExistWarning -> w.ID?.also { removedSeminarIDs.add(it) }
+                is ProductNameExistsWarning -> w.ID?.also { removedProductIDs.add(it) }
+            }
+        }
+
+        rdb.warnings = newWarnings
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // DATA DEPENDENCIES:
+
+    private fun removeDependentLacks(
+        lacks: MutableList<DataLack<*,*>>,
+        removedPersonTypeIDs: HashSet<Int>,
+        removedPeopleIDs: HashSet<Int>,
+        removedSeminarIDs: HashSet<Int>,
+        removedProductIDs: HashSet<Int> )
+    {
+        if(removedPersonTypeIDs.isNotEmpty()) {
+            // TODO: Null People.typeIDs referring removed PersonType IDs.
+        }
+
+        if(removedPeopleIDs.isNotEmpty() ||
+            removedSeminarIDs.isNotEmpty() ||
+            removedProductIDs.isNotEmpty() ) {
+            var index = 0
+
+            var personID: Int?
+            var seminarID: Int?
+            var productID: Int?
+            while(index < lacks.size)
+            {
+                personID = null; seminarID = null; productID = null
+                val lack = lacks[index]
+
+                when(lack)
+                {
+                    is AppointmentPurchaseLack -> {
+                        personID = lack.personID
+                        seminarID = lack.seminarID
+                    }
+                    is AppointmentCostLack -> {
+                        personID = lack.personID
+                        seminarID = lack.seminarID
+                    }
+                    is AppointmentMoneyLack -> {
+                        personID = lack.personID
+                        seminarID = lack.seminarID
+                    }
+                    is OrderPurchaseLack -> {
+                        personID = lack.personID
+                        productID = lack.productID
+                    }
+                    is SemCostMoneyLack -> {
+                        seminarID = lack.seminarID
+                    }
+                }
+
+                if( (personID?.let { removedPeopleIDs.contains(it) } == true) ||
+                    (seminarID?.let { removedSeminarIDs.contains(it) } == true) ||
+                    (productID?.let { removedProductIDs.contains(it) } == true) ) {
+                    // Constraint failed. Remove this Lack.
+                    lacks[index] = lacks.last()
+                    lacks.removeAt(lacks.lastIndex)
+                } else {
+                    // OK, move on.
+                    ++index
+                }
+            }
+        }
+    }
+
+    private fun removeDependentEntities(
+        entities: MutableList<Any>,
+        entityActions: MutableList<RemoteData.EntityAction>,
+        removedPersonTypeIDs: HashSet<Int>,
+        removedPeopleIDs: HashSet<Int>,
+        removedSeminarIDs: HashSet<Int>,
+        removedProductIDs: HashSet<Int> )
+    {
+        if(removedPersonTypeIDs.isNotEmpty()) {
+            // TODO: Find People dependent on removed PersonTypes and null their typeIDs.
+        }
+
+        var personID: Int?
+        var seminarID: Int?
+        var productID: Int?
+        for(index in 0 until entities.size)
+        {
+            personID = null; seminarID = null; productID = null
+
+            if(entityActions[index] == RemoteData.EntityAction.DELETE)
+                continue
+
+            val entity = entities[index]
+            when(entity)
+            {
+                is Appointment -> {
+                    personID = entity.personID
+                    seminarID = entity.seminarID
+                }
+                is Order -> {
+                    personID = entity.personID
+                    productID = entity.productID
+                }
+                is SemDay -> {
+                    seminarID = entity.seminarID
+                }
+                is SemCost -> {
+                    seminarID = entity.seminarID
+                }
+            }
+
+            if( (personID?.let { removedPeopleIDs.contains(it) } == true) ||
+                (seminarID?.let { removedSeminarIDs.contains(it) } == true) ||
+                (productID?.let { removedProductIDs.contains(it) } == true) )
+                entityActions[index] = RemoteData.EntityAction.DELETE
+        }
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // DATA REFACTORING:
+
+    private fun mapEntitiesToWarnings(rdBuilder: RemoteData.Builder)
+    {
+        val newEntities = mutableListOf<Any>()
+
+        for(entity in rdBuilder.entities)
+        {
+            warningOrNull(entity)?.also {
+                rdBuilder.warnings.add(it)
+            } ?: newEntities.add(entity)
+        }
+
+        rdBuilder.entities = newEntities
+        rdBuilder.entityActions = MutableList(newEntities.size) { RemoteData.EntityAction.INSERT }
+        Log.v(LOGTAG, "mapEntitiesToWarnings: E=${newEntities.size}, W=${rdBuilder.warnings.size}")
+    }
+
+    private fun mapFilledLacks(rdBuilder: RemoteData.Builder)
+    {
+        val newLacks = mutableListOf<DataLack<*,*>>()
+
+        for(lack in rdBuilder.lacks)
+        {
+            if(!lack.isFilled) {
+                newLacks.add(lack)
+                continue
+            }
+
+            val builtObject = lack.buildObject()!!
+            val warning = warningOrNull(builtObject)
+            if(warning == null) {
+                rdBuilder.entities.add(builtObject)
+                rdBuilder.entityActions.add(RemoteData.EntityAction.INSERT)
+            } else {
+                rdBuilder.warnings.add(warning)
+            }
+        }
+
+        rdBuilder.lacks = newLacks
+        Log.v(LOGTAG, "mapFilledLacks: generated ${newLacks.size} lacks.")
+    }
+
+    private fun mapWarningsWithDefinedAction(rdBuilder: RemoteData.Builder)
+    {
+        val newWarnings = mutableListOf<DataWarning<*>>()
+
+        for(w in rdBuilder.warnings)
+        {
+            if(w.action == DataWarning.Action.NOT_DEFINED) {
+                newWarnings.add(w)
+            } else {
+                rdBuilder.entities.add(w.produceObject()!!)
+                rdBuilder.entityActions.add(
+                    when(w.action)
+                    {
+                        DataWarning.Action.UPDATE    -> RemoteData.EntityAction.UPDATE
+                        DataWarning.Action.DROP      -> RemoteData.EntityAction.DELETE
+                        DataWarning.Action.DUPLICATE -> RemoteData.EntityAction.INSERT
+                        else -> throw Exception("Unknown DataWarning.Action")
+                    }
+                )
+            }
+        }
+
+        rdBuilder.warnings = newWarnings
+        Log.v(LOGTAG, "mapWarningsWithDefinedAction: generated ${newWarnings.size} warnings")
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // DATA INSERTION:
+
+    private fun flushEntities(rdb: RemoteData.Builder)
+    {
+        // Map pseudo-IDs to real database IDs:
+        val personTypeIdsMap = HashMap<Int, Int>()
+        val personIdsMap = HashMap<Int, Int>()
         val seminarIdMap = HashMap<Int, Int>()
         val productIdMap = HashMap<Int, Int>()
 
-        val newBuilder = RemoteData.Builder(
-            requestID = builder.requestID,
-            lacks = builder.lacks,
-            warnings = builder.warnings
-        )
+        // TODO: Have a loop for PersonTypes.
 
-        // Insert PersonType's, so that People's foreign key constraints don't fail.
-        for(entity in builder.entities)
+        for(index in 0 until rdb.entities.size)
         {
-            if(entity !is PersonType) continue
-            // TODO: Insert this PersonType.
-        }
+            val ent = rdb.entities[index]
+            val action = rdb.entityActions[index]
+            if(action == RemoteData.EntityAction.DELETE)
+                continue
 
-        // Fill in the ID-maps:
-        for(entity in builder.entities)
-        {
-            when(entity)
+            when(ent)
             {
                 is Person -> {
-                    if(super.peopleDAO.getByName(entity.name).isEmpty()) {
-                        // No person with such name. Add one.
-                        val realPerson = Person(null, entity.name, entity.personTypeID)
-                        val realID = super.peopleDAO.addOrUpdate(realPerson).toInt()
-                        Log.i(LOGTAG, "Map person ID: ${entity.ID} -> $realID")
-                        entity.ID?.also { personIdMap[it] = realID }
+                    var mID = ent.ID; var mName = ent.name
+                    var mType = ent.personTypeID?.let { personTypeIdsMap[it]!! }
+
+                    if(action == RemoteData.EntityAction.INSERT) {
+                        val realID = Person(null, mName, mType)
+                            .let { super.peopleDAO.addOrUpdate(it).toInt() }
+                        mID?.also { personIdsMap[it] = realID }
                     } else {
-                        // A person with such name already exists. Add another one?
-                        PersonNameExistsWarning(entity.ID, entity.name, entity.personTypeID).also {
-                            newBuilder.warnings.add(it)
+                        for(oldPerson in super.peopleDAO.getByName(mName))
+                        {
+                            super.peopleDAO.addOrUpdate( Person(oldPerson.ID, mName, mType) )
+                            mID?.also { personIdsMap[it] = oldPerson.ID!! }
                         }
                     }
                 }
 
                 is Seminar -> {
-                    if(super.seminarsDAO
-                            .getByNameAndCity(entity.name, entity.city)
-                            .isEmpty() ) {
-                        val realSem = Seminar(null,
-                            entity.name,
-                            entity.city,
-                            entity.address,
-                            entity.content,
-                            entity.imageUri,
-                            entity.costing,
-                            entity.isLogicallyDeleted )
+                    if(action == RemoteData.EntityAction.INSERT) {
+                        val realSem = Seminar(
+                            null,
+                            ent.name,
+                            ent.city,
+                            ent.address,
+                            ent.content,
+                            ent.imageUri,
+                            ent.costing,
+                            ent.isLogicallyDeleted
+                        )
                         val realID = super.seminarsDAO.addOrUpdate(realSem).toInt()
-                        Log.i(LOGTAG, "Map seminar ID: ${entity.ID} -> $realID")
-                        entity.ID?.also { seminarIdMap[it] = realID }
+                        ent.ID?.also { seminarIdMap[it] = realID }
                     } else {
-                        SeminarNameAndCityExistWarning(entity.ID,
-                            entity.name,
-                            entity.city,
-                            entity.address,
-                            entity.content,
-                            entity.costing,
-                            entity.isLogicallyDeleted
-                        ).also { newBuilder.warnings.add(it) }
-                        Log.i(LOGTAG, "Generate SeminarNameAndCityExistWarning" +
-                            "(name=\"${entity.name}\", city=\"${entity.city}\"" )
+                        for(oldSem in super.seminarsDAO.getByNameAndCity(ent.name, ent.city))
+                        {
+                            val newSem = Seminar(
+                                oldSem.ID,
+                                ent.name,
+                                ent.city,
+                                ent.address,
+                                ent.content,
+                                ent.imageUri,
+                                ent.costing,
+                                ent.isLogicallyDeleted
+                            )
+                            super.seminarsDAO.addOrUpdate(newSem)
+                            ent.ID?.also { seminarIdMap[it] = oldSem.ID!! }
+                        }
                     }
                 }
 
                 is Product -> {
-                    if(super.productsDAO.getByName(entity.name).isEmpty()) {
-                        val realProduct = Product(null,
-                            entity.name,
-                            entity.cost,
-                            entity.countBoxes,
-                            entity.countCase,
-                            entity.isLogicallyDeleted )
-                        val realID = super.productsDAO.addOrUpdate(realProduct).toInt()
-                        Log.i(LOGTAG, "Map product ID: ${entity.ID} -> $realID")
-                        entity.ID?.also { productIdMap[it] = realID }
+                    if(action == RemoteData.EntityAction.INSERT) {
+                        val realProd = Product(
+                            null, ent.name, ent.cost, ent.countBoxes, ent.countCase, ent.isLogicallyDeleted )
+                        val realID = super.productsDAO.addOrUpdate(realProd).toInt()
+                        ent.ID?.also { productIdMap[it] = realID }
                     } else {
-                        ProductNameExistsWarning(entity.ID,
-                            entity.name,
-                            entity.cost,
-                            entity.countBoxes,
-                            entity.countCase,
-                            entity.isLogicallyDeleted
-                        ).also {
-                            newBuilder.warnings.add(it)
+                        for(oldProd in super.productsDAO.getByName(ent.name))
+                        {
+                            val newProd = Product(
+                                oldProd.ID, ent.name, ent.cost, ent.countBoxes, ent.countCase, ent.isLogicallyDeleted )
+                            super.productsDAO.addOrUpdate(newProd)
+                            ent.ID?.also { productIdMap[it] = oldProd.ID!! }
                         }
-                        Log.i(LOGTAG, "Generate ProductNameExistWarning" +
-                            "(ID=${entity.ID}, name=${entity.name}" )
                     }
                 }
             }
         }
 
-        // Map IDs of remaining entities and optionally insert them:
-        val insertedAppoints = mutableListOf<Appointment>()
-        val insertedOrders = mutableListOf<Order>()
-        val insertedDays = mutableListOf<SemDay>()
-        val insertedCosts = mutableListOf<SemCost>()
-        for(entity in builder.entities)
+        val appoints = mutableListOf<Appointment>()
+        val orders = mutableListOf<Order>()
+        val semdays = mutableListOf<SemDay>()
+        val semcosts = mutableListOf<SemCost>()
+        for(index in 0 until rdb.entities.size)
         {
-            when(entity)
+            val ent = rdb.entities[index]
+            if(rdb.entityActions[index] == RemoteData.EntityAction.DELETE)
+                continue
+
+            // No warnings are generated for these types of entities,
+            // so further in this loop all actions are INSERT.
+            when(ent)
             {
                 is Appointment -> {
-                    val personRealID = personIdMap[entity.personID]
-                    val seminarRealID = seminarIdMap[entity.seminarID]
-                    if(personRealID != null && seminarRealID != null) {
-                        Appointment(
-                            personRealID,
-                            seminarRealID,
-                            entity.purchase,
-                            entity.cost,
-                            entity.historyStatus,
-                            entity.isLogicallyDeleted
-                        ).let { insertedAppoints.add(it) }
-                    } else {
-                        // Leave this Appointment for later, when the user fills required lacks.
-                        newBuilder.entities.add(entity)
-                    }
+                    appoints.add( Appointment(
+                        personIdsMap[ent.personID]!!,
+                        seminarIdMap[ent.seminarID]!!,
+                        ent.purchase,
+                        ent.cost,
+                        ent.historyStatus,
+                        ent.isLogicallyDeleted
+                    ) )
                 }
 
                 is Order -> {
-                    val personRealID = personIdMap[entity.personID]
-                    val productRealID = productIdMap[entity.productID]
-                    if(personRealID != null && productRealID != null) {
-                        Order(
-                            personRealID,
-                            productRealID,
-                            entity.purchase,
-                            entity.historyStatus,
-                            entity.isLogicallyDeleted
-                        ).let { insertedOrders.add(it) }
-                    } else {
-                        newBuilder.entities.add(entity)
-                    }
+                    val personID = personIdsMap[ent.personID]!!
+                    val productID = productIdMap[ent.productID]!!
+                    val order = Order(
+                        personID, productID, ent.purchase, ent.historyStatus, ent.isLogicallyDeleted )
+                    orders.add(order)
                 }
 
                 is SemDay -> {
-                    val seminarRealID = seminarIdMap[entity.seminarID]
-                    seminarRealID?.also {
-                        SemDay(null, seminarRealID, entity.start, entity.duration).let {
-                            insertedDays.add(it)
-                        }
-                    } ?: newBuilder.entities.add(entity)
+                    val semID = seminarIdMap[ent.seminarID]!!
+                    val day = SemDay(null, semID, ent.start, ent.duration)
+                    semdays.add(day)
                 }
 
                 is SemCost -> {
-                    val seminarRealID = seminarIdMap[entity.seminarID]
-                    seminarRealID?.also {
-                        SemCost(null,
-                            seminarRealID,
-                            entity.minParticipants,
-                            entity.minDate,
-                            entity.cost
-                        ).let { insertedCosts.add(it) }
-                    } ?: newBuilder.entities.add(entity)
+                    val semID = seminarIdMap[ent.seminarID]!!
+                    val cost = SemCost(null, semID, ent.minParticipants, ent.minDate, ent.cost)
+                    semcosts.add(cost)
                 }
             }
         }
-        super.associationsDAO.addOrUpdateAppointments(insertedAppoints)
-        super.associationsDAO.addOrUpdateOrders(insertedOrders)
-        super.seminarsDAO.addOrUpdateDays(insertedDays)
-        super.seminarsDAO.addOrUpdateCosts(insertedCosts)
-
-        return newBuilder.build()
+        super.associationsDAO.addOrUpdateAppointments(appoints)
+        super.associationsDAO.addOrUpdateOrders(orders)
+        super.seminarsDAO.addOrUpdateDays(semdays)
+        super.seminarsDAO.addOrUpdateCosts(semcosts)
     }
 
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // LACK INFOS:
 
     private fun getLackInfos(request: DataLackInfosRequest): List<DataLackInfo?>
     {
@@ -435,6 +604,72 @@ SpeechManRepository(appContext)
     val databaseFulfillSubject = PublishSubject.create<RemoteData>()
     val lackInfosSubject = PublishSubject.create<DataLackInfosRequest>()
 
+    fun createRemoteDataObservable(): Observable<RemoteData>
+        = requestSubject
+            .observeOn(Schedulers.io())
+            .filter { request ->
+                request.action == SyncRequest.RemoteAction.IMPORT
+            }.map { request ->
+                // Data comes from the server with all constraints fulfilled
+                // (otherwise SpeechManXmlParser throws an exception), but there may be a duplicated data,
+                // so we possibly need to generate warnings.
+                fetchRemoteData(request)
+                    .also { mapEntitiesToWarnings(it) }
+            }.mergeWith( databaseFulfillSubject
+                .observeOn(Schedulers.computation())
+                .map { rd ->
+                    if(rd.entities.size != rd.entityActions.size)
+                        throw Exception("${rd.entities.size} entities VS ${rd.entityActions.size} actions")
+
+                    // RemoteData comes from UI with changes.
+                    // Lacks may have been filled/discarded and DataWarning.Actions may have been defined.
+
+                    val rdb = rd.toBuilder()
+
+                    // Learn which IDs entities cannot depend on anymore:
+                    val removedPersonTypeIDs = HashSet<Int>()
+                    val removedPersonIDs = HashSet<Int>()
+                    val removedSeminarIDs = HashSet<Int>()
+                    val removedProductIDs = HashSet<Int>()
+                    removeDiscardedLacks(rdb, removedSeminarIDs, removedProductIDs)
+                    removeDroppedWarnings(rdb, removedPersonIDs, removedSeminarIDs, removedProductIDs)
+
+                    // Remove the dependencies:
+                    removeDependentLacks(
+                        rdb.lacks, removedPersonTypeIDs, removedPersonIDs, removedSeminarIDs, removedProductIDs )
+                    removeDependentEntities(
+                        rdb.entities,
+                        rdb.entityActions,
+                        removedPersonTypeIDs,
+                        removedPersonIDs,
+                        removedSeminarIDs,
+                        removedProductIDs
+                    )
+
+                    // Apply user changes, generate new entities or warnings:
+                    mapWarningsWithDefinedAction(rdb)
+                    mapFilledLacks(rdb)
+
+                    rdb
+                }
+            ).map { rdb ->
+                // Data comes here with all constraints fulfilled.
+                // No filled lacks, no warnings with a defined action, no duplicated data.
+
+                if(rdb.lacks.isEmpty() && rdb.warnings.isEmpty()) {
+                    flushEntities(rdb)
+                    return@map RemoteData(rdb.requestID, listOf(), listOf(), listOf(), listOf())
+                }
+                return@map rdb.build()
+            }.observeOn(AndroidSchedulers.mainThread())
+
+    fun createLackInfosObservable(): Observable<DataLackInfosResponse>
+        = lackInfosSubject
+            .observeOn(Schedulers.computation())
+            .map { request ->
+                DataLackInfosResponse(request.requestID, getLackInfos(request))
+            }.observeOn(AndroidSchedulers.mainThread())
+
     fun createSyncResponseObservable(): Observable<SyncResponse>
         = requestSubject
             .observeOn(Schedulers.io())
@@ -445,34 +680,4 @@ SpeechManRepository(appContext)
                 SyncResponse(request.requestID, SyncResponse.ProgressStatus.DATA_PUSHED)
             }.mergeWith(responseSubject)
             .observeOn(AndroidSchedulers.mainThread())
-
-
-    /** Emits responses for requests supplied via [requestSubject] and [databaseFulfillSubject]. **/
-    fun createRemoteDataObservable(): Observable<RemoteData>
-        = requestSubject                   // A publish subject.
-            .observeOn(Schedulers.io())    // Won't be triggered unless the user requests it explicitly.
-            .filter { request ->
-                Log.v(LOGTAG,
-                    "filter: request.requestID=${request.requestID}. lastRequestID=$lastRequestID" )
-                request.requestID != lastRequestID &&
-                request.action == SyncRequest.RemoteAction.IMPORT
-            }.map { request ->
-                lastRequestID = request.requestID
-                fetchRemoteData(request)
-            }.mergeWith(databaseFulfillSubject
-                .observeOn(Schedulers.computation())
-                .map { rd ->
-                    refactorRemoteData(rd)
-                }
-            ).observeOn(Schedulers.io())
-            .map { builder ->
-                handleRemoteData(builder)
-            }.observeOn(AndroidSchedulers.mainThread())
-
-    fun createLackInfosObservable(): Observable<DataLackInfosResponse>
-        = lackInfosSubject
-            .observeOn(Schedulers.computation())
-            .map { request ->
-                DataLackInfosResponse(request.requestID, getLackInfos(request))
-            }.observeOn(AndroidSchedulers.mainThread())
 }

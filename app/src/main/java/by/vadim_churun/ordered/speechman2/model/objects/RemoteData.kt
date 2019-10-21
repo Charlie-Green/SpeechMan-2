@@ -8,21 +8,30 @@ class RemoteData(
     val requestID: Int,
     val entities: List<Any>,
     val lacks: List< DataLack<*,*> >,
-    val warnings: List< DataWarning<*> > )
+    val warnings: List< DataWarning<*> >,
+    val entityActions: List< RemoteData.EntityAction > )
 {
+    enum class EntityAction {
+        INSERT,
+        UPDATE,
+        DELETE
+    }
+
     class Builder(
         var requestID: Int,
-        val entities: MutableList<Any> = mutableListOf(),
-        val lacks: MutableList<DataLack<*,*>> = mutableListOf(),
-        val warnings: MutableList<DataWarning<*>> = mutableListOf() )
+        var entities: MutableList<Any> = mutableListOf(),
+        var lacks: MutableList<DataLack<*,*>> = mutableListOf(),
+        var warnings: MutableList<DataWarning<*>> = mutableListOf(),
+        var entityActions: MutableList<RemoteData.EntityAction> = mutableListOf() )
     {
         fun build()
-            = RemoteData(requestID, entities, lacks, warnings)
+            = RemoteData(requestID, entities, lacks, warnings, entityActions)
     }
 
     fun toBuilder()
         = Builder(requestID,
             entities.toMutableList(),
             lacks.toMutableList(),
-            warnings.toMutableList() )
+            warnings.toMutableList(),
+            entityActions.toMutableList() )
 }

@@ -10,11 +10,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"  >
 
-        <androidx.cardview.widget.CardView
+        <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="8dp"
-                app:cardCornerRadius="2dp" >
+                android:background="?colorPrimary" >
 
             <LinearLayout
                     android:orientation="horizontal"
@@ -27,38 +26,60 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="8dp"
                         android:src="@drawable/ic_data_warning"
-                        android:tint="@color/warning" />
+                        android:tint="?android:colorBackground" />
 
                 <TextView
-                        android:id="@+id/tvWarningsCount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:textColor="@color/warning"
-                        android:textStyle="italic"
-                        android:text="@string/fs_data_warnings_count" />
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:colorBackground"
+                        android:text="@string/mi_remote" />
+
+                <androidx.appcompat.widget.ActionMenuView
+                        android:id="@+id/vMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/ic_menu"
+                        android:backgroundTint="?android:colorBackground" />
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+                android:id="@+id/tvWarningsCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/warning"
+                android:textStyle="italic"
+                android:text="@string/fs_data_warnings_count" />
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recvWarnings"
+                android:id="@+id/recv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
                 android:layout_weight="1" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/optionsPanel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:menu="@menu/data_warning_options"
-                app:itemTextAppearanceInactive="@style/BottomMenuItemText"
-                app:itemBackground="?colorPrimary"
-                app:itemIconTint="?colorPrimaryDark" />
-
     </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="72dp"
+            app:fabCustomSize="42dp"
+            style="@style/FABBase"
+            android:src="@drawable/ic_save" />
 
 
     <ProgressBar

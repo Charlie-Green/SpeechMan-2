@@ -13,6 +13,6 @@ class SeminarNameAndCityExistWarning(
     val isLogicallyDeleted: Boolean
 ): DataWarning<Seminar>()
 {
-    override fun createObject(): Seminar
+    override fun produceObject(): Seminar
         = Seminar(ID, name, city, address, content, null, costing, isLogicallyDeleted)
 }

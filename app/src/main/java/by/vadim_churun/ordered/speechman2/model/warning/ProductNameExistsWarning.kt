@@ -12,6 +12,6 @@ class ProductNameExistsWarning(val ID: Int?,
     val isLogicallyDeleted: Boolean
 ): DataWarning<Product>()
 {
-    override fun createObject(): Product
+    override fun produceObject(): Product
         = Product(ID, name, cost, countBoxes, countCase, isLogicallyDeleted)
 }

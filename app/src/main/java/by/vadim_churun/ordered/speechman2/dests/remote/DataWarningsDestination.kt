@@ -1,12 +1,15 @@
 package by.vadim_churun.ordered.speechman2.dests.remote
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
+import by.vadim_churun.ordered.speechman2.adapters.DataWarningsAdapter
 import by.vadim_churun.ordered.speechman2.model.objects.RemoteData
+import by.vadim_churun.ordered.speechman2.model.warning.DataWarning
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.data_warnings_destination.*
@@ -14,6 +17,8 @@ import kotlinx.android.synthetic.main.data_warnings_destination.*
 
 class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destination)
 {
+    private val LOGTAG = "Import UI"
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTIONALITY:
 
@@ -24,25 +29,27 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
         val warns = lastRemoteData!!.warnings
         tvWarningsCount.text = super.requireContext()
             .getString(R.string.fs_data_warnings_count, warns.size)
-        recvWarnings.layoutManager = recvWarnings.layoutManager
+        recv.layoutManager = recv.layoutManager
             ?: LinearLayoutManager(super.requireContext())
-        val newAdapter = TODO()
-        recvWarnings.swapAdapter(newAdapter, true)
+        val newAdapter = DataWarningsAdapter(super.requireContext(), warns)
+        recv.swapAdapter(newAdapter, true)
     }
 
-    private fun doCheckAll()
+    private fun setActionToAll(action: DataWarning.Action)
     {
-        // TODO
-    }
-
-    private fun doUncheckAll()
-    {
-        // TODO
+        val adapter = recv.adapter as? DataWarningsAdapter ?: return
+        prBar.visibility = View.VISIBLE
+        adapter.setActionToAll(action)
+        prBar.visibility = View.GONE
     }
 
 
     private fun navigateLacks()
-    { findNavController().navigate(R.id.actWarningsToLacks) }
+    {
+        val rd = lastRemoteData ?: return
+        super.viewModel.keepRemoteData(rd)
+        findNavController().navigate(R.id.actWarningsToLacks)
+    }
 
     private fun finishImport()
     {
@@ -69,6 +76,7 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
             .createRemoteDataObservable()
             .mergeWith(super.viewModel.getKeptRemoteDataRx())
             .doOnNext { rd ->
+                Log.i(LOGTAG, "Received ${rd.lacks.size} lacks and ${rd.warnings.size} warnings.")
                 lastRemoteData = rd
                 if(rd.warnings.isNotEmpty())
                     setAdapter()
@@ -92,13 +100,26 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        optionsPanel.setOnNavigationItemReselectedListener { mi ->
-            when(mi.itemId)
-            {
-                R.id.miCheckAll   -> doCheckAll()
-                R.id.miUncheckAll -> doUncheckAll()
-                R.id.miSave       -> saveRemoteData()
-            }
+        fabSave.setOnClickListener { saveRemoteData() }
+
+        vMenu.menu.add(R.string.mi_update_all_warnings)
+        vMenu.menu.add(R.string.mi_drop_all_warnings)
+        vMenu.menu.add(R.string.mi_duplicate_all_warnings)
+        vMenu.setOnMenuItemClickListener { mi ->
+            val ctxt = super.requireContext()
+            setActionToAll(
+                when(mi.title)
+                {
+                    ctxt.getString(R.string.mi_update_all_warnings)
+                        -> DataWarning.Action.UPDATE
+                    ctxt.getString(R.string.mi_drop_all_warnings)
+                        -> DataWarning.Action.DROP
+                    ctxt.getString(R.string.mi_duplicate_all_warnings)
+                        -> DataWarning.Action.DUPLICATE
+                    else -> throw Exception("Unknown menu option \"${mi.title}\"")
+                }
+            )
+            return@setOnMenuItemClickListener true
         }
     }
 

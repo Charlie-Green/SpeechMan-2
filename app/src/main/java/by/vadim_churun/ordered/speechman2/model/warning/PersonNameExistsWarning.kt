@@ -8,6 +8,6 @@ class PersonNameExistsWarning(val ID: Int?,
     val personTypeID: Int?
 ): DataWarning<Person>()
 {
-    override fun createObject(): Person
+    override fun produceObject(): Person
         = Person(ID, name, personTypeID)
 }

@@ -207,12 +207,12 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         isRemoteDataSubscribed = true
         return super.viewModel
             .createRemoteDataObservable()
-            .onErrorResumeNext { thr: Throwable ->
-                unregisterNetCallback()
-                handleError(thr)
-                isRemoteDataSubscribed = false
-                Observable.empty()
-            }.filter { rd ->
+//            .onErrorResumeNext { thr: Throwable ->
+//                unregisterNetCallback()
+//                handleError(thr)
+//                isRemoteDataSubscribed = false
+//                Observable.empty()
+            /*}*/.filter { rd ->
                 rd.requestID == requestID
             }.doOnNext { rd ->
                 prbDataLoad.visibility = View.GONE

@@ -2,9 +2,9 @@ package by.vadim_churun.ordered.speechman2.adapters
 
 import android.content.Context
 import android.content.res.Resources
-import android.util.Log
 import android.util.TypedValue
 import android.view.*
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.RecyclerView
 import by.vadim_churun.ordered.speechman2.R
@@ -38,6 +38,8 @@ class DataWarningsAdapter(
 
     private fun setActionSelection(holder: WarningViewHolder, warning: DataWarning<*>)
     {
+        if(warning.action == DataWarning.Action.NOT_DEFINED)
+            warning.action = DataWarning.Action.UPDATE
         holder.spAction.setSelection(
             when(warning.action)
             {
@@ -51,19 +53,33 @@ class DataWarningsAdapter(
 
     private fun listenActionChange(holder: WarningViewHolder, warning: DataWarning<*>)
     {
-        holder.spAction.setOnClickListener {
-            val selectedAction = holder.spAction.selectedItem as ActionSpinnerItem
-            Log.v(LOGTAG, "Selected action ${context.getString(selectedAction.labelResId)} " +
-                    "for a ${warning.javaClass.simpleName}" )
+        holder.spAction.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?)
+            {   }
 
-            warning.action = when(selectedAction.labelResId) {
-                R.string.mi_update_warning    -> DataWarning.Action.UPDATE
-                R.string.mi_drop_warning      -> DataWarning.Action.DROP
-                R.string.mi_duplicate_warning -> DataWarning.Action.DUPLICATE
-                else -> throw Exception(
-                    "Unknown action label \"${context.getString(selectedAction.labelResId)}\"" )
+            override fun onItemSelected
+            (parent: AdapterView<*>, view: View, position: Int, id: Long)
+            {
+                val selectedAction = holder.spAction.selectedItem as ActionSpinnerItem
+
+                warning.action = when(selectedAction.labelResId) {
+                    R.string.mi_update_warning    -> DataWarning.Action.UPDATE
+                    R.string.mi_drop_warning      -> DataWarning.Action.DROP
+                    R.string.mi_duplicate_warning -> DataWarning.Action.DUPLICATE
+                    else -> throw Exception(
+                        "Unknown action label \"${context.getString(selectedAction.labelResId)}\"" )
+                }
             }
         }
+    }
+
+    fun setActionToAll(action: DataWarning.Action)
+    {
+        for(warning in warnings)
+        {
+            warning.action = action
+        }
+        super.notifyDataSetChanged()
     }
 
 
@@ -151,24 +167,29 @@ class DataWarningsAdapter(
     override fun onBindViewHolder(holder: WarningViewHolder, position: Int)
     {
         if(position == 0) {
-            holder.imgvEntityType.visibility = View.GONE
+            holder.imgvEntityType.visibility = View.INVISIBLE
+            holder.tvTitle.visibility = View.GONE
+            holder.tvInfo.alpha = 1f; holder.tvInfo.setTextColor(colorHeaderText)
             holder.tvActionHeader.visibility = View.VISIBLE
             holder.spAction.visibility = View.GONE
             bindHeader(holder)
             return
         }
 
-        setActionSelection(holder, warnings[position])
-        listenActionChange(holder, warnings[position])
+        val warning = warnings[position - 1]
+        setActionSelection(holder, warning)
+        listenActionChange(holder, warning)
 
         holder.imgvEntityType.visibility = View.VISIBLE
+        holder.tvTitle.visibility = View.VISIBLE
+        holder.tvInfo.alpha = 0.4f; holder.tvInfo.setTextColor(colorItemText)
         holder.tvActionHeader.visibility = View.GONE
         holder.spAction.visibility = View.VISIBLE
-        when(warnings[position])
+        when(warning)
         {
-            is PersonNameExistsWarning        -> bindPersonName(holder, position)
-            is SeminarNameAndCityExistWarning -> bindSeminarNameAndCity(holder, position)
-            is ProductNameExistsWarning       -> bindProductName(holder, position)
+            is PersonNameExistsWarning        -> bindPersonName(holder, position - 1)
+            is SeminarNameAndCityExistWarning -> bindSeminarNameAndCity(holder, position - 1)
+            is ProductNameExistsWarning       -> bindProductName(holder, position - 1)
         }
     }
 }

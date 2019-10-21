@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import by.vadim_churun.ordered.speechman2.db.SpeechManDatabase
+import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -22,6 +24,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.android.synthetic.main.speechman_activity.*
+import kotlin.concurrent.thread
 
 
 class SpeechManActivity: AppCompatActivity()
@@ -155,7 +158,8 @@ class SpeechManActivity: AppCompatActivity()
                 destID == R.id.destEditParticipants )
                 itemID = R.id.miSeminars
             else if(destID == R.id.destRemote ||
-                destID == R.id.destLacks )
+                destID == R.id.destLacks ||
+                destID == R.id.destWarnings )
                 itemID = R.id.miRemote
             else
                 throw Exception("Unknown destination")
@@ -217,6 +221,14 @@ class SpeechManActivity: AppCompatActivity()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
+        // TODO: This is just for testing purposes, so remove after release!
+        super.getApplicationContext().deleteDatabase("speech.db")
+        thread {
+            SpeechManDatabase.getInstance(super.getApplicationContext())
+                .getSeminarsDAO().addOrUpdate(
+                    Seminar(null, "Alalia", "Cit", "", "Old Content", null, Seminar.CostingStrategy.FIXED, false) )
+        }
+
         super.onCreate(savedInstanceState)
         super.setContentView(R.layout.speechman_activity)
         setupPopUp()
