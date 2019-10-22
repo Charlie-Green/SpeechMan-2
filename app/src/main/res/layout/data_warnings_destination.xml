@@ -44,8 +44,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/ic_menu"
-                        android:backgroundTint="?android:colorBackground" />
+                        android:foregroundTint="?android:colorBackground" />
 
             </LinearLayout>
 

@@ -18,6 +18,9 @@ interface SeminarsDAO
     @Query("select * from Seminars where Seminars.id=:seminarID")
     fun getRx(seminarID: Int): Observable<Seminar>
 
+    @Query("select * from Seminars")
+    fun rawGetAll(): List<Seminar>
+
     @Query("select * from Seminars where name=:name and city=:city and isDeleted=0")
     fun getByNameAndCity(name: String, city: String): List<Seminar>
 
@@ -72,6 +75,12 @@ interface SeminarsDAO
 
     @Query("select * from SemDays where seminar=:seminarID")
     fun getDays(seminarID: Int): Observable< List<SemDay> >
+
+    @Query("select * from SemDays")
+    fun rawGetDays(): List<SemDay>
+
+    @Query("select * from SemCosts")
+    fun rawGetCosts(): List<SemCost>
 
     @Query("select * from SemCosts where id=:costID")
     fun rawGetCost(costID: Int): SemCost

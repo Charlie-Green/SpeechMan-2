@@ -31,9 +31,15 @@ interface AssociationsDAO
     @Query("select * from Appointments where seminar=:seminarID and isDeleted=0")
     fun getAppointmentsForSeminar(seminarID: Int): List<Appointment>
 
+    @Query("select * from Appointments")
+    fun getAllAppointments(): List<Appointment>
+
     /** Selects both deleted and undeleted [Appointment]s. **/
     @Query("select * from Appointments where person=:personID")
     fun getAllAppointmentsForPerson(personID: Int): List<Appointment>
+
+    @Query("select * from Orders")
+    fun getAllOrders(): List<Order>
 
     /** Selects both deleted and undeleted [Orders]. **/
     @Query("select * from Orders where person=:personID")

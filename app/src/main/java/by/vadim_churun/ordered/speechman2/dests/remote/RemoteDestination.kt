@@ -16,9 +16,9 @@ import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.remote.connect.SpeechManServerException
 import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlException
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.*
 import kotlinx.android.synthetic.main.remote_destination.*
 
 
@@ -77,6 +77,9 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         else if(thr is SpeechManServerException &&
             thr.reason == SpeechManServerException.Reason.NO_DATA )
             messageResId = R.string.msg_server_no_data
+        else if(thr is SpeechManServerException &&
+            thr.reason == SpeechManServerException.Reason.IO_EXCEPTION )
+            messageResId = R.string.msg_server_ioexception
         else if(thr is UnknownResponseSpeechManException)
             messageResId = R.string.msg_unknown_server_response
 
@@ -89,6 +92,7 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     private fun notifyConnectionOpened()
     {
         prbDataLoad.visibility = View.VISIBLE
+        tvLog.setTextColor(colorText)
         tvLog.setText(R.string.msg_connection_opened)
     }
 
@@ -109,6 +113,7 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
 
     private fun requestRemoteAction()
     {
+        prbDataLoad.visibility = View.VISIBLE
         tvLog.setTextColor(colorText)
         tvLog.setText(R.string.msg_waiting_for_network)
 
@@ -120,13 +125,9 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         netCallback = netCallback ?: object: ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network)
             {
-                tvLog.text = ""
-                val dialogArgs = Bundle()
-                dialogArgs.putInt(IPDialog.KEY_REMOTE_ACTION, remoteAction.ordinal)
-                IPDialog().apply {
-                    arguments = dialogArgs
-                    show(this@RemoteDestination.requireFragmentManager(), null)
-                }
+                this@RemoteDestination.viewModel
+                    .actionSubject
+                    .onNext( SpeechManAction.ApplyAvailableNetwork(network) )
             }
 
             override fun onLost(network: Network)
@@ -138,13 +139,27 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         connectMan.requestNetwork(netRequest, netCallback!!)
     }
 
+    private fun applyAvailableNetwork()
+    {
+        tvLog.text = ""
+        val dialogArgs = Bundle()
+        dialogArgs.putInt(IPDialog.KEY_REMOTE_ACTION, remoteAction.ordinal)
+        IPDialog().apply {
+            arguments = dialogArgs
+            show(this@RemoteDestination.requireFragmentManager(), null)
+        }
+        prbDataLoad.visibility = View.GONE
+    }
+
     private fun unregisterNetCallback()
     {
+        tvLog.text = ""
         netCallback?.also { ContextCompat
             .getSystemService(super.requireContext(), ConnectivityManager::class.java)!!
             .unregisterNetworkCallback(it)
         }
         netCallback = null
+        prbDataLoad.visibility = View.GONE
     }
 
     private fun navigateNext(rd: RemoteData)
@@ -155,7 +170,7 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         if(rd.lacks.isNotEmpty()) {
             actionID = R.id.actRemoteToLacks
         } else if(rd.warnings.isNotEmpty()) {
-            actionID = TODO()
+            actionID = R.id.actRemoteToWarnings
         } else {
             actionID = R.id.actToPeople
             SpeechManAction.ShowMessage(
@@ -177,14 +192,24 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     private val disposable = CompositeDisposable()
     private var isRemoteDataSubscribed = false
 
+    private fun subscribeAvailableNetwork()
+        = super.viewModel
+            .actionSubject
+            .observeOn(AndroidSchedulers.mainThread())
+            .filter { action ->
+                action is SpeechManAction.ApplyAvailableNetwork
+            }.doOnNext { _ ->
+                applyAvailableNetwork()
+            }.subscribe()
+
     private fun subscribeSyncRequest()
         = super.viewModel
             .actionSubject
+            .observeOn(AndroidSchedulers.mainThread())
             .filter { action ->
                 action is SpeechManAction.RequestSync
             }.doOnNext { action ->
                 requestID = (action as SpeechManAction.RequestSync).request.requestID
-                Log.i(LOGTAG, "requestID = $requestID")
             }.subscribe()
 
     private fun subscribeSyncResponse()
@@ -195,9 +220,12 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
             }.doOnNext { response ->
                 when(response.action)
                 {
-                    SyncResponse.ProgressStatus.CONNECTION_OPENED -> notifyConnectionOpened()
-                    SyncResponse.ProgressStatus.DATA_PUSHED       -> notifyDataPushed()
-                    SyncResponse.ProgressStatus.XML_PARSED        -> notifyXmlParsed()
+                    SyncResponse.ProgressStatus.CONNECTION_OPENED
+                        -> { notifyConnectionOpened() }
+                    SyncResponse.ProgressStatus.DATA_PUSHED
+                        -> { notifyDataPushed(); unregisterNetCallback() }
+                    SyncResponse.ProgressStatus.XML_PARSED
+                        -> { notifyXmlParsed() }
                 }
             }.subscribe()
 
@@ -207,17 +235,23 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
         isRemoteDataSubscribed = true
         return super.viewModel
             .createRemoteDataObservable()
-//            .onErrorResumeNext { thr: Throwable ->
-//                unregisterNetCallback()
-//                handleError(thr)
-//                isRemoteDataSubscribed = false
-//                Observable.empty()
-            /*}*/.filter { rd ->
+            .onErrorResumeNext { thr: Throwable ->
+                unregisterNetCallback()
+                handleError(thr)
+                isRemoteDataSubscribed = false
+                Observable.empty()
+            }.filter { rd ->
                 rd.requestID == requestID
             }.doOnNext { rd ->
                 prbDataLoad.visibility = View.GONE
                 navigateNext(rd)
             }.subscribe()
+    }
+
+    private fun clearDisposable()
+    {
+        disposable.clear()
+        isRemoteDataSubscribed = false
     }
 
 
@@ -250,9 +284,11 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     override fun onStart()
     {
         super.onStart()
+        tvLog.text = ""
         disposable.add(subscribeSyncRequest())
         disposable.add(subscribeSyncResponse())
         subscribeRemoteData()?.also { disposable.add(it) }
+        disposable.add(subscribeAvailableNetwork())
     }
 
     override fun onSaveInstanceState(outState: Bundle)
@@ -264,7 +300,7 @@ class RemoteDestination: SpeechManFragment(R.layout.remote_destination)
     override fun onStop()
     {
         unregisterNetCallback()
-        disposable.clear()
+        clearDisposable()
         super.onStop()
     }
 }

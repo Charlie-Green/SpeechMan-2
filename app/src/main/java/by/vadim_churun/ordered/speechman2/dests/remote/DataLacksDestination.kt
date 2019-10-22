@@ -17,12 +17,11 @@ import kotlinx.android.synthetic.main.data_lacks_destination.*
 
 class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
 {
-    private val LOGTAG = "Import UI"
-
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTIONALITY:
 
     private var lastRemoteData: RemoteData? = null
+    private var isSaveUserRequested = false
 
     private fun applyLacks()
     {
@@ -43,13 +42,22 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
 
     private fun navigateWarnings()
     {
-        Log.i(LOGTAG, "Navigate: Lacks -> Warnings")
         val rd = lastRemoteData ?: return
+
+        disposable.clear()
         super.viewModel.keepRemoteData(rd)
-        findNavController().navigate(R.id.actLacksToWarnings) }
+        findNavController().navigate(R.id.actLacksToWarnings)
+    }
 
     private fun finishImport()
-    { findNavController().navigateUp() }
+    {
+        val msg = super.getResources().getString(R.string.msg_import_finished)
+        super.viewModel.actionSubject.apply {
+            onNext( SpeechManAction.SetBackButtonLock(false) )
+            onNext( SpeechManAction.ShowMessage(false, msg) )
+        }
+        findNavController().navigate(R.id.actToRemote)
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,32 +65,27 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
 
     private val disposable = CompositeDisposable()
 
-    private fun subscribeInitialRemoteData()
-        = super.viewModel
-            .getKeptRemoteDataRx()
-            .doOnNext { rd ->
-                lastRemoteData = rd
-                applyLacks()
-                prbLoad.visibility = View.GONE
-            }.subscribe()
-
     private fun subscribeRemoteData()
         = super.viewModel
             .createRemoteDataObservable()
+            .mergeWith(super.viewModel.getKeptRemoteDataRx())
             .doOnNext { rd ->
-                // Notify the user that their changes are applied:
-                SpeechManAction.ShowMessage(false,
-                    super.getResources(),
-                    R.string.msg_changes_applied
-                ).also {
-                    super.viewModel
-                        .actionSubject
-                        .onNext(it)
+                if(isSaveUserRequested) {
+                    // Notify the user that their changes are applied:
+                    SpeechManAction.ShowMessage(false,
+                        super.getResources(),
+                        R.string.msg_changes_applied
+                    ).also {
+                        super.viewModel
+                            .actionSubject
+                            .onNext(it)
+                    }
+
+                    isSaveUserRequested = false
                 }
 
                 // Proceed with the import process or finish it:
                 lastRemoteData = rd
-                Log.i(LOGTAG, "Received ${rd.lacks.size} lacks and ${rd.warnings.size} warnings.")
                 if(rd.lacks.isEmpty()) {
                     if(rd.warnings.isEmpty())
                         finishImport()
@@ -92,7 +95,7 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
                     applyLacks()
 
                     // Request DataLackInfo's for the updated RemoteData.lacks:
-                    DataLackInfosRequest(rd.requestID, rd.lacks, rd.warnings).let {
+                    DataLackInfosRequest(rd.requestID, rd.entities, rd.lacks, rd.warnings).let {
                         SpeechManAction.RequestDataLackInfos(it)
                     }.also {
                         super.viewModel
@@ -115,9 +118,20 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
     private fun applyChanges()
     {
         val rd = lastRemoteData ?: return
+        if(isSaveUserRequested) {
+            super.viewModel
+                .actionSubject
+                .onNext( SpeechManAction.SaveRemoteData(rd) )
+        } else {
+            super.viewModel.keepRemoteData(rd)
+        }
+    }
+
+    private fun lockBackButton()
+    {
         super.viewModel
             .actionSubject
-            .onNext( SpeechManAction.SaveRemoteData(rd) )
+            .onNext( SpeechManAction.SetBackButtonLock(true) )
     }
 
 
@@ -125,13 +139,16 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
     // LIFECYCLE:
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        fabSave.setOnClickListener { applyChanges() }
+        fabSave.setOnClickListener {
+            isSaveUserRequested = true
+            applyChanges()
+        }
     }
 
     override fun onStart()
     {
+        lockBackButton()
         super.onStart()
-        disposable.add(subscribeInitialRemoteData())
         disposable.add(subscribeRemoteData())
         disposable.add(subscribeLackInfos())
     }
@@ -139,6 +156,7 @@ class DataLacksDestination: SpeechManFragment(R.layout.data_lacks_destination)
     override fun onStop()
     {
         disposable.clear()
+        isSaveUserRequested = false; applyChanges()
         super.onStop()
     }
 }

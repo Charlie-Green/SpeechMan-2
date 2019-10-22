@@ -14,8 +14,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
-import by.vadim_churun.ordered.speechman2.db.SpeechManDatabase
-import by.vadim_churun.ordered.speechman2.db.entities.Seminar
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -24,7 +22,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.android.synthetic.main.speechman_activity.*
-import kotlin.concurrent.thread
 
 
 class SpeechManActivity: AppCompatActivity()
@@ -47,6 +44,7 @@ class SpeechManActivity: AppCompatActivity()
     private var colorFore = 0
     private var colorError = 0
     private var colorErrorBack = 0
+    private var lastBackTime: Long? = null
 
     private fun initColors()
     {
@@ -64,11 +62,11 @@ class SpeechManActivity: AppCompatActivity()
         val params = navHost.view!!.layoutParams as CoordinatorLayout.LayoutParams
         params.behavior = object: CoordinatorLayout.Behavior<View>() {
             override fun layoutDependsOn
-                        (parent: CoordinatorLayout, child: View, dependency: View): Boolean
+            (parent: CoordinatorLayout, child: View, dependency: View): Boolean
                     = dependency is Snackbar.SnackbarLayout    // Pop-up in response to a Snackbar.
 
             override fun onDependentViewChanged
-                        (parent: CoordinatorLayout, child: View, dependency: View): Boolean
+            (parent: CoordinatorLayout, child: View, dependency: View): Boolean
             {
                 val childParams = child.layoutParams as CoordinatorLayout.LayoutParams
                 childParams.bottomMargin = dependency.height.minus(dependency.translationY).toInt()
@@ -178,11 +176,7 @@ class SpeechManActivity: AppCompatActivity()
             .get(SpeechManViewModel::class.java)
             .actionSubject
             .observeOn(AndroidSchedulers.mainThread())
-            .filter { action ->
-                (action is SpeechManAction.ShowMessage) ||
-                (action is SpeechManAction.SelectImage) ||
-                (action == SpeechManAction.NavigateBack)
-            }.doOnNext { action ->
+            .doOnNext { action ->
                 when(action)
                 {
                     is SpeechManAction.ShowMessage -> {
@@ -194,6 +188,14 @@ class SpeechManActivity: AppCompatActivity()
                             requestImage()
                         else
                             requestStoragePermission()
+                    }
+
+                    is SpeechManAction.SetBackButtonLock -> {
+                        val wasLocked = (lastBackTime != null)
+                        if(wasLocked && !action.isLocked)
+                            lastBackTime = null
+                        else if(!wasLocked && action.isLocked)
+                            lastBackTime = 0L
                     }
 
                     SpeechManAction.NavigateBack -> {
@@ -221,14 +223,6 @@ class SpeechManActivity: AppCompatActivity()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
-        // TODO: This is just for testing purposes, so remove after release!
-        super.getApplicationContext().deleteDatabase("speech.db")
-        thread {
-            SpeechManDatabase.getInstance(super.getApplicationContext())
-                .getSeminarsDAO().addOrUpdate(
-                    Seminar(null, "Alalia", "Cit", "", "Old Content", null, Seminar.CostingStrategy.FIXED, false) )
-        }
-
         super.onCreate(savedInstanceState)
         super.setContentView(R.layout.speechman_activity)
         setupPopUp()
@@ -261,6 +255,28 @@ class SpeechManActivity: AppCompatActivity()
         super.getContentResolver().takePersistableUriPermission(uri, flags)
         val vm = ViewModelProviders.of(this).get(SpeechManViewModel::class.java)
         vm.keepAction( SpeechManAction.DecodeImages(vm.nextImageDecodeID, listOf(uri)) )
+    }
+
+    override fun onBackPressed()
+    {
+        val now = System.currentTimeMillis()
+
+        if(lastBackTime == null) {
+            // Back was not locked.
+            super.onBackPressed()
+        } else if(now - lastBackTime!! < 600) {
+            // Back gets unlocked.
+            lastBackTime = null
+            super.onBackPressed()
+        } else {
+            // Back remains locked.
+            lastBackTime = now
+            val msg = super.getString(R.string.msg_back_locked)
+            ViewModelProviders.of(this)
+                .get(SpeechManViewModel::class.java)
+                .actionSubject
+                .onNext( SpeechManAction.ShowMessage(false, msg) )
+        }
     }
 
     override fun onDestroy()

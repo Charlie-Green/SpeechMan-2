@@ -187,6 +187,9 @@
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
+    <string name="msg_back_locked">
+        Нажмите дважды.
+    </string>
     <string name="msg_changes_applied">Изменения сохранены.</string>
     <string name="msg_connection_opened">Идёт передача данных...</string>
     <string name="msg_data_lack_discared">Объект удалён.</string>
@@ -239,6 +242,13 @@
     <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
     <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
     <string name="msg_server_no_data">Данных на сервере не обнаружено.</string>
+    <string name="msg_server_ioexception">
+        На сервере произошла ошибка файлового ввода-вывода. Возможные причины:\n
+        - Во время сетевой операции один из файлов на сервере был
+          переименован, перемещён, удалён или заблокирован.\n
+        - Операционная система, установленная на сервере, запретила web-приложению ЛогоMan
+          доступ к требуемым файлам.
+    </string>
     <string name="msg_unknown_cost">Стоимость неизвестна.</string>
     <string name="msg_unknown_date">Дата неизвестна.</string>
     <string name="msg_unknown_remote_action">

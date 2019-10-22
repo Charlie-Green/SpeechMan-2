@@ -20,9 +20,7 @@ class SpeechManXmlWriter: AutoCloseable
     // LIFECYCLE:
 
     constructor(outstream: OutputStream)
-    {
-        out = PrintWriter(outstream)
-    }
+    { out = PrintWriter(outstream) }
 
     override fun close()
         = out.close()
@@ -35,7 +33,7 @@ class SpeechManXmlWriter: AutoCloseable
 
     private fun getTabs(count: Int): String
     {
-        if(!doFormatting) return ""
+        if(!doFormatting) return " "
 
         val mTabs = tabs ?: mutableListOf(System.lineSeparator()).also { tabs = it }
         while(mTabs.size <= count)
@@ -102,7 +100,7 @@ class SpeechManXmlWriter: AutoCloseable
                 out.print(">${getTabs(0)}${getTabs(2)}")
                 out.print(it)
                 out.print("${getTabs(0)}${getTabs(1)}</$tagName>")
-            } ?: out.print("/>")
+            } ?: out.print(" />")
 
             out.print(getTabs(0))    // Terminate line, if formatting is enabled.
         }

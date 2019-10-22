@@ -2,6 +2,7 @@ package by.vadim_churun.ordered.speechman2.dests.remote
 
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,12 +18,20 @@ import kotlinx.android.synthetic.main.data_warnings_destination.*
 
 class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destination)
 {
-    private val LOGTAG = "Import UI"
+    private var lastRemoteData: RemoteData? = null
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // FUNCTIONALITY:
+    // UI:
 
-    private var lastRemoteData: RemoteData? = null
+    private fun setMenuOverflowIcon()
+    {
+        val typval = TypedValue()
+        super.requireContext().theme
+            .resolveAttribute(android.R.attr.colorBackground, typval, true)
+        val icon = vMenu.overflowIcon!!
+        icon.setTint(typval.data)
+        vMenu.overflowIcon = icon
+    }
 
     private fun setAdapter()
     {
@@ -35,6 +44,10 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
         recv.swapAdapter(newAdapter, true)
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTIONALITY AND NAVIGATION:
+
     private fun setActionToAll(action: DataWarning.Action)
     {
         val adapter = recv.adapter as? DataWarningsAdapter ?: return
@@ -43,6 +56,12 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
         prBar.visibility = View.GONE
     }
 
+    private fun notifyChangesSaved()
+    {
+        val action = SpeechManAction.ShowMessage(
+            false, super.getResources(), R.string.msg_changes_applied )
+        super.viewModel.actionSubject.onNext(action)
+    }
 
     private fun navigateLacks()
     {
@@ -53,15 +72,11 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
 
     private fun finishImport()
     {
-        SpeechManAction.ShowMessage(false,
-            super.getResources(),
-            R.string.msg_import_finished
-        ).also {
-            super.viewModel
-                .actionSubject
-                .onNext(it)
+        val msg = super.getResources().getString(R.string.msg_import_finished)
+        super.viewModel.actionSubject.apply {
+            onNext( SpeechManAction.SetBackButtonLock(false) )
+            onNext( SpeechManAction.ShowMessage(false, msg) )
         }
-
         findNavController().navigate(R.id.actToRemote)
     }
 
@@ -70,28 +85,47 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
     // RX:
 
     private val disposable = CompositeDisposable()
+    private var isSaveUserRequested = false
 
     private fun subscribeRemoteData()
         = super.viewModel
             .createRemoteDataObservable()
             .mergeWith(super.viewModel.getKeptRemoteDataRx())
             .doOnNext { rd ->
-                Log.i(LOGTAG, "Received ${rd.lacks.size} lacks and ${rd.warnings.size} warnings.")
                 lastRemoteData = rd
-                if(rd.warnings.isNotEmpty())
+
+                if(rd.warnings.isNotEmpty()) {
                     setAdapter()
-                else if(rd.lacks.isNotEmpty())
+                    if(isSaveUserRequested) {
+                        notifyChangesSaved()
+                        isSaveUserRequested = false
+                    }
+                } else if(rd.lacks.isNotEmpty()) {
                     navigateLacks()
-                else
+                } else {
                     finishImport()
+                }
+
+                prBar.visibility = View.GONE
             }.subscribe()
 
     private fun saveRemoteData()
     {
         val rd = lastRemoteData ?: return
+        if(isSaveUserRequested) {
+            super.viewModel
+                .actionSubject
+                .onNext( SpeechManAction.SaveRemoteData(rd) )
+        } else {
+            super.viewModel.keepRemoteData(rd)
+        }
+    }
+
+    private fun lockBackButton()
+    {
         super.viewModel
             .actionSubject
-            .onNext( SpeechManAction.SaveRemoteData(rd) )
+            .onNext( SpeechManAction.SetBackButtonLock(true) )
     }
 
 
@@ -100,8 +134,12 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        fabSave.setOnClickListener { saveRemoteData() }
+        fabSave.setOnClickListener {
+            isSaveUserRequested = true
+            saveRemoteData()
+        }
 
+        setMenuOverflowIcon()
         vMenu.menu.add(R.string.mi_update_all_warnings)
         vMenu.menu.add(R.string.mi_drop_all_warnings)
         vMenu.menu.add(R.string.mi_duplicate_all_warnings)
@@ -125,6 +163,7 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
 
     override fun onStart()
     {
+        lockBackButton()
         super.onStart()
         disposable.add(subscribeRemoteData())
     }
@@ -132,6 +171,7 @@ class DataWarningsDestination: SpeechManFragment(R.layout.data_warnings_destinat
     override fun onStop()
     {
         disposable.clear()
+        isSaveUserRequested = false; saveRemoteData()
         super.onStop()
     }
 }

@@ -1,12 +1,10 @@
 package by.vadim_churun.ordered.speechman2.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.db.entities.SemCost
-import by.vadim_churun.ordered.speechman2.model.objects.RemoteData
-import by.vadim_churun.ordered.speechman2.model.objects.SeminarBuilder
+import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.repo.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -16,8 +14,6 @@ import io.reactivex.subjects.PublishSubject
 
 class SpeechManViewModel(app: Application): AndroidViewModel(app)
 {
-    private val LOGTAG = SpeechManViewModel::class.java.simpleName
-
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // WRAPPING PEOPLE REPOSITORY:
 
@@ -245,11 +241,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                     }
 
                     is SpeechManAction.SaveSeminarAppoints -> {
-                        for(appoint in action.builder.addedAppoints)
-                        {
-                            Log.i(LOGTAG, "Saving cost: ${appoint.cost}")
-                        }
-
                         super.getApplication<Application>().getString(R.string.msg_saving_changes).also {
                             actionSubject.onNext( SpeechManAction.ShowMessage(false, it) )
                         }
@@ -310,11 +301,11 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // VIEWMODEL LIFECYCLE:
 
-    init
-    {
+    init {
         disposable.add(observeActionSubject())
     }
 
-    override fun onCleared()
-    { disposable.clear() }
+    override fun onCleared() {
+        disposable.clear()
+    }
 }

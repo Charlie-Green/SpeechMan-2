@@ -10,6 +10,9 @@ interface ProductsDAO
     @Query("select * from Products where id=:productID")
     fun rawGet(productID: Int): Product
 
+    @Query("select * from Products")
+    fun rawGetAll(): List<Product>
+
     @Query("select * from Products where name=:name")
     fun getByName(name: String): List<Product>
 

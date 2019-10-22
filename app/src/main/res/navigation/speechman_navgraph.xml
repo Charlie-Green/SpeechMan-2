@@ -110,6 +110,9 @@
         <action android:id="@+id/actRemoteToLacks"
                 app:destination="@id/destLacks" />
 
+        <action android:id="@+id/actRemoteToWarnings"
+                app:destination="@id/destWarnings" />
+
     </fragment>
 
     <fragment android:id="@+id/destLacks"

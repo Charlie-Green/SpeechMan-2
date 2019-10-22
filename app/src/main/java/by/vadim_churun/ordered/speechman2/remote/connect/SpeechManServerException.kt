@@ -9,7 +9,8 @@ class SpeechManServerException(
 {
     enum class Reason {
         NO_DATA,
-        UNKNOWN_REMOTE_ACTION
+        UNKNOWN_REMOTE_ACTION,
+        IO_EXCEPTION
     }
 
     val reason: Reason
@@ -18,6 +19,7 @@ class SpeechManServerException(
             {
                 1    -> return Reason.NO_DATA
                 16   -> return Reason.UNKNOWN_REMOTE_ACTION
+                32   -> return Reason.IO_EXCEPTION
                 else -> throw Exception("Unknown errorCode $errorCode")
             }
         }

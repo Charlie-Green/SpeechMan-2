@@ -1,5 +1,6 @@
 package by.vadim_churun.ordered.speechman2.dialogs.remote
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log

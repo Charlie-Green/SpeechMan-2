@@ -389,23 +389,18 @@ class DataLacksAdapter(
         {
             is AppointmentPurchaseLack -> {
                 bindAppointPurchase(holder, position)
-                holder.tvInfo.text = "Per=${lack.personID}, Sem=${lack.seminarID}"
             }
 
             is AppointmentCostLack -> {
                 bindAppointCost(holder, position)
-                holder.tvInfo.text = "Per=${lack.personID}, Sem=${lack.seminarID}"
             }
 
             is AppointmentMoneyLack -> {
                 bindAppointMoney(holder, position)
-                holder.tvInfo.text = "Per=${lack.personID}, Sem=${lack.seminarID}"
             }
 
             is OrderPurchaseLack -> {
-                val info = infos?.get(position) as DataLackInfo.OrderInfo?
                 bindOrderPurchase(holder, position)
-                holder.tvInfo.text = "Per=${lack.personID}, Prd=${lack.productID}"
             }
 
             is ProductCostLack -> {
@@ -422,7 +417,6 @@ class DataLacksAdapter(
 
             is SemCostMoneyLack -> {
                 bindSemCostMoney(holder, position)
-                holder.tvInfo.text = "Sem=${lack.seminarID}"
             }
 
             else -> {

@@ -10,11 +10,13 @@ import by.vadim_churun.ordered.speechman2.model.warning.*
 import by.vadim_churun.ordered.speechman2.remote.connect.*
 import by.vadim_churun.ordered.speechman2.remote.lack.*
 import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlParser
+import by.vadim_churun.ordered.speechman2.remote.xml.SpeechManXmlWriter
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import java.io.InputStream
 
 
 class RemoteRepository(appContext: Context):
@@ -58,6 +60,18 @@ SpeechManRepository(appContext)
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // INTERACTION WITH THE SERVER:
 
+    private fun assertResponseOk(instream: InputStream)
+    {
+        val response = instream.read()
+        when(response.toChar())
+        {
+            'O' ->  return
+            'E' ->  throw SpeechManServerException(instream.read().toByte())
+            else -> throw UnknownResponseSpeechManException(response.toByte())
+        }
+    }
+
+
     private fun fetchRemoteData(request: SyncRequest): RemoteData.Builder
     {
         Log.v(LOGTAG, "fetchRemoteData")
@@ -71,25 +85,8 @@ SpeechManRepository(appContext)
         connection.getOutputStream().use { outstream ->
             outstream.write('I'.toInt())
             connection.getInputStream().use { instream ->
-                val response = instream.read()
-                when(response.toChar())
-                {
-                    'O' -> {
-                        // OK. Parse the response.
-                        SpeechManXmlParser.parse(
-                            instream, rdb.entities, rdb.lacks )
-                    }
-
-                    'E' -> {
-                        // Error. Get the error code.
-                        throw SpeechManServerException(instream.read().toByte())
-                    }
-
-                    else -> {
-                        // Unknown response.
-                        throw UnknownResponseSpeechManException(response.toByte())
-                    }
-                }
+                assertResponseOk(instream)
+                SpeechManXmlParser.parse(instream, rdb.entities, rdb.lacks )
             }
         }
         SyncResponse(request.requestID, SyncResponse.ProgressStatus.XML_PARSED).also {
@@ -97,6 +94,35 @@ SpeechManRepository(appContext)
         }
 
         return rdb
+    }
+
+
+    private fun pushRemoteData(request: SyncRequest)
+    {
+        val connection = SpeechManRemoteConnector.openConnection(request.ip)
+        responseSubject.onNext( SyncResponse(request.requestID, SyncResponse.ProgressStatus.CONNECTION_OPENED) )
+
+        connection.getOutputStream().use { outstream ->
+            outstream.write('E'.toInt())
+            SpeechManXmlWriter(outstream).use { writer ->
+                writer.writeHead()
+
+                // writer.writePersonTypes( ... )
+                writer.writePeople( super.peopleDAO.rawGet() )
+                writer.writeSeminars( super.seminarsDAO.rawGetAll() )
+                writer.writeSemDays( super.seminarsDAO.rawGetDays() )
+                writer.writeSemCosts( super.seminarsDAO.rawGetCosts() )
+                writer.writeProducts( super.productsDAO.rawGetAll() )
+                writer.writeAppointments( super.associationsDAO.getAllAppointments() )
+                writer.writeOrders( super.associationsDAO.getAllOrders() )
+
+                writer.writeEnding()
+            }
+        }
+
+        connection.getInputStream().use { instream ->
+            assertResponseOk(instream)
+        }
     }
 
 
@@ -522,75 +548,85 @@ SpeechManRepository(appContext)
 
     private fun getLackInfos(request: DataLackInfosRequest): List<DataLackInfo?>
     {
-        // Define methods to extract information from the maps and the database:
-        fun getPersonName(personID: Int): String
+        val peopleMap   = HashMap<Int, String?>()                                 // ID -> name?
+        val seminarsMap = HashMap<Int, Pair<String, Seminar.CostingStrategy>?>()  // ID -> (name; costing)?
+        val productsMap = HashMap<Int, String?>()                                 // ID -> name?
+
+        // Fill the maps:
+        for(lack in request.lacks)
         {
-            try {
-                return super.peopleDAO.rawGet(personID).name
-            } catch(exc: Exception) {
-                throw Exception("Cannot retrieve a Person with ID $personID", exc)
-            }
-        }
-        fun getSeminarPair(seminarID: Int): Pair<String, Seminar.CostingStrategy>
-        {
-            try {
-                val sem = super.seminarsDAO.get(seminarID)
-                return Pair(sem.name, sem.costing)
-            } catch(exc: Exception) {
-                throw Exception("Failed to retrieve a Seminar with ID $seminarID", exc)
-            }
-        }
-        fun getProductName(productID: Int): String
-        {
-            try {
-                return super.productsDAO.rawGet(productID).name
-            } catch(exc: Exception) {
-                throw Exception("Failed to retrieve a Product with ID $productID", exc)
+            when(lack)
+            {
+                is SeminarNameLack ->
+                    lack.ID?.also { seminarsMap[it] = Pair("", lack.costing) }
+                is SeminarCityLack ->
+                    lack.ID?.also { seminarsMap[it] = Pair(lack.name, lack.costing) }
+                is ProductCostLack ->
+                    lack.ID?.also { productsMap[it] = lack.name }
             }
         }
 
-        // Obtain the infos and return:
+        for(w in request.warnings)
+        {
+            when(w)
+            {
+                is PersonNameExistsWarning ->
+                    w.ID?.also { peopleMap[it] = w.name }
+                is SeminarNameAndCityExistWarning ->
+                    w.ID?.also { seminarsMap[it] = Pair(w.name, w.costing) }
+                is ProductNameExistsWarning ->
+                    w.ID?.also { productsMap[it] = w.name }
+            }
+        }
+
+        for(ent in request.entities)
+        {
+            when(ent)
+            {
+                is Person ->
+                    ent.ID?.also { peopleMap[it] = ent.name }
+                is Seminar ->
+                    ent.ID?.also { seminarsMap[it] = Pair(ent.name, ent.costing) }
+                is Product ->
+                    ent.ID?.also { productsMap[it] = ent.name }
+            }
+        }
+
+        // Help functions:
+        fun appointLackInfo(personID: Int, seminarID: Int)
+            = DataLackInfo.AppointmentInfo(
+                peopleMap[personID]!!, seminarsMap[seminarID]!!.first )
+        fun orderLackInfo(personID: Int, productID: Int)
+            = DataLackInfo.OrderInfo(
+                peopleMap[personID]!!, productsMap[productID]!! )
+        fun semCostLackInfo(seminarID: Int)
+            = seminarsMap[seminarID]!!.let {
+                DataLackInfo.SemCostInfo(it.first, it.second)
+            }
+
         return MutableList<DataLackInfo?>(request.lacks.size) { index ->
             val lack = request.lacks[index]
             when(lack)
             {
                 is AppointmentPurchaseLack -> {
-                    return@MutableList DataLackInfo.AppointmentInfo(
-                        getPersonName(lack.personID),
-                        getSeminarPair(lack.seminarID).first
-                    )
+                    appointLackInfo(lack.personID, lack.seminarID)
                 }
-
                 is AppointmentCostLack -> {
-                    return@MutableList DataLackInfo.AppointmentInfo(
-                        getPersonName(lack.personID),
-                        getSeminarPair(lack.seminarID).first
-                    )
+                    appointLackInfo(lack.personID, lack.seminarID)
                 }
-
                 is AppointmentMoneyLack -> {
-                    return@MutableList DataLackInfo.AppointmentInfo(
-                        getPersonName(lack.personID),
-                        getSeminarPair(lack.seminarID).first
-                    )
+                    appointLackInfo(lack.personID, lack.seminarID)
                 }
-
                 is OrderPurchaseLack -> {
-                    return@MutableList  DataLackInfo.OrderInfo(
-                        getPersonName(lack.personID),
-                        getProductName(lack.productID)
-                    )
+                    orderLackInfo(lack.personID, lack.productID)
                 }
-
                 is SemCostMoneyLack -> {
-                    val sempair = getSeminarPair(lack.seminarID)
-                    return@MutableList DataLackInfo.SemCostInfo(
-                        sempair.first, sempair.second)
+                    semCostLackInfo(lack.seminarID).also {
+                        Log.v("Import UI", "SemCostMoneyLack -> seminarName=\"${it.seminarName}\"")
+                    }
                 }
+                else -> null
             }
-
-            // No additional information is needed for other types of DataLack.
-            return@MutableList null
         }
     }
 
@@ -598,7 +634,6 @@ SpeechManRepository(appContext)
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATING OBSERVABLES:
 
-    private var lastRequestID: Int? = null
     private val responseSubject = BehaviorSubject.create<SyncResponse>()
     val requestSubject = PublishSubject.create<SyncRequest>()
     val databaseFulfillSubject = PublishSubject.create<RemoteData>()
@@ -613,8 +648,12 @@ SpeechManRepository(appContext)
                 // Data comes from the server with all constraints fulfilled
                 // (otherwise SpeechManXmlParser throws an exception), but there may be a duplicated data,
                 // so we possibly need to generate warnings.
-                fetchRemoteData(request)
-                    .also { mapEntitiesToWarnings(it) }
+                fetchRemoteData(request).also {
+                    val response = SyncResponse(
+                        request.requestID, SyncResponse.ProgressStatus.XML_PARSED )
+                    responseSubject.onNext(response)
+                    mapEntitiesToWarnings(it)
+                }
             }.mergeWith( databaseFulfillSubject
                 .observeOn(Schedulers.computation())
                 .map { rd ->
@@ -676,7 +715,7 @@ SpeechManRepository(appContext)
             .filter { request ->
                 request.action == SyncRequest.RemoteAction.EXPORT
             }.map { request ->
-                // TODO: Export data
+                pushRemoteData(request)
                 SyncResponse(request.requestID, SyncResponse.ProgressStatus.DATA_PUSHED)
             }.mergeWith(responseSubject)
             .observeOn(AndroidSchedulers.mainThread())
