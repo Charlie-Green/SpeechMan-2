@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"  >
+
+        <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?colorPrimary" >
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_data_warning"
+                        android:tint="?android:colorBackground" />
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:colorBackground"
+                        android:text="@string/mi_remote" />
+
+                <androidx.appcompat.widget.ActionMenuView
+                        android:id="@+id/vMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:foregroundTint="?android:colorBackground" />
+
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+                android:id="@+id/tvWarningsCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/warning"
+                android:textStyle="italic"
+                android:text="@string/fs_data_warnings_count" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:layout_weight="1" />
+
+    </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="72dp"
+            app:fabCustomSize="42dp"
+            style="@style/FABBase"
+            android:src="@drawable/ic_save" />
+
+
+    <ProgressBar
+            android:id="@+id/prBar"
+            android:layout_width="@dimen/progressbar_default_size"
+            android:layout_height="@dimen/progressbar_default_size"
+            android:layout_gravity="center"
+            android:theme="@style/ProgressBarTheme" />
+
+</FrameLayout>

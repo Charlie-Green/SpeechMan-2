@@ -18,6 +18,12 @@ interface SeminarsDAO
     @Query("select * from Seminars where Seminars.id=:seminarID")
     fun getRx(seminarID: Int): Observable<Seminar>
 
+    @Query("select * from Seminars")
+    fun rawGetAll(): List<Seminar>
+
+    @Query("select * from Seminars where name=:name and city=:city and isDeleted=0")
+    fun getByNameAndCity(name: String, city: String): List<Seminar>
+
     @Query("select :seminarID as id, " +
             "max(Seminars.name) as name, " +
             "max(Seminars.image) as image, " +
@@ -70,6 +76,15 @@ interface SeminarsDAO
     @Query("select * from SemDays where seminar=:seminarID")
     fun getDays(seminarID: Int): Observable< List<SemDay> >
 
+    @Query("select * from SemDays")
+    fun rawGetDays(): List<SemDay>
+
+    @Query("select * from SemCosts")
+    fun rawGetCosts(): List<SemCost>
+
+    @Query("select * from SemCosts where id=:costID")
+    fun rawGetCost(costID: Int): SemCost
+
     @Query("select * from SemCosts where seminar=:seminarID")
     fun getCosts(seminarID: Int): Observable< List<SemCost> >
 
@@ -78,7 +93,7 @@ interface SeminarsDAO
     // INSERT, UPDATE, DELETE:
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addOrUpdate(seminar: Seminar)
+    fun addOrUpdate(seminar: Seminar): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addOrUpdateRx(seminar: Seminar): Single<Long>
@@ -91,6 +106,9 @@ interface SeminarsDAO
 
     @Delete
     fun delete(seminar: Seminar)
+
+    @Delete
+    fun delete(seminars: List<Seminar>)
 
     @Delete
     fun deleteDays(days: List<SemDay>)

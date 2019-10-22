@@ -27,8 +27,21 @@ internal object SpeechManDatabaseMigrations
             return object: Migration(2, 3) {
                 override fun migrate(database: SupportSQLiteDatabase)
                 {
-                    database.execSQL("alter table Orders add paid text not null")
-                    database.execSQL("alter table Products add isDeleted integer not null")
+                    database.execSQL("alter table Orders add paid text not null default '0.00 BYN'")
+
+                    database.execSQL("pragma foreign_keys=off")
+                    database.execSQL("alter table Products add isDeleted integer not null default 0")
+                    database.execSQL("alter table Products rename to Products_temp")
+                    database.execSQL("create table Products(" +
+                        "id integer primary key autoincrement, " +
+                        "name text not null, " +
+                        "cost text not null, " +
+                        "countBoxes integer not null, " +
+                        "countCase integer not null, " +
+                        "isDeleted integer not null)" )
+                    database.execSQL("insert into Products select * from Products_temp")
+                    database.execSQL("drop table Products_temp")
+                    database.execSQL("pragma foreign_keys=on")
                 }
             }
         }

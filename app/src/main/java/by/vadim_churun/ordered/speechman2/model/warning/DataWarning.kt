@@ -5,21 +5,13 @@ package by.vadim_churun.ordered.speechman2.model.warning
   * is put into a question and chances are it shouldn't be added to the local database. **/
 abstract class DataWarning<ObjectType>
 {
-    protected abstract fun createObject(): ObjectType
-
-
-    private var confirmed: Boolean? = null
-
-    var isConfirmed: Boolean
-        get() = confirmed
-            ?: throw NullPointerException("Data hasn't been neither confirmed nor denied")
-        set(decision) { confirmed = decision }
-
-
-    fun produceObject(): ObjectType
-    {
-        if(confirmed != true)
-            throw IllegalStateException("Adding data hasn't been confirmed")
-        return createObject()
+    enum class Action {
+        UPDATE,
+        DROP,
+        DUPLICATE,
+        NOT_DEFINED
     }
+    var action = Action.NOT_DEFINED
+
+    abstract fun produceObject(): ObjectType
 }

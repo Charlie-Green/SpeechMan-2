@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" >
+
+    <LinearLayout
+            android:id="@+id/vlltBack"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+        <GridLayout
+                android:columnCount="3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+            <ImageView
+                    android:id="@+id/imgvEntityType"
+                    android:layout_rowSpan="3"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:tint="?colorPrimary"
+                    android:visibility="invisible" />
+
+            <TextView
+                    android:id="@+id/tvTitle"
+                    style="@style/TitleDefault"
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_height="wrap_content"
+                    android:text="Title" />
+
+            <ImageView
+                    android:id="@+id/imgvDiscard"
+                    android:layout_rowSpan="3"
+                    android:layout_width="@dimen/edit_icon_default_size"
+                    android:layout_height="@dimen/edit_icon_default_size"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_delete"
+                    android:tint="@color/dangerPrimary" />
+
+            <TextView
+                    android:id="@+id/tvDeletedWarning"
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    android:alpha="0.5"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    android:text="@string/msg_entity_deleted" />
+
+            <TextView
+                    android:id="@+id/tvInfo"
+                    style="@style/SubtitleDefault"
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    android:maxLines="4"
+                    android:scrollHorizontally="false"
+                    android:text="Info" />
+
+        </GridLayout>
+
+        <!-- Placeholder for a TextView or an EditText. -->
+        <FrameLayout
+                android:id="@+id/pholderMissingData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+            android:id="@+id/vlltFront"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone" >
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_horizontal"
+                android:text="@string/msg_data_lack_discared" />
+
+        <Button
+                android:id="@+id/buRestore"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_default_height"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_horizontal"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                style="@style/ApplyButton"
+                android:text="@string/la_restore_data_lack" />
+
+    </LinearLayout>
+
+</FrameLayout>

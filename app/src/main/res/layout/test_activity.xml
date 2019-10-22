@@ -1,12 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <androidx.viewpager.widget.ViewPager
-            android:id="@+id/filePager"
+    <androidx.recyclerview.widget.RecyclerView
+            android:visibility="gone"
+            android:id="@+id/recv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
-</FrameLayout>
+    <Button
+            android:visibility="gone"
+            android:id="@+id/buCheckActuibs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Check actions" />
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2" >
+
+        <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp" />
+
+    </ScrollView>
+
+    <Button
+            android:id="@+id/buToSpeechManActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="to SpeechManActivity" />
+
+</LinearLayout>

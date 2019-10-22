@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+
+    <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?colorPrimary" >
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:colorBackground"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="@string/mi_remote" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical" >
+
+
+        <!-- Export. -->
+        <GridLayout
+                android:id="@+id/grltExport"
+                android:columnCount="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" >
+
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/cardvExport"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_margin="8dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_rowSpan="2"
+                    app:cardElevation="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="?colorPrimary" >
+
+                <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_export"
+                        android:tint="?android:colorBackground" />
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    style="@style/TitleDefault"
+                    android:text="@string/la_export" />
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    style="@style/SubtitleDefault"
+                    android:text="@string/la_export_expanded" />
+
+        </GridLayout>
+
+
+        <!-- Import. -->
+        <GridLayout
+                android:id="@+id/grltImport"
+                android:columnCount="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/cardvImport"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_margin="8dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_rowSpan="2"
+                    app:cardElevation="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="?colorPrimary" >
+
+                <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_import"
+                        android:tint="?android:colorBackground" />
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    style="@style/TitleDefault"
+                    android:text="@string/la_import" />
+
+            <TextView
+                    android:layout_width="0dp"
+                    android:layout_gravity="fill_horizontal"
+                    style="@style/SubtitleDefault"
+                    android:text="@string/la_import_expanded" />
+
+        </GridLayout>
+
+        <ProgressBar
+                android:id="@+id/prbDataLoad"
+                android:layout_width="@dimen/progressbar_default_size"
+                android:layout_height="@dimen/progressbar_default_size"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:theme="@style/ProgressBarTheme"
+                android:visibility="gone" />
+
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+
+</LinearLayout>

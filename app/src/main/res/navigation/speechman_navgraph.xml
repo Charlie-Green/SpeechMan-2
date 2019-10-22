@@ -18,6 +18,12 @@
             app:launchSingleTop="true"
             app:popUpTo="@id/destPeopleList" />
 
+    <action android:id="@+id/actToRemote"
+            app:destination="@id/destRemote"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/destPeopleList" />
+
+
 
     <!-- Destinations within dests.people project package. -->
 
@@ -87,12 +93,42 @@
     </fragment>
 
     <fragment android:id="@+id/destAddSeminar"
-            android:name="by.vadim_churun.ordered.speechman2.dests.sems.AddSeminarDestination" />
+              android:name="by.vadim_churun.ordered.speechman2.dests.sems.AddSeminarDestination" />
 
     <fragment android:id="@+id/destEditSeminar"
-            android:name="by.vadim_churun.ordered.speechman2.dests.sems.EditSeminarDestination" />
+              android:name="by.vadim_churun.ordered.speechman2.dests.sems.EditSeminarDestination" />
 
     <fragment android:id="@+id/destEditParticipants"
-            android:name="by.vadim_churun.ordered.speechman2.dests.sems.EditParticipantsDestination" />
+              android:name="by.vadim_churun.ordered.speechman2.dests.sems.EditParticipantsDestination" />
+
+
+    <!-- Destinations within dests.remote package. -->
+
+    <fragment android:id="@+id/destRemote"
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.RemoteDestination" >
+
+        <action android:id="@+id/actRemoteToLacks"
+                app:destination="@id/destLacks" />
+
+        <action android:id="@+id/actRemoteToWarnings"
+                app:destination="@id/destWarnings" />
+
+    </fragment>
+
+    <fragment android:id="@+id/destLacks"
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataLacksDestination" >
+
+        <action android:id="@+id/actLacksToWarnings"
+                app:destination="@id/destWarnings" />
+
+    </fragment>
+
+    <fragment android:id="@+id/destWarnings"
+              android:name="by.vadim_churun.ordered.speechman2.dests.remote.DataWarningsDestination" >
+
+        <action android:id="@+id/actWarningsToLacks"
+                app:destination="@id/destLacks" />
+
+    </fragment>
 
 </navigation>

@@ -111,6 +111,8 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
     fun deleteSeminar(seminarID: Int)
     {
         thread(start = true) {
+            // TODO: This implementation is unstable. Reimplement.
+
             // Logically delete the Seminar itself:
             val sem = super.seminarsDAO.get(seminarID)
             val deletedSem = Seminar(sem.ID, sem.name, sem.city,

@@ -16,6 +16,12 @@ interface PeopleDAO
     @Query("select * from People where id=:personID")
     fun get(personID: Int): Observable<Person>
 
+    @Query("select * from People where id=:personID")
+    fun rawGet(personID: Int): Person
+
+    @Query("select * from People")
+    fun rawGet(): List<Person>
+
     ///** Selects [Appointment]s and [Seminar]s regardless of their logical deletion status. **/
     /** Selects only those [Appointment]s which haven't been logically deleted. **/
     @Query("select max(Appointments.person) as appoint_person, " +
@@ -52,9 +58,15 @@ interface PeopleDAO
            "(select seminar from Appointments where person=:excludedPersonID)" )
     fun getSemHeadersNotForPerson(excludedPersonID: Int): Observable< List<SeminarHeader> >
 
+    @Query("select * from People where name=:name")
+    fun getByName(name: String): List<Person>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addOrUpdate(person: Person)
+    fun addOrUpdate(person: Person): Long
 
     @Delete
     fun delete(person: Person)
+
+    @Delete
+    fun delete(people: List<Person>)
 }

@@ -1,4 +1,4 @@
-package by.vadim_churun.ordered.speechman2.remote
+package by.vadim_churun.ordered.speechman2.remote.xml
 
 import android.util.Xml
 import by.vadim_churun.ordered.speechman2.db.entities.*
@@ -7,60 +7,11 @@ import by.vadim_churun.ordered.speechman2.remote.lack.*
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 import java.util.*
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
+import kotlin.collections.*
 
 
 object SpeechManXmlParser
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // CONTRACT:
-
-    private const val TAG_ROOT = "speech2"
-    private const val TAG_PERSON        = "person"
-    private const val TAG_PERSON_TYPE   = "personType"    // PersonType's are not yet supported.
-    private const val TAG_SEMINAR       = "seminar"
-    private const val TAG_PRODUCT       = "product"
-    private const val TAG_SEMDAY_SHORT  = "day"
-    private const val TAG_SEMDAY_LONG   = "semday"
-    private const val TAG_SEMCOST_SHORT = "cost"
-    private const val TAG_SEMCOST_LONG  = "semcost"
-    private const val TAG_APPOINT_SHORT = "appoint"
-    private const val TAG_APPOINT_LONG  = "appointment"
-    private const val TAG_ORDER         = "order"
-    private const val ATTR_PSEUDOID = "id"
-    private const val ATTR_PERSON_NAME    = "name"
-    private const val ATTR_PERSON_TYPE_ID = "typeID"
-    private const val ATTR_SEMINAR_NAME    = "name"
-    private const val ATTR_SEMINAR_CITY    = "city"
-    private const val ATTR_SEMINAR_ADDRESS = "address"
-    private const val ATTR_SEMINAR_COSTING = "costing"
-    private const val ATTR_SEMINAR_DELETED = "isDeleted"
-    private const val ATTR_SEMDAY_SEMINAR_ID = "seminarID"
-    private const val ATTR_SEMDAY_START      = "start"
-    private const val ATTR_SEMDAY_DURATION   = "duration"
-    private const val ATTR_SEMCOST_SEMINAR_ID   = "seminarID"
-    private const val ATTR_SEMCOST_PARTICIPANTS = "minParticipants"
-    private const val ATTR_SEMCOST_DATE         = "minDate"
-    private const val ATTR_SEMCOST_MONEY        = "amount"
-    private const val ATTR_PRODUCT_NAME         = "name"
-    private const val ATTR_PRODUCT_COST         = "cost"
-    private const val ATTR_PRODUCT_COUNT_BOXED  = "inBoxes"
-    private const val ATTR_PRODUCT_COUNT_CASED  = "inSuite"
-    private const val ATTR_PRODUCT_DELETED      = "isDeleted"
-    private const val ATTR_APPOINT_PERSON_ID      = "personID"
-    private const val ATTR_APPOINT_SEMINAR_ID     = "seminarID"
-    private const val ATTR_APPOINT_PURCHASE       = "paid"
-    private const val ATTR_APPOINT_COST           = "cost"
-    private const val ATTR_APPOINT_HISTORY_STATUS = "historyStatus"
-    private const val ATTR_APPOINT_DELETED        = "isDeleted"
-    private const val ATTR_ORDER_PERSON_ID      = "personID"
-    private const val ATTR_ORDER_PRODUCT_ID     = "productID"
-    private const val ATTR_ORDER_PURCHASE       = "paid"
-    private const val ATTR_ORDER_HISTORY_STATUS = "historyStatus"
-    private const val ATTR_ORDER_DELETED        = "isDeleted"
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // HELP METHODS:
 
@@ -158,7 +109,7 @@ object SpeechManXmlParser
     private fun processRootTag(parser: XmlPullParser)
     {
         if(parser.depth != 1)
-            throw SpeechManXmlException("<$TAG_ROOT> must be the root tag")
+            throw SpeechManXmlException("<$XmlContract.TAG_ROOT> must be the root tag")
     }
 
     private fun processPersonTag(parser: XmlPullParser,
@@ -166,12 +117,14 @@ object SpeechManXmlParser
         presentPersonIDs: HashSet<Int> )
     {
         if(parser.depth != 2)
-            throw SpeechManXmlException("<$TAG_PERSON> must be a direct child of <$TAG_ROOT>")
+            throw SpeechManXmlException(
+                "<${XmlContract.TAG_PERSON}> must be a direct child of <$XmlContract.TAG_ROOT>" )
 
-        val id = parser.getIntValue(ATTR_PSEUDOID)
-        val name = parser.getStringValue(ATTR_PERSON_NAME)
-            ?: throw SpeechManXmlException("$ATTR_PERSON_NAME is a mandatory attribute for <$TAG_PERSON>")
-        val type = parser.getIntValue(ATTR_PERSON_TYPE_ID)
+        val id = parser.getIntValue(XmlContract.ATTR_PSEUDOID)
+        val name = parser.getStringValue(XmlContract.ATTR_PERSON_NAME)
+            ?: throw SpeechManXmlException(
+                "${XmlContract.ATTR_PERSON_NAME} is a mandatory attribute for <${XmlContract.TAG_PERSON}>" )
+        val type = parser.getIntValue(XmlContract.ATTR_PERSON_TYPE_ID)
         id?.also { presentPersonIDs.add(it) }
 
         objs.add( Person(id, name, type) )
@@ -185,18 +138,19 @@ object SpeechManXmlParser
     (parser: XmlPullParser, seminarMap: HashMap<Int, Any>): Any
     {
         if(parser.depth != 2)
-            throw SpeechManXmlException("<$TAG_SEMINAR> must be a direct child of <${TAG_ROOT}>")
-
-        val id = parser.getIntValue(ATTR_PSEUDOID)
-        val name = parser.getStringValue(ATTR_SEMINAR_NAME)
-        val city = parser.getStringValue(ATTR_SEMINAR_CITY)
-        if(name == null && city == null) {
             throw SpeechManXmlException(
-                "<$TAG_SEMINAR> is missing both $ATTR_SEMINAR_NAME and $ATTR_SEMINAR_CITY attributes" )
+                "<${XmlContract.TAG_SEMINAR}> must be a direct child of <${XmlContract.TAG_ROOT}>" )
+
+        val id = parser.getIntValue(XmlContract.ATTR_PSEUDOID)
+        val name = parser.getStringValue(XmlContract.ATTR_SEMINAR_NAME)
+        val city = parser.getStringValue(XmlContract.ATTR_SEMINAR_CITY)
+        if(name == null && city == null) {
+            throw SpeechManXmlException("<$XmlContract.TAG_SEMINAR> is missing both " +
+                "${XmlContract.ATTR_SEMINAR_NAME} and ${XmlContract.ATTR_SEMINAR_CITY} attributes" )
         }
-        val address = parser.getStringValue(ATTR_SEMINAR_ADDRESS) ?: ""
-        val isDeleted = parser.getBooleanValue(ATTR_SEMINAR_DELETED) ?: false
-        val costing = parser.getCostingStrategyValue(ATTR_SEMINAR_COSTING) ?: Seminar.CostingStrategy.FIXED
+        val address = parser.getStringValue(XmlContract.ATTR_SEMINAR_ADDRESS) ?: ""
+        val isDeleted = parser.getBooleanValue(XmlContract.ATTR_SEMINAR_DELETED) ?: false
+        val costing = parser.getCostingStrategyValue(XmlContract.ATTR_SEMINAR_COSTING) ?: Seminar.CostingStrategy.FIXED
 
         val seminarObject: Any
         if(name == null)
@@ -215,16 +169,17 @@ object SpeechManXmlParser
         productMap: HashMap<Int, Any> )
     {
         if(parser.depth != 2)
-            throw SpeechManXmlException("<$TAG_PRODUCT> must be a direct child of <$TAG_ROOT>")
+            throw SpeechManXmlException("<$XmlContract.TAG_PRODUCT> must be a direct child of <$XmlContract.TAG_ROOT>")
 
-        val id = parser.getIntValue(ATTR_PSEUDOID)
-        val name = parser.getStringValue(ATTR_PRODUCT_NAME)
+        val id = parser.getIntValue(XmlContract.ATTR_PSEUDOID)
+        val name = parser.getStringValue(XmlContract.ATTR_PRODUCT_NAME)
             ?: throw SpeechManXmlException(
-                "$ATTR_PRODUCT_NAME is a mandatory attribute for <$TAG_PRODUCT>" )
-        val cost = parser.getMoneyValue(ATTR_PRODUCT_COST)
-        val boxed = parser.getIntValue(ATTR_PRODUCT_COUNT_BOXED) ?: 0
-        val cased = parser.getIntValue(ATTR_PRODUCT_COUNT_CASED) ?: 0
-        val deleted = parser.getBooleanValue(ATTR_PRODUCT_DELETED) ?: false
+                "${XmlContract.ATTR_PRODUCT_NAME} is a mandatory attribute for <${XmlContract.TAG_PRODUCT}>"
+            )
+        val cost = parser.getMoneyValue(XmlContract.ATTR_PRODUCT_COST)
+        val boxed = parser.getIntValue(XmlContract.ATTR_PRODUCT_COUNT_BOXED) ?: 0
+        val cased = parser.getIntValue(XmlContract.ATTR_PRODUCT_COUNT_CASED) ?: 0
+        val deleted = parser.getBooleanValue(XmlContract.ATTR_PRODUCT_DELETED) ?: false
 
         val costObject: Any
         if(cost == null) {
@@ -252,28 +207,33 @@ object SpeechManXmlParser
         if(parser.name == shortTagName) {
             if(seminarObject == null || parser.depth != 3) {
                 throw SpeechManXmlException(
-                    "<$shortTagName> must be a direct child of <$TAG_SEMINAR>")
+                    "<$shortTagName> must be a direct child of <${XmlContract.TAG_SEMINAR}>"
+                )
             }
 
             // This SemDay or SemCost inherits Seminar ID from its parent Seminar tag.
             return seminarObject.ID ?: throw SpeechManXmlException(
-                    "<$TAG_SEMINAR> without $ATTR_PSEUDOID cannot contain <$shortTagName>" )
+                "<${XmlContract.TAG_SEMINAR}> without ${XmlContract.ATTR_PSEUDOID} cannot contain <$shortTagName>" )
         }
 
         if( (parser.depth != 3 && parser.depth != 2) ||
             (parser.depth == 3 && seminarObject == null) ) {
             throw SpeechManXmlException(
-                "<$longTagName> must be a direct child of either <$TAG_SEMINAR> or <$TAG_ROOT>" )
+                "<$longTagName> must be a direct child of either <${XmlContract.TAG_SEMINAR}> or <${XmlContract.TAG_ROOT}>"
+            )
         }
 
         if(seminarObject == null) {
             return parser.getIntValue(seminarIdAttrName)
-                ?: throw SpeechManXmlException("<$longTagName> must either " +
-                    "be a direct child of <$TAG_SEMINAR> or specify $seminarIdAttrName attribute" )
+                ?: throw SpeechManXmlException(
+                    "<$longTagName> must either " +
+                            "be a direct child of <${XmlContract.TAG_SEMINAR}> or specify $seminarIdAttrName attribute"
+                )
         }
 
         return seminarObject.ID ?: throw SpeechManXmlException(
-            "<$TAG_SEMINAR> without $ATTR_PSEUDOID cannot contain <$longTagName>" )
+            "<${XmlContract.TAG_SEMINAR}> without ${XmlContract.ATTR_PSEUDOID} cannot contain <$longTagName>"
+        )
     }
 
     private fun processSemDayTag(
@@ -281,13 +241,21 @@ object SpeechManXmlParser
         objs: MutableCollection<Any>,
         seminarObject: Any? )
     {
-        val semID = getSeminarIdForDayOrCost(
-            parser, TAG_SEMDAY_SHORT, TAG_SEMDAY_LONG, ATTR_SEMDAY_SEMINAR_ID, seminarObject )
+        val semID =
+            getSeminarIdForDayOrCost(
+                parser,
+                XmlContract.TAG_SEMDAY_SHORT,
+                XmlContract.TAG_SEMDAY_LONG,
+                XmlContract.ATTR_SEMDAY_SEMINAR_ID,
+                seminarObject
+            )
 
-        val start = parser.getLongValue(ATTR_SEMDAY_START)?.let {
+        val start = parser.getLongValue(XmlContract.ATTR_SEMDAY_START)?.let {
             Calendar.getInstance().apply { timeInMillis = it }
-        } ?: throw SpeechManXmlException("<${parser.name}> requires $ATTR_SEMDAY_START attribute")
-        val dur = parser.getAttributeValue(null, ATTR_SEMDAY_DURATION)?.toShort() ?: 480
+        } ?: throw SpeechManXmlException("<${parser.name}> requires ${XmlContract.ATTR_SEMDAY_START} attribute")
+        val dur = parser.getAttributeValue(null,
+            XmlContract.ATTR_SEMDAY_DURATION
+        )?.toShort() ?: 480
 
         objs.add( SemDay(null, semID, start, dur) )
     }
@@ -298,15 +266,21 @@ object SpeechManXmlParser
         seminarObject: Any?,
         costCountMap: HashMap<Int, Int> )
     {
-        val semID = getSeminarIdForDayOrCost(
-            parser, TAG_SEMCOST_SHORT, TAG_SEMCOST_LONG, ATTR_SEMCOST_SEMINAR_ID, seminarObject )
+        val semID =
+            getSeminarIdForDayOrCost(
+                parser,
+                XmlContract.TAG_SEMCOST_SHORT,
+                XmlContract.TAG_SEMCOST_LONG,
+                XmlContract.ATTR_SEMCOST_SEMINAR_ID,
+                seminarObject
+            )
         val oldCount = costCountMap[semID] ?: 0
         costCountMap[semID] = oldCount + 1
 
-        val particips = parser.getIntValue(ATTR_SEMCOST_PARTICIPANTS) ?: 0
-        val dateMillis = parser.getLongValue(ATTR_SEMCOST_DATE) ?: Long.MIN_VALUE
+        val particips = parser.getIntValue(XmlContract.ATTR_SEMCOST_PARTICIPANTS) ?: 0
+        val dateMillis = parser.getLongValue(XmlContract.ATTR_SEMCOST_DATE) ?: Long.MIN_VALUE
         val date = Calendar.getInstance().apply { timeInMillis = dateMillis }
-        val cost = parser.getMoneyValue(ATTR_SEMCOST_MONEY)
+        val cost = parser.getMoneyValue(XmlContract.ATTR_SEMCOST_MONEY)
 
         cost?.also {
             objs.add( SemCost(null, semID, particips, date, it) )
@@ -318,19 +292,21 @@ object SpeechManXmlParser
         lacks: MutableCollection<DataLack<*,*>>,
         mandatoryAliveSemIDs: HashSet<Int> )
     {
-        val personID = parser.getIntValue(ATTR_APPOINT_PERSON_ID)
+        val personID = parser.getIntValue(XmlContract.ATTR_APPOINT_PERSON_ID)
             ?: throw SpeechManXmlException(
-                "$ATTR_APPOINT_PERSON_ID attribute is mandatory for <${parser.name}>" )
+                "${XmlContract.ATTR_APPOINT_PERSON_ID} attribute is mandatory for <${parser.name}>"
+            )
 
-        val semID = parser.getIntValue(ATTR_APPOINT_SEMINAR_ID)
+        val semID = parser.getIntValue(XmlContract.ATTR_APPOINT_SEMINAR_ID)
             ?: throw SpeechManXmlException(
-                "$ATTR_APPOINT_SEMINAR_ID attribute is mandatory for <${parser.name}>" )
+                "${XmlContract.ATTR_APPOINT_SEMINAR_ID} attribute is mandatory for <${parser.name}>"
+            )
 
-        val purchase = parser.getMoneyValue(ATTR_APPOINT_PURCHASE)
-        val cost = parser.getMoneyValue(ATTR_APPOINT_COST)
-        val history = parser.getHistoryStatusValue(ATTR_APPOINT_HISTORY_STATUS) ?: HistoryStatus.USUAL
+        val purchase = parser.getMoneyValue(XmlContract.ATTR_APPOINT_PURCHASE)
+        val cost = parser.getMoneyValue(XmlContract.ATTR_APPOINT_COST)
+        val history = parser.getHistoryStatusValue(XmlContract.ATTR_APPOINT_HISTORY_STATUS) ?: HistoryStatus.USUAL
         val deleted: Boolean
-        when(parser.getBooleanValue(ATTR_APPOINT_DELETED))
+        when(parser.getBooleanValue(XmlContract.ATTR_APPOINT_DELETED))
         {
             true -> { deleted = true }
             false -> {
@@ -360,18 +336,20 @@ object SpeechManXmlParser
         lacks: MutableCollection< DataLack<*,*> >,
         mandatoryAliveProductIDs: HashSet<Int> )
     {
-        val personID = parser.getIntValue(ATTR_ORDER_PERSON_ID)
+        val personID = parser.getIntValue(XmlContract.ATTR_ORDER_PERSON_ID)
             ?: throw SpeechManXmlException(
-                "$ATTR_ORDER_PERSON_ID attribute is mandatory for <$TAG_ORDER>" )
+                "${XmlContract.ATTR_ORDER_PERSON_ID} attribute is mandatory for <${XmlContract.TAG_ORDER}>"
+            )
 
-        val productID = parser.getIntValue(ATTR_ORDER_PRODUCT_ID)
+        val productID = parser.getIntValue(XmlContract.ATTR_ORDER_PRODUCT_ID)
             ?: throw SpeechManXmlException(
-                "$ATTR_ORDER_PRODUCT_ID attribute is mandatory for <$TAG_ORDER>" )
+                "$XmlContract.ATTR_ORDER_PRODUCT_ID attribute is mandatory for <$XmlContract.TAG_ORDER>"
+            )
 
-        val purchase = parser.getMoneyValue(ATTR_ORDER_PURCHASE)
-        val history = parser.getHistoryStatusValue(ATTR_ORDER_HISTORY_STATUS) ?: HistoryStatus.USUAL
+        val purchase = parser.getMoneyValue(XmlContract.ATTR_ORDER_PURCHASE)
+        val history = parser.getHistoryStatusValue(XmlContract.ATTR_ORDER_HISTORY_STATUS) ?: HistoryStatus.USUAL
         val deleted: Boolean
-        when(parser.getBooleanValue(ATTR_ORDER_DELETED))
+        when(parser.getBooleanValue(XmlContract.ATTR_ORDER_DELETED))
         {
             true -> {
                 deleted = true
@@ -471,8 +449,10 @@ object SpeechManXmlParser
 
         if(mandatoryAliveSemIDs?.contains(semID) == true && isSemDeleted) {
             // The seminar is deleted and the Appointment is forced not to be.
-            throw SpeechManXmlException("" +
-                    "Seminar ID $semID must not be deleted, since it has an undeleted Appointment" )
+            throw SpeechManXmlException(
+                "" +
+                        "Seminar ID $semID must not be deleted, since it has an undeleted Appointment"
+            )
         }
 
         if(!isSemDeleted)
@@ -536,7 +516,8 @@ object SpeechManXmlParser
 
         if(isProductDeleted && mandatoryAliveProductIDs.isNotNullAndContains(productID)) {
             throw SpeechManXmlException(
-                "Product pseudo-ID $productID cannot be deleted since it has an undeleted Order" )
+                "Product pseudo-ID $productID cannot be deleted since it has an undeleted Order"
+            )
         }
 
         if(!isProductDeleted)
@@ -581,8 +562,10 @@ object SpeechManXmlParser
             else -> costing = (sem as Seminar).costing
         }
         if(costing == Seminar.CostingStrategy.FIXED) {
-            throw SpeechManXmlException("Cannot have more than one SemCost " +
-                "for a Seminar with fixed costing (found ${costCountMap[seminarID]})")
+            throw SpeechManXmlException(
+                "Cannot have more than one SemCost " +
+                        "for a Seminar with fixed costing (found ${costCountMap[seminarID]})"
+            )
         }
     }
 
@@ -619,11 +602,15 @@ object SpeechManXmlParser
         while(parser.next() != XmlPullParser.END_DOCUMENT)
         {
             if(parser.eventType == XmlPullParser.TEXT) {
-                seminarObject = processText(parser, seminarObject)
+                seminarObject =
+                    processText(
+                        parser,
+                        seminarObject
+                    )
                 continue
             }
             if(parser.eventType == XmlPullParser.END_TAG) {
-                if(parser.name == TAG_SEMINAR) {
+                if(parser.name == XmlContract.TAG_SEMINAR) {
                     if(seminarObject is DataLack<*,*>)
                         lacks.add(seminarObject)
                     else
@@ -637,54 +624,94 @@ object SpeechManXmlParser
             }
 
             var tagName = parser.name
-            if(tagName == TAG_SEMDAY_SHORT)
-                tagName = TAG_SEMDAY_LONG    // To execute the same code for both.
-            else if(tagName == TAG_SEMCOST_SHORT)
-                tagName = TAG_SEMCOST_LONG
-            else if(tagName == TAG_APPOINT_SHORT)
-                tagName = TAG_APPOINT_LONG
+            if(tagName == XmlContract.TAG_SEMDAY_SHORT)
+                tagName =
+                    XmlContract.TAG_SEMDAY_LONG    // To execute the same code for both.
+            else if(tagName == XmlContract.TAG_SEMCOST_SHORT)
+                tagName =
+                    XmlContract.TAG_SEMCOST_LONG
+            else if(tagName == XmlContract.TAG_APPOINT_SHORT)
+                tagName =
+                    XmlContract.TAG_APPOINT_LONG
             when(tagName)
             {
-                TAG_ROOT -> {
-                    processRootTag(parser)
+                XmlContract.TAG_ROOT -> {
+                    processRootTag(
+                        parser
+                    )
                 }
 
-                TAG_PERSON -> {
+                XmlContract.TAG_PERSON -> {
                     presentPersonIDs = presentPersonIDs ?: HashSet()
-                    processPersonTag(parser, objs, presentPersonIDs)
+                    processPersonTag(
+                        parser,
+                        objs,
+                        presentPersonIDs
+                    )
                 }
 
-                TAG_PERSON_TYPE -> {
-                    processPersonTypeTag(parser)
+                XmlContract.TAG_PERSON_TYPE -> {
+                    processPersonTypeTag(
+                        parser
+                    )
                 }
 
-                TAG_SEMINAR -> {
+                XmlContract.TAG_SEMINAR -> {
                     seminarMap = seminarMap ?: HashMap()
-                    seminarObject = processSeminarTag(parser, seminarMap)
+                    seminarObject =
+                        processSeminarTag(
+                            parser,
+                            seminarMap
+                        )
                 }
 
-                TAG_PRODUCT -> {
+                XmlContract.TAG_PRODUCT -> {
                     productMap = productMap ?: HashMap()
-                    processProductTag(parser, objs, lacks, productMap)
+                    processProductTag(
+                        parser,
+                        objs,
+                        lacks,
+                        productMap
+                    )
                 }
 
-                TAG_SEMDAY_LONG -> {
-                    processSemDayTag(parser, objs, seminarObject)
+                XmlContract.TAG_SEMDAY_LONG -> {
+                    processSemDayTag(
+                        parser,
+                        objs,
+                        seminarObject
+                    )
                 }
 
-                TAG_SEMCOST_LONG -> {
+                XmlContract.TAG_SEMCOST_LONG -> {
                     costCountMap = costCountMap ?: HashMap()
-                    processSemCostTag(parser, objs, lacks, seminarObject, costCountMap)
+                    processSemCostTag(
+                        parser,
+                        objs,
+                        lacks,
+                        seminarObject,
+                        costCountMap
+                    )
                 }
 
-                TAG_APPOINT_LONG -> {
+                XmlContract.TAG_APPOINT_LONG -> {
                     mandatoryAliveSemIDs = mandatoryAliveSemIDs ?: HashSet()
-                    processAppointTag(parser, objs, lacks, mandatoryAliveSemIDs)
+                    processAppointTag(
+                        parser,
+                        objs,
+                        lacks,
+                        mandatoryAliveSemIDs
+                    )
                 }
 
-                TAG_ORDER -> {
+                XmlContract.TAG_ORDER -> {
                     mandatoryAliveProductIDs = mandatoryAliveProductIDs ?: HashSet()
-                    processOrderTag(parser, objs, lacks, mandatoryAliveProductIDs)
+                    processOrderTag(
+                        parser,
+                        objs,
+                        lacks,
+                        mandatoryAliveProductIDs
+                    )
                 }
 
                 else -> {
@@ -702,20 +729,35 @@ object SpeechManXmlParser
             when(obj)
             {
                 is Appointment -> {
-                    objs[j] = validateAppointment(
-                        obj, presentPersonIDs, seminarMap, mandatoryAliveSemIDs )
+                    objs[j] =
+                        validateAppointment(
+                            obj, presentPersonIDs, seminarMap, mandatoryAliveSemIDs
+                        )
                 }
 
                 is Order -> {
-                    objs[j] = validateOrder(obj, presentPersonIDs, productMap, mandatoryAliveProductIDs)
+                    objs[j] =
+                        validateOrder(
+                            obj,
+                            presentPersonIDs,
+                            productMap,
+                            mandatoryAliveProductIDs
+                        )
                 }
 
                 is SemDay -> {
-                    validateSemDay(obj.seminarID, seminarMap)
+                    validateSemDay(
+                        obj.seminarID,
+                        seminarMap
+                    )
                 }
 
                 is SemCost -> {
-                    validateSemCost(obj.seminarID, seminarMap, costCountMap)
+                    validateSemCost(
+                        obj.seminarID,
+                        seminarMap,
+                        costCountMap
+                    )
                 }
             }
         }
@@ -726,26 +768,34 @@ object SpeechManXmlParser
             {
                 is AppointmentPurchaseLack -> {
                     lacks[j] = validateAppointment(
-                        lack, presentPersonIDs, seminarMap, mandatoryAliveSemIDs ) as DataLack<*,*>
+                        lack, presentPersonIDs, seminarMap, mandatoryAliveSemIDs
+                    ) as DataLack<*,*>
                 }
 
                 is AppointmentCostLack -> {
                     lacks[j] = validateAppointment(
-                        lack, presentPersonIDs, seminarMap, mandatoryAliveSemIDs ) as DataLack<*,*>
+                        lack, presentPersonIDs, seminarMap, mandatoryAliveSemIDs
+                    ) as DataLack<*,*>
                 }
 
                 is AppointmentMoneyLack -> {
                     lacks[j] = validateAppointment(
-                        lack, presentPersonIDs, seminarMap, mandatoryAliveSemIDs ) as DataLack<*,*>
+                        lack, presentPersonIDs, seminarMap, mandatoryAliveSemIDs
+                    ) as DataLack<*,*>
                 }
 
                 is OrderPurchaseLack -> {
                     lacks[j] = validateOrder(
-                        lack, presentPersonIDs, productMap, mandatoryAliveProductIDs ) as DataLack<*,*>
+                        lack, presentPersonIDs, productMap, mandatoryAliveProductIDs
+                    ) as DataLack<*,*>
                 }
 
                 is SemCostMoneyLack -> {
-                    validateSemCost(lack.seminarID, seminarMap, costCountMap)
+                    validateSemCost(
+                        lack.seminarID,
+                        seminarMap,
+                        costCountMap
+                    )
                 }
             }
         }

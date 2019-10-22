@@ -16,7 +16,7 @@ class SeminarCityLack(var ID: Int?,
 
     override fun buildObject(missedData: String): Seminar
         = Seminar(
-            ID = null,
+            ID = ID,
             name = name,
             city = missedData,
             content = content,

@@ -17,7 +17,7 @@ import kotlin.concurrent.thread
         Appointment::class,
         Order::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(SpeechManTypeConverters::class)
@@ -25,6 +25,7 @@ abstract class SpeechManDatabase: RoomDatabase()
 {
     abstract fun getPeopleDAO(): PeopleDAO
     abstract fun getSeminarsDAO(): SeminarsDAO
+    abstract fun getProductsDAO(): ProductsDAO
     abstract fun getAssociationsDAO(): AssociationsDAO
 
 

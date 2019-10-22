@@ -1,11 +1,10 @@
 package by.vadim_churun.ordered.speechman2.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.db.entities.SemCost
-import by.vadim_churun.ordered.speechman2.model.objects.SeminarBuilder
+import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.repo.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -15,8 +14,6 @@ import io.reactivex.subjects.PublishSubject
 
 class SpeechManViewModel(app: Application): AndroidViewModel(app)
 {
-    private val LOGTAG = SpeechManViewModel::class.java.simpleName
-
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // WRAPPING PEOPLE REPOSITORY:
 
@@ -78,6 +75,31 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     fun createSemAppointsBuilderObservable()
         = semsRepo.appointsBuilderSubject
             .observeOn(AndroidSchedulers.mainThread())
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // WRAPPING REMOTE REPOSITORY:
+
+    private val remoteRepo = RemoteRepository(super.getApplication())
+    private val ipValidationSubject = PublishSubject.create<Boolean>()
+
+    val nextSyncRequestID: Int
+        get() = RemoteRepository.nextRequestID
+
+    fun createRemoteDataObservable()
+         = remoteRepo.createRemoteDataObservable()
+
+    fun createSyncResponseObservable()
+        = remoteRepo.createSyncResponseObservable()
+
+    fun createLackInfosObservable()
+        = remoteRepo.createLackInfosObservable()
+
+    fun createPersistedIpMaybe()
+        = remoteRepo.createPersistedIpMaybe()
+
+    fun createIpValidationObservable()
+        = ipValidationSubject.observeOn(AndroidSchedulers.mainThread())
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,6 +196,10 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                         semsRepo.retrieveAppointsBuilder(action.seminarID)
                     }
 
+                    is SpeechManAction.RequestDataLackInfos -> {
+                        remoteRepo.lackInfosSubject.onNext(action.request)
+                    }
+
                     is SpeechManAction.RequestPersonInfos -> {
                         peopleRepo.infoRequestSubject.onNext(action.people)
                     }
@@ -186,10 +212,23 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                         semsRepo.infoSubjectHeaders.onNext(action.semHeaders)
                     }
 
+                    is SpeechManAction.RequestSync -> {
+                        val isIpGood = remoteRepo.validateIP(action.request.ip)
+                        ipValidationSubject.onNext(isIpGood)
+                        if(isIpGood) {
+                            remoteRepo.persistIP(action.request.ip)
+                            remoteRepo.requestSubject.onNext(action.request)
+                        }
+                    }
+
                     is SpeechManAction.SaveAppointment -> {
                         val msg = super.getApplication<Application>().getString(R.string.msg_saving_changes)
                         actionSubject.onNext(SpeechManAction.ShowMessage(false, msg))
                         peopleRepo.addOrUpdateAppointments(listOf(action.appoint))
+                    }
+
+                    is SpeechManAction.SaveRemoteData -> {
+                        remoteRepo.databaseFulfillSubject.onNext(action.rd)
                     }
 
                     is SpeechManAction.SaveSeminar -> {
@@ -202,11 +241,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                     }
 
                     is SpeechManAction.SaveSeminarAppoints -> {
-                        for(appoint in action.builder.addedAppoints)
-                        {
-                            Log.i(LOGTAG, "Saving cost: ${appoint.cost}")
-                        }
-
                         super.getApplication<Application>().getString(R.string.msg_saving_changes).also {
                             actionSubject.onNext( SpeechManAction.ShowMessage(false, it) )
                         }
@@ -255,14 +289,23 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     val sbuilderUptodateSubject = BehaviorSubject.create<Boolean>()
 
 
+    private val remoteDataSubject = BehaviorSubject.create<RemoteData>()
+
+    fun keepRemoteData(rd: RemoteData)
+    { remoteDataSubject.onNext(rd) }
+
+    fun getKeptRemoteDataRx()
+        = remoteDataSubject.observeOn(AndroidSchedulers.mainThread())
+
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // VIEWMODEL LIFECYCLE:
 
-    init
-    {
+    init {
         disposable.add(observeActionSubject())
     }
 
-    override fun onCleared()
-        = disposable.clear()
+    override fun onCleared() {
+        disposable.clear()
+    }
 }

@@ -9,16 +9,16 @@ class AppointmentMoneyLack(
     var seminarID: Int,
     var historyStatus: HistoryStatus,
     var isDeleted: Boolean
-): DataLack<AppointmentMoneyLack.MissedData, Appointment>()
+): DataLack<AppointmentMoneyLack.MissingData, Appointment>()
 {
-    class MissedData(
+    class MissingData(
         val purchase: Money,
         val cost: Money )
 
-    override fun validate(potentialData: MissedData): Boolean
+    override fun validate(potentialData: MissingData): Boolean
         = true
 
-    override fun buildObject(missedData: MissedData): Appointment
+    override fun buildObject(missedData: MissingData): Appointment
         = Appointment(personID,
             seminarID,
             missedData.purchase,

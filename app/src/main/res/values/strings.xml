@@ -13,6 +13,54 @@
     <string name="fs_all_seminars_appointed">%s уже участвует во всех семинарах.</string>
     <string name="fs_appoint_money">Оплачено: %s из %s</string>
     <string name="fs_appoints_count">Записей на семинар: %d</string>
+    <string name="fs_data_lacks_count">
+        Для восстановления некоторых объектов не хватает данных. Количество таких объектов: %d.
+    </string>
+    <string name="fs_data_warnings_count">
+        ЛогоMan 2 обнаружил объекты (%d), идентичные тем, что уже имеются в базе данных.
+        Вы можете выбрать действие над каждым объектом.
+    </string>
+    <string name="fs_fill_appoint_cost_lack">
+        Оплата участника %s за семинар "%s" составляет %s.\n
+        Пожалуйста, введите полную стоимость семинара для этого участника.
+    </string>
+    <string name="fs_fill_appoint_money_lack">Введите оплату и стоимость семинара "%s" для участника %s</string>
+    <string name="fs_fill_appoint_purchase_lack">Введите оплату участника %s за семинар "%s"</string>
+    <string name="fs_fill_order_purchase_lack">Введите оплату за товар.\nЗаказчик: %s\nТовар: %s</string>
+    <string name="fs_fill_product_cost_lack">
+        В чемодане: %d\n
+        В коробках: %d\n
+        Пожалуйста, введите стоимость товара.
+    </string>
+    <string name="fs_fill_semcost_lack_f">
+        Введите стоимость семинара.
+    </string>
+    <string name="fs_fill_semcost_lack_d">
+        Введите стоимость семинара "%s" для участников, записавшихся с %s.
+    </string>
+    <string name="fs_fill_semcost_lack_dp">
+        Введите стоимость семинара "%s" при следующих условиях:\n
+        - Дата записи: от %s\n
+        - Количество участников: от %d
+    </string>
+    <string name="fs_fill_semcost_lack_p">
+        Введите стоимость семинара "%s" при минимальном количестве участников %d.
+    </string>
+    <string name="fs_fill_semcost_lack_pd">
+        Введите стоимость при следующих условиях:\n
+        - Количество участников: от %d\n
+        - Дата записи: с %s
+    </string>
+    <string name="fs_fill_seminar_city_lack">
+        Пожалуйста, введите город проведения семинара.\n
+        Адрес: %s\n
+        Программа:\n
+        %s
+    </string>
+    <string name="fs_fill_seminar_name_lack">
+        Введите название семинара, поставленного в г. %s по адресу: %s.\n
+        Программа семинара: %s
+    </string>
     <string name="fs_incorrect_appoint_cost">Стоимость для участника %s введена неправильно.</string>
     <string name="fs_incorrect_appoint_cost_expanded">
         Стоимость для участника %s и ещё %d чел. введена неправильно.
@@ -24,16 +72,23 @@
     <string name="fs_participants_to_remove_count">Вы собираетесь убрать: %d</string>
     <string name="fs_people_count">Всего людей: %d</string>
     <string name="fs_person_appointments_count">Записей на семинары: %d</string>
+    <string name="fs_product_cost_lack_purpose">Введите стоимость товара "%s".</string>
     <string name="fs_removed_participants_count">Вы также собираетесь удалить %d чел. из списка.</string>
     <string name="fs_semcost_date_atleast">дата записи с %s</string>
     <string name="fs_semcost_particips">%d чел</string>
     <string name="fs_semcost_particips_atleast">хотя бы %d чел.</string>
-    <string name="fs_seminar_image_not_decoded">ЛогоMan 2 не смог расшифровать аватарку семинара "%s".</string>
+    <string name="fs_seminar_image_not_decoded">
+        ЛогоMan 2 не смог расшифровать аватарку семинара "%s".
+    </string>
+    <string name="fs_seminar_name_and_city_exist">
+        Город: %s\nВ этом городе уже есть семинар с таким названием.
+    </string>
     <string name="fs_seminar_start">Начало: %s</string>
     <string name="fs_seminars_count">Всего семинаров: %d</string>
     <string name="fs_step">Шаг %d из %d</string>
     <string name="hint_appoint_cost">Стоимость?</string>
     <string name="hint_appoint_purchase">Сколько денег внесено?</string>
+    <string name="hint_ip">Пример: 172.54.16.3</string>
     <string name="hint_person_name">Введите ФИО</string>
     <string name="hint_pick_money">Например: 80.00 USD</string>
     <string name="hint_pick_seminar_for_appoint">Выберите семинар, запись на который вы хотите произвести.</string>
@@ -56,10 +111,23 @@
     <string name="la_confdel_person_appoint">Отменить участие в семинаре?</string>
     <string name="la_confirm_update_seminar">Сохранить изменения?</string>
     <string name="la_costing_strategy">Стратегия расценки</string>
+    <string name="la_data_warning_action">Действие</string>
+    <string name="la_data_warning_info">Описание</string>
     <string name="la_delete">Удалить</string>
     <string name="la_delete_person">Удалить человека?</string>
     <string name="la_delete_person_appoint">Отменить участие</string>
     <string name="la_delete_seminar">Удалить семинар?</string>
+    <string name="la_enter_ip">Введите IP</string>
+    <string name="la_export">Экспорт данных</string>
+    <string name="la_export_expanded">Сохранит копию вашей базы данных на сервере.</string>
+    <string name="la_import">Импорт данных</string>
+    <string name="la_import_expanded">
+        Притянет с сервера недостающие данные. Данные, что ЛогоMan 2 хранит сейчас, останутся невредимы!
+    </string>
+    <string name="la_ip_purpose">
+        Введите IPv4-адрес устройства, с которым вы хотите синхронизировать данные.
+        На устройстве должно быть запущено web-приложение ЛогоMan 2.
+    </string>
     <string name="la_leave_person_appoint">Оставить</string>
     <string name="la_no_person_type">Не относится к типу</string>
     <string name="la_person_detail">Информация о человеке:</string>
@@ -67,9 +135,12 @@
     <string name="la_person_name">ФИО:</string>
     <string name="la_person_type">Тип:</string>
     <string name="la_pick_money">Введите денежную сумму</string>
+    <string name="la_pick_cost">Стоимость:</string>
+    <string name="la_pick_purchase">Оплачено:</string>
     <string name="la_pick_fixed_semcost">Задайте фиксированную стоимость семинара.</string>
     <string name="la_remove_participants">Удалить участников?</string>
     <string name="la_removed_participants_count">Столько человек будет удалено из списка на семинар.</string>
+    <string name="la_restore_data_lack">Восстановить</string>
     <string name="la_save">Сохранить</string>
     <string name="la_save_participants">Сохранить список участников семинара?</string>
     <string name="la_select_photo">Выбрать фото</string>
@@ -77,6 +148,7 @@
     <string name="la_semcost_particips">Минимум участников</string>
     <string name="la_semcost_cost">Стоимость</string>
     <string name="la_semcost_cost_purpose">Введите рекомендуемую стоимость семинара при следующих условиях:</string>
+    <string name="la_seminar_content_empty">* Программа отсутствует. *</string>
     <string name="la_seminar_content_suggest">Вы можете также ввести программу семинара.</string>
     <string name="la_semcosts">Может стоить:</string>
     <string name="la_semdays">Дни семинара:</string>
@@ -84,27 +156,56 @@
     <string name="la_semday_end">Конец</string>
     <string name="la_semday_start">Начало</string>
     <string name="la_seminar_address">Адрес:</string>
+    <string name="la_seminar_address_empty">* Адрес не указан. *</string>
     <string name="la_seminar_city">Город:</string>
     <string name="la_seminar_content">Программа семинара:</string>
     <string name="la_seminar_end">Окончание:</string>
     <string name="la_seminar_id">Семинар:</string>
     <string name="la_seminar_name">Название:</string>
+    <string name="la_seminar_name_lack">Название семинара</string>
     <string name="la_seminar_start">Начало:</string>
     <string name="la_set_editable">Разрешить редактирование</string>
     <string name="la_update_seminar_no">Нет, вернуть как было</string>
     <string name="la_update_seminar_yes">Да, сохранить</string>
     <string name="la_version">Версия ЛогоMan:\u0020</string>
+    <string name="mi_appoint_cost">Стоимость семинара</string>
+    <string name="mi_appoint_money">Оплата и стоимость семинара</string>
+    <string name="mi_appoint_purchase">Оплата за семинар</string>
+    <string name="mi_check_all">Выделить всё</string>
+    <string name="mi_drop_all_warnings">Забыть всё</string>
+    <string name="mi_drop_warning">Забыть</string>
+    <string name="mi_duplicate_all_warnings">Дублировать всё</string>
+    <string name="mi_duplicate_warning">Дублировать</string>
+    <string name="mi_order_purchase">Оплата за товар</string>
     <string name="mi_people">Люди</string>
     <string name="mi_seminars">Семинары</string>
     <string name="mi_products">Товары</string>
+    <string name="mi_remote">Данные</string>
     <string name="mi_tutors">Преподаватели</string>
+    <string name="mi_update_all_warnings">Заменить всё</string>
+    <string name="mi_update_warning">Заменить</string>
     <string name="msg_adding_person">Идёт добавление...</string>
     <string name="msg_appointment_cost_incorrect">Неправильно введена стоимость записи на семинар.</string>
     <string name="msg_appointment_purchase_incorrect">Неправильно введена оплата человека за семинар.</string>
+    <string name="msg_back_locked">
+        Нажмите дважды.
+    </string>
+    <string name="msg_changes_applied">Изменения сохранены.</string>
+    <string name="msg_connection_opened">Идёт передача данных...</string>
+    <string name="msg_data_lack_discared">Объект удалён.</string>
+    <string name="msg_data_not_entered">* Данные не введены. *</string>
+    <string name="msg_data_not_entered_click">\n* Нажмите, чтобы ввести данные. *\n</string>
+    <string name="msg_data_pulled">Данные приняты. Идёт обработка...</string>
+    <string name="msg_data_pushed">Экпорт данных прошёл успешно.</string>
     <string name="msg_deleting_appoint">Идут изменения...</string>
     <string name="msg_deleting_person">Идёт удаление...</string>
     <string name="msg_deleting_seminar">Идёт удаление...</string>
+    <string name="msg_entity_deleted">
+        Этот объект помечен как удалённый. Он может быть отображён в истории человека.
+    </string>
     <string name="msg_image_not_decoded">ЛогоMan 2 не может отобразить выбранную картинку.</string>
+    <string name="msg_import_finished">Импорт данных завершён успешно.</string>
+    <string name="msg_invalid_ip">Некорректный IPv4 адрес.</string>
     <string name="msg_money_amount_incorrect">
         Номинал введён некорректно. Ожидается неотрицательное число, например: 15.45.
     </string>
@@ -115,16 +216,50 @@
     <string name="msg_need_permission_for_image">
         ЛогоMan 2 не может загрузить картинку: нет разрешения на чтение файлов из хранилища.
     </string>
+    <string name="msg_not_money">
+        Введите номинал и валюту - 3 латинские буквы. Например: 79.99 EUR.
+    </string>
     <string name="msg_no_seminars_found">Семинаров не найдено.</string>
     <string name="msg_participants_not_changed">Вы не внесли изменений. Для отмены нажмите стрелку назад.</string>
+    <string name="msg_remote_network_error">
+        ЛогоMan 2 не смог подключиться к серверу. Вот возможные причины:\n
+        - Нет подключения к интернету.\n
+        - Сервер и ваше устройство находятся в разных подсетях.\n
+        - На сервере не запущено web-приложение ЛогоMan 2.\n
+        - Вы ошиблись при вводе IP-адреса.
+    </string>
+    <string name="msg_remote_unknown_error">При передаче данных возникла неизвестная ошибка.</string>
+    <string name="msg_remote_xml_error">
+        Данные, полученные с сервера, некорректны. ЛогоMan 2 не сможет сохранить объекты.
+    </string>
+    <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
+    <string name="msg_lost_network">Соединение потеряно.</string>
+    <string name="msg_no_seminar_name">Вы не ввели название.</string>
+    <string name="msg_person_name_exists">Человек с таким именем уже существует.</string>
+    <string name="msg_product_name_exists">Товар с таким названием уже существует.</string>
+    <string name="msg_saving_changes">Идёт сохранение...</string>
     <string name="msg_semcost_particips_empty">Вы ничего не ввели.</string>
     <string name="msg_semcost_particips_negative">Число участников не может быть отрицательным.</string>
     <string name="msg_semcost_particips_notint">Количество участников должно быть целым числом.</string>
-    <string name="msg_no_seminar_city">Вы не ввели город проведения семинара.</string>
-    <string name="msg_no_seminar_name">Вы не ввели название.</string>
-    <string name="msg_saving_changes">Идёт сохранение...</string>
+    <string name="msg_server_no_data">Данных на сервере не обнаружено.</string>
+    <string name="msg_server_ioexception">
+        На сервере произошла ошибка файлового ввода-вывода. Возможные причины:\n
+        - Во время сетевой операции один из файлов на сервере был
+          переименован, перемещён, удалён или заблокирован.\n
+        - Операционная система, установленная на сервере, запретила web-приложению ЛогоMan
+          доступ к требуемым файлам.
+    </string>
     <string name="msg_unknown_cost">Стоимость неизвестна.</string>
     <string name="msg_unknown_date">Дата неизвестна.</string>
+    <string name="msg_unknown_remote_action">
+        Web-приложение ЛогоMan не поддерживает это действие. Возможное решение:\n
+        - Обновить web-приложение.
+    </string>
+    <string name="msg_unknown_server_response">
+        Web-приложение ЛогоMan общается по неизвестному протоколу. Возможное решение:\n
+        - Обновить ЛогоMan на вашем устройстве.
+    </string>
+    <string name="msg_waiting_for_network">Ожидание подключения к интернету...</string>
     <string name="semcosts_cru_purpose">Укажите возможные значения стоимости семинара.</string>
     <string name="semdays_cru_purpose">Укажиите расписание семинара по дням.</string>
     <string name="seminar_general_cru_purpose">Укажите общие сведения о семинаре.</string>
