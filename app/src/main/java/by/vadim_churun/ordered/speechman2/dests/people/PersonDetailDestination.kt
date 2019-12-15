@@ -6,7 +6,7 @@ import androidx.navigation.fragment.findNavController
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
 import by.vadim_churun.ordered.speechman2.db.entities.*
-import by.vadim_churun.ordered.speechman2.model.objects.PersonInfo
+import by.vadim_churun.ordered.speechman2.model.objects.PersonHeader
 import by.vadim_churun.ordered.speechman2.viewmodel.SpeechManAction
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.person_detail_destination.*
@@ -30,9 +30,9 @@ class PersonDetailDestination:
 
     private fun lookupAppoints()
     {
-        val mPerson = person ?: return
+        val head = header ?: return
         Bundle().apply {
-            putInt(PersonAppointsListDestination.KEY_PERSON_ID, mPerson.ID!!)
+            putInt(PersonAppointsListDestination.KEY_PERSON_ID, head.person.ID!!)
         }.also {
             findNavController().navigate(R.id.actLookupPersonAppointments, it)
         }
@@ -42,29 +42,23 @@ class PersonDetailDestination:
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTIONALITY:
 
-    private var person: Person? = null
-    private var type: PersonType? = null
+    private var header: PersonHeader? = null
     private var editedName: String? = null
 
-    private fun applyPerson(pers: Person)
+    private fun applyPerson(head: PersonHeader)
     {
-        this.person = pers
-        etName.setText(editedName ?: pers.name)
+        this.header = head
+        etName.setText(editedName ?: head.person.name)
         prbPersonLoad.visibility = /*if(type == null) View.VISIBLE else*/ View.GONE
     }
 
-    private fun applyPersonInfo(info: PersonInfo)
-    {
-        tvAppointsCount.text = info.countAppoints.toString()
-        tvOrdersCount.text = info.countOrders.toString()
-    }
 
     private fun updatePerson()
     {
         prbPersonLoad.visibility = View.VISIBLE
 
         val mType: Int? = /* TODO */ null
-        Person(person!!.ID, etName.text.toString(), mType).let {
+        Person(header!!.person.ID, etName.text.toString(), mType).let {
             SpeechManAction.UpdatePerson(it)
         }.also {
             super.viewModel.actionSubject.onNext(it)
@@ -92,9 +86,8 @@ class PersonDetailDestination:
         val nameDTapListener = object: GestureDetector.SimpleOnGestureListener() {
             override fun onDown(event: MotionEvent): Boolean = true
 
-            override fun onDoubleTap(event: MotionEvent): Boolean
-            {
-                setNameViewsProperties(person != null)
+            override fun onDoubleTap(event: MotionEvent): Boolean {
+                setNameViewsProperties(header != null)
                 return false
             }
         }
@@ -103,7 +96,7 @@ class PersonDetailDestination:
 
         imgvCancelEditName.setOnClickListener {
             editedName = null
-            applyPerson(person!!)
+            header?.also { applyPerson(it) }
             setNameViewsProperties(false)
         }
         imgvSaveEditName.setOnClickListener {
@@ -121,16 +114,8 @@ class PersonDetailDestination:
 
     private fun subscribePerson(personID: Int)
         = super.viewModel.createPersonObservable(personID)
-            .doOnNext { pers ->
-                applyPerson(pers)
-                super.viewModel.actionSubject
-                    .onNext( SpeechManAction.RequestPersonInfos(listOf(pers)) )
-            }.subscribe()
-
-    private fun subscribePersonInfo()
-        = super.viewModel.createPersonInfoObservable()
-            .doOnNext { info ->
-                applyPersonInfo(info)
+            .doOnNext { head ->
+                applyPerson(head)
             }.subscribe()
 
 
@@ -149,7 +134,6 @@ class PersonDetailDestination:
         super.onStart()
         val personID = super.getIntArgument(KEY_PERSON_ID, null, "KEY_PERSON_ID")
         disposable.add(subscribePerson(personID))
-        disposable.add(subscribePersonInfo())
     }
 
     override fun onSaveInstanceState(outState: Bundle)

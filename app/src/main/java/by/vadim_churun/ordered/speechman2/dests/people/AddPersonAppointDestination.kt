@@ -105,8 +105,8 @@ class AddPersonAppointDestination: SpeechManFragment(R.layout.add_person_appoint
 
     private fun subscribePerson(personID: Int)
         = super.viewModel.createPersonObservable(personID)
-            .doOnNext { p ->
-                person = p
+            .doOnNext { header ->
+                person = header.person
                 applyPerson()
             }.subscribe()
 

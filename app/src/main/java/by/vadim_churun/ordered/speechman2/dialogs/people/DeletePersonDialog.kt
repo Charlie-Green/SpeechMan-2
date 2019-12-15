@@ -46,8 +46,8 @@ class DeletePersonDialog: SpeechManFragment(R.layout.delete_person_dialog)
 
     private fun subscribePerson(personID: Int)
         = super.viewModel.createPersonObservable(personID)
-            .doOnNext { pers ->
-                applyPerson(pers)
+            .doOnNext { p ->
+                applyPerson(p.person)
             }.subscribe()
 
     private fun subscribeType()

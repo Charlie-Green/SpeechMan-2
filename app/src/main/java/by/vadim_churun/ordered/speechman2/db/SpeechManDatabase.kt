@@ -2,14 +2,13 @@ package by.vadim_churun.ordered.speechman2.db
 
 import android.content.Context
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteDatabase
 import by.vadim_churun.ordered.speechman2.db.daos.*
 import by.vadim_churun.ordered.speechman2.db.entities.*
-import kotlin.concurrent.thread
 
 
 @Database(
-    entities = [Person::class,
+    entities = [
+        Person::class,
         Seminar::class,
         Product::class,
         SemDay::class,
@@ -17,7 +16,7 @@ import kotlin.concurrent.thread
         Appointment::class,
         Order::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(SpeechManTypeConverters::class)
@@ -37,13 +36,18 @@ abstract class SpeechManDatabase: RoomDatabase()
             = instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     appContext, SpeechManDatabase::class.java, "speech.db" )
-                    .addMigrations(SpeechManDatabaseMigrations.get(
-                        SpeechManDatabaseMigrations.Version.V2_0_ALPHA1,
-                        SpeechManDatabaseMigrations.Version.V2_0_BETA1
-                    ), SpeechManDatabaseMigrations.get(
-                        SpeechManDatabaseMigrations.Version.V2_0_BETA1,
-                        SpeechManDatabaseMigrations.Version.V2_1_ALPHA1
-                    )).build().also { instance = it }
+                    .addMigrations(
+                        SpeechManDatabaseMigrations.get(
+                            SpeechManDatabaseMigrations.Version.V2_0_ALPHA1,
+                            SpeechManDatabaseMigrations.Version.V2_0_BETA1
+                        ), SpeechManDatabaseMigrations.get(
+                            SpeechManDatabaseMigrations.Version.V2_0_BETA1,
+                            SpeechManDatabaseMigrations.Version.V2_1_ALPHA1
+                        ), SpeechManDatabaseMigrations.get(
+                            SpeechManDatabaseMigrations.Version.V2_1_ALPHA1,
+                            SpeechManDatabaseMigrations.Version.V2_1_BETA1
+                        )
+                    ).build().also { instance = it }
             }
     }
 }

@@ -94,7 +94,7 @@ abstract class AppointmentDialog: SpeechManFragment(R.layout.appointment_dialog)
         val personID = super.getIntArgument(KEY_PERSON_ID, null, "KEY_PERSON_ID")
         return super.viewModel.createPersonObservable(personID)
             .doOnNext { p ->
-                this.person = p
+                this.person = p.person
             }.subscribe()
     }
 
