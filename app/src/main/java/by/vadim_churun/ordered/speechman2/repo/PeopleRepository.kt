@@ -25,9 +25,15 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
     private fun Person.toHeader()
         = PersonHeader(
             this,
-            super.associationsDAO.countAppointmentsForPerson(this.ID!!),
-            super.associationsDAO.countOrdersForPerson(this.ID!!)
+            this@PeopleRepository.associationsDAO.countAppointmentsForPerson(this.ID!!),
+            this@PeopleRepository.associationsDAO.countOrdersForPerson(this.ID!!)
         )
+
+    private fun List<Person>.filter(filt: PeopleFilter)
+        = this.filter { person ->
+            (filt.typeID == null || person.personTypeID == filt.typeID) &&
+            (person.name.contains(filt.nameSubstring, true))
+        }
 
 
     fun createPeopleHeadersObservable(): Observable< List<PersonHeader> >
@@ -39,23 +45,15 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
             filterSubject.map { filter ->
                 lastFilter = filter
                 Pair< List<Person>?, PeopleFilter? >(lastPeople, filter)
-            }
-        ).switchMap { pair ->
-            if(android.os.Looper.myLooper() == android.os.Looper.getMainLooper())
-                throw Error("switchMap on main thread!")
-
+            }.subscribeOn(Schedulers.computation())
+        ).observeOn(Schedulers.computation())
+        .switchMap { pair ->
             val filter = pair.second
             val people = pair.first?.let { allPeople ->
-                if(filter == null) {
-                    // If no filter is specified, pass all the people.
-                    allPeople
-                } else {
-                    // Otherwise, filter people.
-                    allPeople.filter { person ->
-                        (filter.typeID == null || person.personTypeID == filter.typeID) &&
-                        (person.name.contains(filter.nameSubstring, true))
-                    }
-                }
+                filter?.let {
+                    // Apply filter is one is provided.
+                    allPeople.filter(it)
+                } ?: allPeople  // Otherwise, pass all people.
             } ?: return@switchMap Observable.empty< List<PersonHeader> >()
 
             Observable.create< List<PersonHeader> > { emitter ->
@@ -75,12 +73,21 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
                 if((headers.size % EMIT_FREQUENCY) != 0)
                     emitter.onNext(headers)
             }
-        }.subscribeOn(Schedulers.computation())
-        .observeOn(AndroidSchedulers.mainThread())
+        }.observeOn(AndroidSchedulers.mainThread())
 
     fun createPeopleObservable()
-        // TODO: Provide an implementation which allows filtering.
-        = super.peopleDAO.get()
+        = super.peopleDAO.get().map { people ->
+            if(android.os.Looper.myLooper() == android.os.Looper.getMainLooper())
+                throw Error("people.filter on main thread")
+
+            lastFilter?.let {
+                people.filter(it)
+            } ?: people
+        }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+
+    fun createPersonObservable(personID: Int): Observable<Person>
+        = super.peopleDAO.get(personID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
@@ -133,11 +140,6 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
 
     fun validateName(name: CharSequence): Boolean
         = name.isNotEmpty()
-
-    fun createPersonObservable(personID: Int): Observable<Person>
-        = super.peopleDAO.get(personID)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
 
     fun addOrUpdate(person: Person)
     {

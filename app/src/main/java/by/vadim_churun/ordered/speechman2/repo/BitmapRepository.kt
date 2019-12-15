@@ -21,8 +21,6 @@ class BitmapRepository(appContext: Context): SpeechManRepository(appContext)
 
     companion object
     {
-        private val LOGTAG = BitmapRepository::class.java.simpleName
-
         private var idNextRequest = 0
         val nextRequestID
             get() = synchronized(this) {
@@ -61,10 +59,11 @@ class BitmapRepository(appContext: Context): SpeechManRepository(appContext)
                             is AppointedSeminar -> { uri = item.seminar.imageUri }
                             is SeminarBuilder   -> { uri = item.imageUri }
                             is SeminarHeader    -> { uri = item.imageUri }
+                            is SeminarHeaderX   -> { uri = item.base.imageUri }
                             is Uri              -> { uri = item }
                             else -> {
                                 throw IllegalArgumentException(
-                                    "Not sure how to convert ${item.javaClass.name} to ${Uri::javaClass.name}" )
+                                    "Not sure how to convert ${item.javaClass.name} to ${Uri::class.java.name}" )
                             }
                         }
 

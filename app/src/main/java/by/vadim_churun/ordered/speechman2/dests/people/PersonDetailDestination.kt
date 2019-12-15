@@ -48,6 +48,8 @@ class PersonDetailDestination:
     private fun applyPerson(head: PersonHeader)
     {
         this.header = head
+        tvAppointsCount.text = "${head.countAppoints}"
+        tvOrdersCount.text = "${head.countOrders}"
         etName.setText(editedName ?: head.person.name)
         prbPersonLoad.visibility = /*if(type == null) View.VISIBLE else*/ View.GONE
     }
@@ -113,7 +115,7 @@ class PersonDetailDestination:
     private val disposable = CompositeDisposable()
 
     private fun subscribePerson(personID: Int)
-        = super.viewModel.createPersonObservable(personID)
+        = super.viewModel.createPersonHeaderObservable(personID)
             .doOnNext { head ->
                 applyPerson(head)
             }.subscribe()

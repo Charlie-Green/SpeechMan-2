@@ -108,7 +108,7 @@ class PersonAppointsListDestination:
     }
 
     private fun subscribePerson(personID: Int)
-        = super.viewModel.createPersonObservable(personID)
+        = super.viewModel.createPersonHeaderObservable(personID)
             .doOnNext { header ->
                 person = header.person
                 applyPerson()

@@ -19,6 +19,9 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     private val peopleRepo = PeopleRepository(super.getApplication())
 
     fun createPersonObservable(personID: Int)
+        = peopleRepo.createPersonObservable(personID)
+
+    fun createPersonHeaderObservable(personID: Int)
         = peopleRepo.createPersonHeaderObservable(personID)
 
     fun createPeopleObservable()
@@ -48,6 +51,9 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     fun createSeminarObservable(seminarID: Int)
         = semsRepo.createSeminarObservable(seminarID)
 
+    fun createSeminarXObservable(seminarID: Int)
+        = semsRepo.createSeminarXObservable(seminarID)
+
     fun createSemDaysObservable(seminarID: Int)
         = semsRepo.createDaysObservable(seminarID)
 
@@ -61,9 +67,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
 
     fun createSeminarHeadersObservable()
         = semsRepo.createHeadersObservable()
-
-    fun createSeminarInfosObservable()
-        = semsRepo.createInfosObservable()
 
     fun createParticipantsObservable(seminarID: Int)
         = semsRepo.createParticipantsObservable(seminarID)
@@ -197,18 +200,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
 
                     is SpeechManAction.RequestDataLackInfos -> {
                         remoteRepo.lackInfosSubject.onNext(action.request)
-                    }
-
-                    is SpeechManAction.RequestPersonInfos -> {
-                        peopleRepo.infoRequestSubject.onNext(action.people)
-                    }
-
-                    is SpeechManAction.RequestSeminarInfo -> {
-                        semsRepo.infoSubject.onNext(action.seminar)
-                    }
-
-                    is SpeechManAction.RequestSeminarInfos -> {
-                        semsRepo.infoSubjectHeaders.onNext(action.semHeaders)
                     }
 
                     is SpeechManAction.RequestSync -> {

@@ -32,7 +32,7 @@ class SeminarsListDestination: SpeechManFragment(R.layout.seminars_list_destinat
     // UI:
 
     private var decodeID: Int? = null
-    private var headers: List<SeminarHeader>? = null
+    private var headers: List<SeminarHeaderX>? = null
 
     private fun setAdapter()
     {
@@ -46,21 +46,7 @@ class SeminarsListDestination: SpeechManFragment(R.layout.seminars_list_destinat
         recvSems.swapAdapter(newAdapter, true)
     }
 
-    private fun requestInfos(source: List<SeminarHeader>)
-    {
-        SpeechManAction.RequestSeminarInfos(source).also {
-            super.viewModel.actionSubject.onNext(it)
-        }
-    }
-
-    private fun applyInfos(infos: List<SeminarInfo>)
-    {
-        val adapter = recvSems.adapter as? SeminarsAdapter ?: return
-        if(infos.size == adapter.headers.size)
-            adapter.seminarInfos = infos
-    }
-
-    private fun requestAvatars(source: List<SeminarHeader>)
+    private fun requestAvatars(source: List<SeminarHeaderX>)
     {
         decodeID = super.viewModel.nextImageDecodeID
         SpeechManAction.DecodeImages(decodeID!!, source).also {
@@ -104,14 +90,7 @@ class SeminarsListDestination: SpeechManFragment(R.layout.seminars_list_destinat
             .doOnNext { mHeaders ->
                 headers = mHeaders
                 setAdapter()
-                requestInfos(mHeaders)
                 requestAvatars(mHeaders)
-            }.subscribe()
-
-    private fun subscribeInfos()
-        = super.viewModel.createSeminarInfosObservable()
-            .doOnNext { infos ->
-                applyInfos(infos)
             }.subscribe()
 
     private fun subscribeAvatars()
@@ -121,7 +100,7 @@ class SeminarsListDestination: SpeechManFragment(R.layout.seminars_list_destinat
                 if(thr is ImageNotDecodedException &&
                     thr.requestID == decodeID &&
                     mHeaders != null ) {
-                    super.viewModel.createSeminarObservable(mHeaders[thr.listPosition].ID)
+                    super.viewModel.createSeminarObservable(mHeaders[thr.listPosition].base.ID)
                         .doOnNext { s ->
                             val goodSem = Seminar(s.ID, s.name, s.city, s.address,
                                 s.content, null, s.costing, s.isLogicallyDeleted )
@@ -149,7 +128,6 @@ class SeminarsListDestination: SpeechManFragment(R.layout.seminars_list_destinat
     {
         super.onStart()
         disposable.add(subscribeSeminars())
-        disposable.add(subscribeInfos())
         disposable.add(subscribeAvatars())
     }
 
