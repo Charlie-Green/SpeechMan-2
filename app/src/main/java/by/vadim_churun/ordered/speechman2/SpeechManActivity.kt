@@ -119,9 +119,6 @@ class SpeechManActivity: AppCompatActivity()
         navDrawer.setCheckedItem(R.id.miPeople)
 
         navDrawer.setNavigationItemSelectedListener { selectedItem ->
-            if(navDrawer.checkedItem == selectedItem)
-                return@setNavigationItemSelectedListener true
-
             when(selectedItem.itemId)
             {
                 R.id.miPeople -> {

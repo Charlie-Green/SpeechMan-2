@@ -17,7 +17,7 @@ class SeminarBuilder(
 {
     class DayBuilder(
         var start: Calendar = Calendar.getInstance(),
-        var duration: Short = 360 )
+        var duration: Short = 480 )
     {
         companion object
         {
@@ -29,7 +29,8 @@ class SeminarBuilder(
                 val startClone = basedOn.start.clone() as Calendar
                 return DayBuilder(
                     startClone.apply { add(Calendar.DAY_OF_MONTH, 1) },
-                    basedOn.duration )
+                    basedOn.duration
+                )
             }
         }
 

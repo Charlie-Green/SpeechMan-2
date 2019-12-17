@@ -10,7 +10,8 @@
             android:id="@+id/tvPersonName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/TitleDefault"
+            android:textSize="18sp"
+            android:textColor="?colorPrimary"
             android:text="Name" />
 
     <TextView

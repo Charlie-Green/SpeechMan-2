@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.vadim_churun.ordered.speechman2.*
 import by.vadim_churun.ordered.speechman2.adapters.PeopleAdapter
@@ -34,6 +35,9 @@ class PeopleListDestination:
         val newAdapter = PeopleAdapter(
             super.requireContext(), people, findNavController(), super.requireFragmentManager() )
         recvPeople.swapAdapter(newAdapter, true)
+
+        val decor = DividerItemDecoration(super.requireContext(), DividerItemDecoration.VERTICAL)
+        recvPeople.addItemDecoration(decor)
     }
 
     private fun setTypesMenu(types: List<PersonType>)
