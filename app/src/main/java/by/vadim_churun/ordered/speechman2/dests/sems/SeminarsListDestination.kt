@@ -9,7 +9,6 @@ import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
 import by.vadim_churun.ordered.speechman2.adapters.SeminarsAdapter
 import by.vadim_churun.ordered.speechman2.db.entities.Seminar
-import by.vadim_churun.ordered.speechman2.db.objs.SeminarHeader
 import by.vadim_churun.ordered.speechman2.model.exceptions.ImageNotDecodedException
 import by.vadim_churun.ordered.speechman2.model.filters.SeminarsFilter
 import by.vadim_churun.ordered.speechman2.model.objects.*

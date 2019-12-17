@@ -9,6 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
@@ -42,16 +43,17 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
             Pair< List<Person>?, PeopleFilter? >(people, lastFilter)
         }.subscribeOn(Schedulers.io())
         .mergeWith(
-            filterSubject.map { filter ->
-                lastFilter = filter
-                Pair< List<Person>?, PeopleFilter? >(lastPeople, filter)
-            }.subscribeOn(Schedulers.computation())
+            filterSubject.debounce(256, TimeUnit.MILLISECONDS)
+                .map { filter ->
+                    lastFilter = filter
+                    Pair< List<Person>?, PeopleFilter? >(lastPeople, filter)
+                }.subscribeOn(Schedulers.computation())
         ).observeOn(Schedulers.computation())
         .switchMap { pair ->
             val filter = pair.second
             val people = pair.first?.let { allPeople ->
                 filter?.let {
-                    // Apply filter is one is provided.
+                    // Apply filter if one is provided.
                     allPeople.filter(it)
                 } ?: allPeople  // Otherwise, pass all people.
             } ?: return@switchMap Observable.empty< List<PersonHeader> >()
@@ -77,9 +79,6 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
 
     fun createPeopleObservable()
         = super.peopleDAO.get().map { people ->
-            if(android.os.Looper.myLooper() == android.os.Looper.getMainLooper())
-                throw Error("people.filter on main thread")
-
             lastFilter?.let {
                 people.filter(it)
             } ?: people

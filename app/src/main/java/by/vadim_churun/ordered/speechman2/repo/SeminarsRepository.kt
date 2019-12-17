@@ -13,6 +13,7 @@ import io.reactivex.disposables.*
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.*
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
@@ -86,20 +87,16 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
         = super.seminarsDAO.getHeaders()
             .subscribeOn(Schedulers.io())
             .map { basicHeaders ->
-                if(android.os.Looper.myLooper() == android.os.Looper.getMainLooper())
-                    throw Error("Main thread assertion failed")
                 lastHeaders = basicHeaders
                 Pair< List<SeminarHeader>?, SeminarsFilter? >(basicHeaders, lastFilter)
             }.mergeWith(
-                filterSubject.map { filter ->
-                    lastFilter = filter
-                    Pair< List<SeminarHeader>?, SeminarsFilter? >(lastHeaders, filter)
-                }
+                filterSubject.debounce(256, TimeUnit.MILLISECONDS)
+                    .map { filter ->
+                        lastFilter = filter
+                        Pair< List<SeminarHeader>?, SeminarsFilter? >(lastHeaders, filter)
+                    }
             ).observeOn(Schedulers.computation())
             .switchMap<List<SeminarHeaderX>>  { pair ->
-                if(android.os.Looper.myLooper() == android.os.Looper.getMainLooper())
-                    throw Error("Main thread assertion failed")
-
                 val basicHeaders = pair.first?.let { allHeaders ->
                     pair.second?.let {
                         allHeaders.filter(it)
@@ -107,9 +104,6 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
                 } ?: return@switchMap Observable.empty()
 
                 Observable.create { emitter ->
-                    if(android.os.Looper.myLooper() == android.os.Looper.getMainLooper())
-                        throw Error("Main thread assertion failed")
-
                     val headers = MutableList(basicHeaders.size) { index ->
                         SeminarHeaderX(basicHeaders[index], null)
                     }
