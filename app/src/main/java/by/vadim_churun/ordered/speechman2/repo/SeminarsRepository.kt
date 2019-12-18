@@ -13,20 +13,45 @@ import io.reactivex.disposables.*
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.*
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
 class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
 {
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // SELECT QUERIES:
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // FIELDS AND HELP:
 
     val filterSubject = PublishSubject.create<SeminarsFilter>()
+    private var lastFilter: SeminarsFilter? = null
+    private var lastHeaders: List<SeminarHeader>? = null
+
+    private fun List<SeminarHeader>.filter(filt: SeminarsFilter)
+        = this.filter { header ->
+            (!header.isLogicallyDeleted || !filt.forbidLogicallyDeleted) &&
+            (header.name.contains(filt.nameSubstring, true))
+        }
+
+    private fun SeminarHeader.toHeaderX()
+        = SeminarHeaderX(
+            this,
+            this@SeminarsRepository.associationsDAO.countAppointmentsForSeminar(this.ID)
+        )
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // SELECT:
 
     fun createSeminarObservable(seminarID: Int): Observable<Seminar>
         = super.seminarsDAO.getRx(seminarID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+
+    fun createSeminarXObservable(seminarID: Int): Observable<SeminarX>
+        = super.seminarsDAO.getRx(seminarID).map { sem ->
+            SeminarX(sem, super.associationsDAO.countAppointmentsForSeminar(sem.ID!!))
+        }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
 
     fun createDaysObservable(seminarID: Int): Observable< List<SemDay> >
         = super.seminarsDAO.getDays(seminarID)
@@ -58,41 +83,43 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
-    fun createHeadersObservable(): Observable<List<SeminarHeader>>
-        = SpeechManRepository.FiilteredItemsStreamBuilder<SeminarHeader, SeminarsFilter>()
-            .create(super.seminarsDAO.getHeaders(), filterSubject) { header, filter ->
-                (!header.isLogicallyDeleted || !filter.forbidLogicallyDeleted) &&
-                (header.name.contains(filter.nameSubstring, true))
-            }.map { headers ->
-                // Sort by start time. Nulls first, then ascending.
-                headers.sortedBy { it.start?.timeInMillis ?: Long.MIN_VALUE }
+    fun createHeadersObservable(): Observable<List<SeminarHeaderX>>
+        = super.seminarsDAO.getHeaders()
+            .subscribeOn(Schedulers.io())
+            .map { basicHeaders ->
+                lastHeaders = basicHeaders
+                Pair< List<SeminarHeader>?, SeminarsFilter? >(basicHeaders, lastFilter)
+            }.mergeWith(
+                filterSubject.debounce(256, TimeUnit.MILLISECONDS)
+                    .map { filter ->
+                        lastFilter = filter
+                        Pair< List<SeminarHeader>?, SeminarsFilter? >(lastHeaders, filter)
+                    }
+            ).observeOn(Schedulers.computation())
+            .switchMap<List<SeminarHeaderX>>  { pair ->
+                val basicHeaders = pair.first?.let { allHeaders ->
+                    pair.second?.let {
+                        allHeaders.filter(it)
+                    } ?: allHeaders
+                } ?: return@switchMap Observable.empty()
+
+                Observable.create { emitter ->
+                    val headers = MutableList(basicHeaders.size) { index ->
+                        SeminarHeaderX(basicHeaders[index], null)
+                    }
+                    emitter.onNext(headers)
+
+                    val EMIT_FREQUENCY = 96
+                    for(index in 0 until headers.size) {
+                        headers[index] = basicHeaders[index].toHeaderX()
+                        if(index % EMIT_FREQUENCY == EMIT_FREQUENCY - 1)
+                            emitter.onNext(headers)
+                    }
+                    if(headers.size % EMIT_FREQUENCY != 0)
+                        emitter.onNext(headers)
+                }
             }.observeOn(AndroidSchedulers.mainThread())
 
-
-    val infoSubject = PublishSubject.create<Seminar>()
-    val infoSubjectHeaders = PublishSubject.create<List<SeminarHeader>>()
-
-    fun createInfosObservable(): Observable<List<SeminarInfo>>
-        = infoSubject.observeOn(Schedulers.computation())
-            .map { seminar ->
-                listOf(
-                    seminar.ID ?: throw NullPointerException(
-                        "Attempt to retrieve SeminarInfo for a Seminar with null ID" )
-                )
-            }.mergeWith(infoSubjectHeaders.observeOn(Schedulers.computation())
-                .map { headers ->
-                    if (Looper.myLooper() == Looper.getMainLooper())
-                        throw Exception("Mapping infoSubjectHeaders on the UI thread!")
-                    headers.map { header -> header.ID }
-                }
-            ).map { semIDs ->
-                if (Looper.myLooper() == Looper.getMainLooper())
-                    throw Exception("Mapping infoSubjectHeaders on the UI thread!")
-                semIDs.map { semID ->
-                    SeminarInfo(super.associationsDAO.countAppointmentsForSeminar(semID))
-                }
-            }.subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
 
     fun createParticipantsObservable(seminarID: Int): Observable< List<Participant> >
         = super.seminarsDAO.getParticipants(seminarID)
@@ -105,7 +132,7 @@ class SeminarsRepository(appContext: Context): SpeechManRepository(appContext)
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // INSERT, UPDATE, DELETE QUERIES
+    // INSERT, UPDATE, DELETE:
 
     /** Asynchronously performs logical deletion of the specified [Seminar]. **/
     fun deleteSeminar(seminarID: Int)

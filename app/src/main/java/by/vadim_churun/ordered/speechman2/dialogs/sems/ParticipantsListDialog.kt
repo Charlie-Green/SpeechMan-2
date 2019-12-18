@@ -3,6 +3,7 @@ package by.vadim_churun.ordered.speechman2.dialogs.sems
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.vadim_churun.ordered.speechman2.R
 import by.vadim_churun.ordered.speechman2.SpeechManFragment
@@ -52,6 +53,9 @@ SpeechManFragment(R.layout.participants_list_dialog)
         val newAdapter = ParticipantsAdapter(
             super.requireContext(), particips, super.requireFragmentManager() )
         recvParticips.swapAdapter(newAdapter, true)
+        val decor = DividerItemDecoration(super.requireContext(), DividerItemDecoration.VERTICAL)
+        recvParticips.addItemDecoration(decor)
+
         prbParticipsLoad.visibility = View.GONE
     }
 

@@ -1,56 +1,99 @@
 package by.vadim_churun.ordered.speechman2.repo
 
 import android.content.Context
-import android.os.Looper
 import by.vadim_churun.ordered.speechman2.db.entities.*
 import by.vadim_churun.ordered.speechman2.db.objs.*
 import by.vadim_churun.ordered.speechman2.model.filters.*
-import by.vadim_churun.ordered.speechman2.model.objects.PersonInfo
+import by.vadim_churun.ordered.speechman2.model.objects.PersonHeader
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 
 class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
 {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // LIST OF PEOPLE:
+    // SELECT PEOPLE:
 
+    private var lastPeople: List<Person>? = null
+    private var lastFilter: PeopleFilter? = null
     val filterSubject = BehaviorSubject.create<PeopleFilter>()
-
-    fun createPeopleObservable(): Observable< List<Person> >
-        = SpeechManRepository.FiilteredItemsStreamBuilder<Person, PeopleFilter>()
-            .create(super.peopleDAO.get(), this.filterSubject) { person, filter ->
-                ( person.name.contains(filter.nameSubstring, true) ) &&
-                ( filter.typeID == null || person.personTypeID == filter.typeID )
-            }.map { people ->
-                people.sortedBy { it.name.toLowerCase() }
-            }.observeOn(AndroidSchedulers.mainThread())
-
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // PERSON INFOS:
-
     val infoRequestSubject = BehaviorSubject.create< List<Person> >()
 
-    fun createInfoObservable(): Observable<PersonInfo>
-        = infoRequestSubject.switchMap { people ->
-            Observable.create<PersonInfo> { emitter ->
-                for(j in 0..people.lastIndex)
-                {
-                    PersonInfo(j,
-                        super.associationsDAO.countAppointmentsForPerson(people[j].ID!!),
-                        super.associationsDAO.countOrdersForPerson(people[j].ID!!)
-                    ).also {
-                        emitter.onNext(it)
-                    }
-                }
+    private fun Person.toHeader()
+        = PersonHeader(
+            this,
+            this@PeopleRepository.associationsDAO.countAppointmentsForPerson(this.ID!!),
+            this@PeopleRepository.associationsDAO.countOrdersForPerson(this.ID!!)
+        )
 
-                emitter.onComplete()
-            }.subscribeOn(Schedulers.single())
-        }.subscribeOn(Schedulers.single())
+    private fun List<Person>.filter(filt: PeopleFilter)
+        = this.filter { person ->
+            (filt.typeID == null || person.personTypeID == filt.typeID) &&
+            (person.name.contains(filt.nameSubstring, true))
+        }
+
+
+    fun createPeopleHeadersObservable(): Observable< List<PersonHeader> >
+        = super.peopleDAO.get().map { people ->
+            lastPeople = people
+            Pair< List<Person>?, PeopleFilter? >(people, lastFilter)
+        }.subscribeOn(Schedulers.io())
+        .mergeWith(
+            filterSubject.debounce(256, TimeUnit.MILLISECONDS)
+                .map { filter ->
+                    lastFilter = filter
+                    Pair< List<Person>?, PeopleFilter? >(lastPeople, filter)
+                }.subscribeOn(Schedulers.computation())
+        ).observeOn(Schedulers.computation())
+        .switchMap { pair ->
+            val filter = pair.second
+            val people = pair.first?.let { allPeople ->
+                filter?.let {
+                    // Apply filter if one is provided.
+                    allPeople.filter(it)
+                } ?: allPeople  // Otherwise, pass all people.
+            } ?: return@switchMap Observable.empty< List<PersonHeader> >()
+
+            Observable.create< List<PersonHeader> > { emitter ->
+                // First, provide UI with basic information about people.
+                val headers = MutableList(people.size) { index ->
+                    PersonHeader(people[index], null, null)
+                }
+                emitter.onNext(headers)
+
+                // Now, provide additional information.
+                val EMIT_FREQUENCY = 64
+                for(index in 0 until headers.size) {
+                    headers[index] = people[index].toHeader()
+                    if((index % EMIT_FREQUENCY) == EMIT_FREQUENCY - 1)
+                        emitter.onNext(headers)
+                }
+                if((headers.size % EMIT_FREQUENCY) != 0)
+                    emitter.onNext(headers)
+            }
+        }.observeOn(AndroidSchedulers.mainThread())
+
+    fun createPeopleObservable()
+        = super.peopleDAO.get().map { people ->
+            lastFilter?.let {
+                people.filter(it)
+            } ?: people
+        }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+
+    fun createPersonObservable(personID: Int): Observable<Person>
+        = super.peopleDAO.get(personID)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+    fun createPersonHeaderObservable(personID: Int)
+        = super.peopleDAO.get(personID).map { person ->
+            person.toHeader()
+        }.subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
 
 
@@ -96,11 +139,6 @@ class PeopleRepository(appContext: Context): SpeechManRepository(appContext)
 
     fun validateName(name: CharSequence): Boolean
         = name.isNotEmpty()
-
-    fun createPersonObservable(personID: Int): Observable<Person>
-        = super.peopleDAO.get(personID)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
 
     fun addOrUpdate(person: Person)
     {

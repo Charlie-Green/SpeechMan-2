@@ -92,9 +92,9 @@ abstract class AppointmentDialog: SpeechManFragment(R.layout.appointment_dialog)
     protected fun subscribePerson(): Disposable
     {
         val personID = super.getIntArgument(KEY_PERSON_ID, null, "KEY_PERSON_ID")
-        return super.viewModel.createPersonObservable(personID)
+        return super.viewModel.createPersonHeaderObservable(personID)
             .doOnNext { p ->
-                this.person = p
+                this.person = p.person
             }.subscribe()
     }
 

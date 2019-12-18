@@ -8,8 +8,7 @@ import by.vadim_churun.ordered.speechman2.model.objects.*
 import by.vadim_churun.ordered.speechman2.repo.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.*
 
 
 class SpeechManViewModel(app: Application): AndroidViewModel(app)
@@ -22,11 +21,14 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     fun createPersonObservable(personID: Int)
         = peopleRepo.createPersonObservable(personID)
 
+    fun createPersonHeaderObservable(personID: Int)
+        = peopleRepo.createPersonHeaderObservable(personID)
+
     fun createPeopleObservable()
         = peopleRepo.createPeopleObservable()
 
-    fun createPersonInfoObservable()
-        = peopleRepo.createInfoObservable()
+    fun createPeopleHeadersObservable()
+        = peopleRepo.createPeopleHeadersObservable()
 
     fun createAppointedSeminarObservable(personID: Int, seminarID: Int)
         = peopleRepo.createAppointedSeminarObservable(personID, seminarID)
@@ -49,11 +51,14 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
     fun createSeminarObservable(seminarID: Int)
         = semsRepo.createSeminarObservable(seminarID)
 
+    fun createSeminarXObservable(seminarID: Int)
+        = semsRepo.createSeminarXObservable(seminarID)
+
     fun createSemDaysObservable(seminarID: Int)
         = semsRepo.createDaysObservable(seminarID)
 
     /** [SemCost]s are sorted just by their [Money] component.
-     * For a smarter sort the received list can be passed to a [SeminarBuilder]. **/
+      * For a smarter sort the received list can be passed to a [SeminarBuilder]. **/
     fun createSemCostsObservable(seminarID: Int)
         = semsRepo.createCostsObservable(seminarID)
 
@@ -62,9 +67,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
 
     fun createSeminarHeadersObservable()
         = semsRepo.createHeadersObservable()
-
-    fun createSeminarInfosObservable()
-        = semsRepo.createInfosObservable()
 
     fun createParticipantsObservable(seminarID: Int)
         = semsRepo.createParticipantsObservable(seminarID)
@@ -208,8 +210,13 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                         semsRepo.infoSubject.onNext(action.seminar)
                     }
 
-                    is SpeechManAction.RequestSeminarInfos -> {
-                        semsRepo.infoSubjectHeaders.onNext(action.semHeaders)
+                    is SpeechManAction.RequestSync -> {
+                        val isIpGood = remoteRepo.validateIP(action.request.ip)
+                        ipValidationSubject.onNext(isIpGood)
+                        if(isIpGood) {
+                            remoteRepo.persistIP(action.request.ip)
+                            remoteRepo.requestSubject.onNext(action.request)
+                        }
                     }
 
                     is SpeechManAction.RequestSync -> {

@@ -40,7 +40,7 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
 
     private fun commitBuilder(): Boolean
     {
-        val mSeminar = seminar ?: return false
+        val mSeminar = seminar?.base ?: return false
         val mDays = days ?: return false
         val mCosts = costs ?: return false
 
@@ -55,7 +55,7 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
     {
         val sem = seminar ?: return
         val dialogArgs = Bundle()
-        dialogArgs.putInt(ParticipantsListDialog.KEY_SEMINAR_ID, sem.ID!!)
+        dialogArgs.putInt(ParticipantsListDialog.KEY_SEMINAR_ID, sem.base.ID!!)
         ParticipantsListDialog().apply {
             arguments = dialogArgs
             show(super.requireFragmentManager(), null)
@@ -86,7 +86,7 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // UI:
 
-    private var seminar: Seminar? = null
+    private var seminar: SeminarX? = null
     private var days: List<SemDay>? = null
     private var costs: List<SemCost>? = null
     private var infoLoaded = false
@@ -144,10 +144,11 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
 
     private fun applySeminar()
     {
-        tbLayout.title = seminar?.name ?: ""
-        tvCity.text = seminar?.city ?: ""
-        tvAddress.text = seminar?.address ?: ""
-        tvContent.text = seminar?.content ?: ""
+        tbLayout.title = seminar?.base?.name ?: ""
+        tvCity.text = seminar?.base?.city ?: ""
+        tvAddress.text = seminar?.base?.address ?: ""
+        tvContent.text = seminar?.base?.content ?: ""
+        tvAppointsCount.text = seminar?.appointsCount.toString() ?: ""
     }
 
     private fun applyImage(image: DecodedImage)
@@ -158,13 +159,6 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
             wantToolbarCollapsed = false
         }
         prbImageLoad.visibility = View.GONE
-    }
-
-    private fun applyInfo(info: SeminarInfo)
-    {
-        tvAppointsCount.text = "${info.appointsCount}"
-        // tvTutorsCount = TODO()
-        infoLoaded = true
     }
 
     private fun applyDays()
@@ -205,15 +199,12 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
     private var decodeID: Int? = null
 
     private fun subscribeSeminar(seminarID: Int)
-        = super.viewModel.createSeminarObservable(seminarID)
+        = super.viewModel.createSeminarXObservable(seminarID)
             .doOnNext { sem ->
                 seminar = sem
                 applySeminar()
 
-                super.viewModel.actionSubject
-                    .onNext( SpeechManAction.RequestSeminarInfo(sem) )
-
-                sem.imageUri?.also {
+                sem.base.imageUri?.also {
                     decodeID = super.viewModel.nextImageDecodeID
                     super.viewModel.actionSubject
                         .onNext( SpeechManAction.DecodeImages(decodeID!!, listOf(it)) )
@@ -240,18 +231,11 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
                 updateProgressBarByLoad()
             }.subscribe()
 
-    private fun subscribeInfos()
-        = super.viewModel.createSeminarInfosObservable()
-            .doOnNext { infos ->
-                applyInfo(infos[0])
-                updateProgressBarByLoad()
-            }.subscribe()
-
     private fun subscribeDecodedImages()
         = super.viewModel.createDecodedImagesObservable()
             .onErrorResumeNext { thr: Throwable ->
                 seminar?.also {
-                    super.handleImageNotDecoded(thr, decodeID!!, listOf(it)) { it }
+                    super.handleImageNotDecoded(thr, decodeID!!, listOf(it.base)) { it }
                 }
                 Observable.empty()
             }.doOnNext { image ->
@@ -284,7 +268,6 @@ class SeminarDetailDestination: SpeechManFragment(R.layout.seminar_detail_destin
         disposable.add(subscribeDecodedImages())
         disposable.add(subscribeDays(seminarID))
         disposable.add(subscribeCosts(seminarID))
-        disposable.add(subscribeInfos())
     }
 
     override fun onStop()

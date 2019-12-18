@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import by.vadim_churun.ordered.speechman2.R
-import by.vadim_churun.ordered.speechman2.db.objs.SeminarHeader
 import by.vadim_churun.ordered.speechman2.dests.sems.SeminarDetailDestination
 import by.vadim_churun.ordered.speechman2.dialogs.sems.SeminarDeleteDialog
 import by.vadim_churun.ordered.speechman2.model.objects.*
@@ -18,7 +17,7 @@ import java.text.SimpleDateFormat
 
 
 class SeminarsAdapter(val context: Context,
-    val headers: List<SeminarHeader>,
+    val headers: List<SeminarHeaderX>,
     val navController: NavController,
     val fragmMan: FragmentManager
 ): RecyclerView.Adapter<SeminarsAdapter.SeminarViewHolder>()
@@ -49,18 +48,6 @@ class SeminarsAdapter(val context: Context,
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // DYNAMIC MODIFICATIONS:
 
-    private var infos = List<SeminarInfo?>(headers.size) { null }
-    var seminarInfos: List<SeminarInfo?>
-        get() { return infos }
-        set(value) {
-            if(value.size != headers.size)
-                throw IllegalArgumentException(
-                    "Wrong list size: got ${value.size}, expected ${headers.size}" )
-            infos = value
-            super.notifyDataSetChanged()
-        }
-
-
     private var avatars = MutableList<Bitmap?>(headers.size) { null }
     fun setAvatar(avatar: DecodedImage)
     {
@@ -75,7 +62,7 @@ class SeminarsAdapter(val context: Context,
     private fun navigateSeminarDetail(position: Int)
     {
         Bundle().apply {
-            putInt(SeminarDetailDestination.KEY_SEMINAR_ID, headers[position].ID)
+            putInt(SeminarDetailDestination.KEY_SEMINAR_ID, headers[position].base.ID)
         }.also {
             navController.navigate(R.id.actToSeminarDetail, it)
         }
@@ -84,7 +71,7 @@ class SeminarsAdapter(val context: Context,
     private fun showDeleteDialog(position: Int)
     {
         val dialogArgs = Bundle()
-        dialogArgs.putInt(SeminarDeleteDialog.KEY_SEMINAR_ID, headers[position].ID)
+        dialogArgs.putInt(SeminarDeleteDialog.KEY_SEMINAR_ID, headers[position].base.ID)
         SeminarDeleteDialog().apply {
             arguments = dialogArgs
             show(fragmMan, null)
@@ -120,11 +107,12 @@ class SeminarsAdapter(val context: Context,
 
     override fun onBindViewHolder(holder: SeminarViewHolder, position: Int)
     {
-        holder.tvName.text = headers[position].name
-        holder.tvCity.text = headers[position].city
-        holder.tvAppointsCount.text = infos[position]?.appointsCount?.toString() ?: ""
+        val head = headers[position]
+        holder.tvName.text = head.base.name
+        holder.tvCity.text = head.base.city
+        holder.tvAppointsCount.text = head.appointsCount?.toString() ?: ""
 
-        headers[position].start?.also {
+        head.base.start?.also {
             holder.tvDate.text = dateFormat.format(it.time)
         } ?: holder.tvDate.setText(R.string.msg_unknown_date)
 

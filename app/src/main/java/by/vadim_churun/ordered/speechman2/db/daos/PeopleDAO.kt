@@ -55,7 +55,8 @@ interface PeopleDAO
            "from Seminars left join SemDays on Seminars.id=SemDays.seminar " +
            "group by Seminars.id " +
            "having not Seminars.id in " +
-           "(select seminar from Appointments where person=:excludedPersonID)" )
+           "(select seminar from Appointments " +
+           "where person=:excludedPersonID and isDeleted=0)" )
     fun getSemHeadersNotForPerson(excludedPersonID: Int): Observable< List<SeminarHeader> >
 
     @Query("select * from People where name=:name")

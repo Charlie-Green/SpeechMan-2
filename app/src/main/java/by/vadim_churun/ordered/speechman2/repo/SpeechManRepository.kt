@@ -5,6 +5,7 @@ import by.vadim_churun.ordered.speechman2.db.SpeechManDatabase
 import by.vadim_churun.ordered.speechman2.db.daos.*
 import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 
 abstract class SpeechManRepository(val appContext: Context)
@@ -25,12 +26,11 @@ abstract class SpeechManRepository(val appContext: Context)
             = itemsSource.observeOn(Schedulers.single()).map { newItems ->
                 lastItems = newItems
                 newItems to lastFilters
-            }.mergeWith(filtersSource.observeOn(Schedulers.single())
-                .switchMap< Pair<List<ItemType>, FilterConfigType> > { newFilters ->
-                    if(newFilters!!.equals(lastFilters))
-                        return@switchMap Observable.empty()
+            }.mergeWith(filtersSource
+                .debounce(256, TimeUnit.MILLISECONDS)
+                .map< Pair<List<ItemType>, FilterConfigType> > { newFilters ->
                     lastFilters = newFilters
-                    return@switchMap Observable.just(lastItems to newFilters)
+                    lastItems to newFilters
             }).map { pair ->
                 // If filters haven't been set, just pass everything.
                 if(pair.second == null)
