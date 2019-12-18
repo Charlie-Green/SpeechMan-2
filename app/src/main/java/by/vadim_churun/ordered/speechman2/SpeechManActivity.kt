@@ -124,6 +124,7 @@ class SpeechManActivity: AppCompatActivity()
                 R.id.miPeople -> {
                     navController.navigate(R.id.actToPeople)
                 }
+            }
 
             when(selectedItem.itemId)
             {

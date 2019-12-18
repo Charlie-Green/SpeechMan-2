@@ -16,7 +16,7 @@ import by.vadim_churun.ordered.speechman2.db.entities.*
         Appointment::class,
         Order::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(SpeechManTypeConverters::class)

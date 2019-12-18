@@ -206,10 +206,6 @@ class SpeechManViewModel(app: Application): AndroidViewModel(app)
                         peopleRepo.infoRequestSubject.onNext(action.people)
                     }
 
-                    is SpeechManAction.RequestSeminarInfo -> {
-                        semsRepo.infoSubject.onNext(action.seminar)
-                    }
-
                     is SpeechManAction.RequestSync -> {
                         val isIpGood = remoteRepo.validateIP(action.request.ip)
                         ipValidationSubject.onNext(isIpGood)
